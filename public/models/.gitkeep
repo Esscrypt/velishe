@@ -1,0 +1,10 @@
+# Place model images and videos here
+# Structure:
+# models/
+#   [model-slug]/
+#     featured.jpg
+#     gallery-1.jpg
+#     gallery-2.jpg
+#     video-1.mp4
+#     video-1-thumb.jpg
+
