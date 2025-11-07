@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: "Velishe Model Management",
     template: "%s | Velishe Model Management",
   },
-  description: "Professional modeling portfolio website based in Sofia, Bulgaria. Representing talented models with diverse backgrounds and unique beauty.",
+  description: "Boutique model agency",
   keywords: [
     "modeling agency",
     "Sofia",
