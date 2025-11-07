@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
-import { Instagram } from "lucide-react";
+import Header from "@/components/Header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -87,44 +86,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="antialiased bg-white text-gray-900">
-        <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-32 py-4">
-              <Link href="/" className="flex items-center">
-                <img
-                  src="/logo/logo.svg"
-                  alt="Velishe Model Management"
-                  className="h-64 w-auto"
-                  width={800}
-                  height={320}
-                />
-              </Link>
-              <nav className="hidden md:flex items-center gap-10">
-                <Link href="/models" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                  MODELS
-                </Link>
-                <Link href="/search" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                  SEARCH
-                </Link>
-                <Link href="/become-a-model" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                  BECOME A MODEL
-                </Link>
-                <Link href="/contact" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                  CONTACT
-                </Link>
-              </nav>
-              <a
-                href="https://instagram.com/velishe.mgmt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-black hover:text-gray-600 transition-colors flex items-center"
-                aria-label="Instagram"
-              >
-                <Instagram size={32} />
-              </a>
-            </div>
-          </div>
-        </header>
+        <Header />
         <main className="min-h-screen">
           {children}
         </main>

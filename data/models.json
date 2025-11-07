@@ -17,22 +17,6 @@
   },
   {
     "id": "2",
-    "slug": "gabriela",
-    "name": "Gabriela",
-    "stats": {
-      "height": "183 cm",
-      "hips": "97cm",
-      "waist": "64 cm",
-      "bust": "84 cm",
-      "shoeSize": "41",
-      "hairColor": "Black",
-      "eyeColor": "Hazel"
-    },
-    "instagram": "https://instagram.com/gabriella.spasova",
-    "featuredImage": "/models/gabriela/featured.webp"
-  },
-  {
-    "id": "3",
     "slug": "kaloyan",
     "name": "Kaloyan",
     "stats": {
@@ -46,5 +30,21 @@
     },
     "instagram": "https://www.instagram.com/kaloyan_mitov/",
     "featuredImage": "/models/model-1/featured.webp"
+  },
+  {
+    "id": "3",
+    "slug": "gabriela",
+    "name": "Gabriela",
+    "stats": {
+      "height": "184 cm",
+      "hips": "97cm",
+      "waist": "64 cm",
+      "bust": "84 cm",
+      "shoeSize": "41",
+      "hairColor": "Black",
+      "eyeColor": "Hazel"
+    },
+    "instagram": "https://instagram.com/gabriella.spasova",
+    "featuredImage": "/models/gabriela/featured.webp"
   }
 ]

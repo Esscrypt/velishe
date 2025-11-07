@@ -47,7 +47,12 @@ export async function getAllModels(): Promise<Model[]> {
     models.push(model);
   }
 
-  return models;
+  // Sort models by id (numeric)
+  return models.sort((a, b) => {
+    const idA = Number.parseInt(a.id || "0", 10);
+    const idB = Number.parseInt(b.id || "0", 10);
+    return idA - idB;
+  });
 }
 
 export async function getModelBySlugAsync(slug: string): Promise<Model | undefined> {

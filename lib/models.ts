@@ -8,7 +8,13 @@ import modelsData from "@/data/models.json";
  * Use this for generateStaticParams
  */
 export function getAllModelsSync(): Model[] {
-  return modelsData as Model[];
+  const models = [...modelsData] as Model[];
+  // Sort models by id (numeric)
+  return models.sort((a, b) => {
+    const idA = Number.parseInt(a.id || "0", 10);
+    const idB = Number.parseInt(b.id || "0", 10);
+    return idA - idB;
+  });
 }
 
 export function getModelBySlug(slug: string): Model | undefined {

@@ -45,6 +45,10 @@ export default function BecomeAModelPage() {
     fullProfile: null as File | null,
     halfProfile: null as File | null,
     fullLengthProfile: null as File | null,
+    headshotBase64: "",
+    fullProfileBase64: "",
+    halfProfileBase64: "",
+    fullLengthProfileBase64: "",
     agreeToTerms: false,
   });
 
@@ -120,19 +124,46 @@ export default function BecomeAModelPage() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
     if (files && files[0]) {
       const file = files[0];
-      setFormData((prev) => ({ ...prev, [name]: file }));
       
       // Validate file
       const fieldName = name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, " $1");
       const fileError = validateFile(file, fieldName);
       if (fileError) {
         setErrors((prev) => ({ ...prev, [name]: fileError }));
-      } else {
+        return;
+      }
+      
+      // Convert to base64
+      try {
+        const base64 = await convertFileToBase64(file);
+        const base64FieldName = `${name}Base64` as keyof typeof formData;
+        setFormData((prev) => ({ 
+          ...prev, 
+          [name]: file,
+          [base64FieldName]: base64,
+        }));
         setErrors((prev) => ({ ...prev, [name]: undefined }));
+      } catch (error) {
+        setErrors((prev) => ({ 
+          ...prev, 
+          [name]: "Failed to process image. Please try again." 
+        }));
       }
     }
   };
@@ -232,55 +263,103 @@ export default function BecomeAModelPage() {
     setSubmitStatus({ type: null, message: "" });
 
     try {
-      // Create FormData for file uploads
-      const formDataToSend = new FormData();
+      // Create JSON payload for Formspree (works with CORS and static builds)
+      const payload: Record<string, string> = {
+        gender: formData.gender,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        contactNumber: formData.contactNumber,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country,
+        dateOfBirth: formData.dateOfBirth,
+        height: formData.height,
+        bust: formData.bust,
+        waist: formData.waist,
+        hips: formData.hips,
+        shoeSize: formData.shoeSize,
+        hairColor: formData.hairColor,
+        eyeColor: formData.eyeColor,
+        instagram: formData.instagram,
+        tiktok: formData.tiktok,
+        message: formData.message,
+        agreeToTerms: formData.agreeToTerms.toString(),
+      };
+
+      // Add base64 images if they exist
+      // Create HTML content with embedded images for email display
+      const imageHtmlParts: string[] = [];
       
-      // Add all text fields
-      formDataToSend.append("gender", formData.gender);
-      formDataToSend.append("firstName", formData.firstName);
-      formDataToSend.append("lastName", formData.lastName);
-      formDataToSend.append("email", formData.email);
-      formDataToSend.append("contactNumber", formData.contactNumber);
-      formDataToSend.append("address", formData.address);
-      formDataToSend.append("city", formData.city);
-      formDataToSend.append("state", formData.state);
-      formDataToSend.append("zipCode", formData.zipCode);
-      formDataToSend.append("country", formData.country);
-      formDataToSend.append("dateOfBirth", formData.dateOfBirth);
-      formDataToSend.append("height", formData.height);
-      formDataToSend.append("bust", formData.bust);
-      formDataToSend.append("waist", formData.waist);
-      formDataToSend.append("hips", formData.hips);
-      formDataToSend.append("shoeSize", formData.shoeSize);
-      formDataToSend.append("hairColor", formData.hairColor);
-      formDataToSend.append("eyeColor", formData.eyeColor);
-      formDataToSend.append("instagram", formData.instagram);
-      formDataToSend.append("tiktok", formData.tiktok);
-      formDataToSend.append("message", formData.message);
-      formDataToSend.append("agreeToTerms", formData.agreeToTerms.toString());
+      if (formData.headshotBase64) {
+        payload.headshot = formData.headshotBase64;
+        payload.headshot_filename = formData.headshot?.name || "headshot.jpg";
+        imageHtmlParts.push(`
+          <div style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px;">Headshot</h3>
+            <img src="${formData.headshotBase64}" alt="Headshot" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
+            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.headshot?.name || "headshot.jpg"}</p>
+          </div>
+        `);
+      }
+      if (formData.fullProfileBase64) {
+        payload.fullProfile = formData.fullProfileBase64;
+        payload.fullProfile_filename = formData.fullProfile?.name || "fullProfile.jpg";
+        imageHtmlParts.push(`
+          <div style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px;">Full Profile</h3>
+            <img src="${formData.fullProfileBase64}" alt="Full Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
+            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.fullProfile?.name || "fullProfile.jpg"}</p>
+          </div>
+        `);
+      }
+      if (formData.halfProfileBase64) {
+        payload.halfProfile = formData.halfProfileBase64;
+        payload.halfProfile_filename = formData.halfProfile?.name || "halfProfile.jpg";
+        imageHtmlParts.push(`
+          <div style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px;">Half Profile</h3>
+            <img src="${formData.halfProfileBase64}" alt="Half Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
+            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.halfProfile?.name || "halfProfile.jpg"}</p>
+          </div>
+        `);
+      }
+      if (formData.fullLengthProfileBase64) {
+        payload.fullLengthProfile = formData.fullLengthProfileBase64;
+        payload.fullLengthProfile_filename = formData.fullLengthProfile?.name || "fullLengthProfile.jpg";
+        imageHtmlParts.push(`
+          <div style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px;">Full Length Profile</h3>
+            <img src="${formData.fullLengthProfileBase64}" alt="Full Length Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
+            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.fullLengthProfile?.name || "fullLengthProfile.jpg"}</p>
+          </div>
+        `);
+      }
 
-      // Add files if they exist
-      if (formData.headshot) {
-        formDataToSend.append("headshot", formData.headshot);
-      }
-      if (formData.fullProfile) {
-        formDataToSend.append("fullProfile", formData.fullProfile);
-      }
-      if (formData.halfProfile) {
-        formDataToSend.append("halfProfile", formData.halfProfile);
-      }
-      if (formData.fullLengthProfile) {
-        formDataToSend.append("fullLengthProfile", formData.fullLengthProfile);
+      // Add HTML-formatted images section that Formspree can include in email
+      if (imageHtmlParts.length > 0) {
+        const imagesHtml = `
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
+            <h2 style="margin-bottom: 20px;">Portfolio Images</h2>
+            ${imageHtmlParts.join("")}
+          </div>
+        `;
+        payload._images_html = imagesHtml;
       }
 
-      // Submit to Formspree
+      // Submit directly to Formspree using JSON (CORS-compatible for static builds)
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
-        body: formDataToSend,
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
         },
+        body: JSON.stringify(payload),
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         setSubmitStatus({
@@ -315,6 +394,10 @@ export default function BecomeAModelPage() {
           fullProfile: null,
           halfProfile: null,
           fullLengthProfile: null,
+          headshotBase64: "",
+          fullProfileBase64: "",
+          halfProfileBase64: "",
+          fullLengthProfileBase64: "",
           agreeToTerms: false,
         });
         setErrors({});
@@ -322,8 +405,7 @@ export default function BecomeAModelPage() {
         // Scroll to top to show success message
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to submit form");
+        throw new Error(data.error || data.message || "Failed to submit form");
       }
     } catch (error) {
       console.error("Form submission error:", error);
