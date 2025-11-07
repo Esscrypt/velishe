@@ -16,24 +16,32 @@ export async function getAllModels(): Promise<Model[]> {
     const discovered = await discoverModelImages(slug);
 
     // Merge JSON metadata with discovered images
+    // Filter out featured image from gallery to avoid duplicates
+    const featuredImagePath = discovered.featuredImage || jsonModel?.featuredImage || "";
+    const galleryWithoutFeatured = discovered.gallery
+      .filter((img) => img.path !== featuredImagePath)
+      .map((img) => ({
+        type: img.type,
+        src: img.path,
+        alt: `${slug} - ${img.name}`,
+      }));
+
     const model: Model = {
       id: jsonModel?.id || slug,
       slug,
       name: jsonModel?.name || slug,
-      bio: jsonModel?.bio,
       stats: jsonModel?.stats || {
-        weight: "",
         height: "",
-        hips: "",
+        bust: "",
         waist: "",
+        hips: "",
+        shoeSize: "",
+        hairColor: "",
+        eyeColor: "",
       },
       instagram: jsonModel?.instagram,
-      featuredImage: discovered.featuredImage || jsonModel?.featuredImage || "",
-      gallery: discovered.gallery.map((img) => ({
-        type: img.type,
-        src: img.path,
-        alt: `${slug} - ${img.name}`,
-      })),
+      featuredImage: featuredImagePath,
+      gallery: galleryWithoutFeatured,
     };
 
     models.push(model);

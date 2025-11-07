@@ -22,10 +22,9 @@ export default function ModelCard({
 }: ModelCardProps) {
   const statsList = [
     { label: "Height", value: stats.height },
-    { label: "Weight", value: stats.weight },
-    { label: "Hips", value: stats.hips },
-    { label: "Waist", value: stats.waist },
     ...(stats.bust ? [{ label: "Bust", value: stats.bust }] : []),
+    { label: "Waist", value: stats.waist },
+    { label: "Hips", value: stats.hips },
     ...(stats.shoeSize ? [{ label: "Shoe", value: stats.shoeSize }] : []),
     ...(stats.hairColor ? [{ label: "Hair", value: stats.hairColor }] : []),
     ...(stats.eyeColor ? [{ label: "Eyes", value: stats.eyeColor }] : []),

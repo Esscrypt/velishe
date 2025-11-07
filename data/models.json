@@ -3,228 +3,48 @@
     "id": "1",
     "slug": "raya",
     "name": "Raya",
-    "bio": "Professional model specializing in fashion and editorial work.",
     "stats": {
-      "weight": "120 lbs",
-      "height": "5'9\"",
-      "hips": "36\"",
-      "waist": "24\"",
-      "bust": "34\"",
-      "shoeSize": "8",
+      "height": "179 cm",
+      "hips": "95 cm",
+      "waist": "65 cm",
+      "bust": "86 cm",
+      "shoeSize": "40",
       "hairColor": "Brown",
-      "eyeColor": "Brown"
+      "eyeColor": "Green"
     },
-    "instagram": "https://instagram.com/raya",
-    "featuredImage": "/models/raya/image10.webp",
-    "gallery": []
+    "instagram": "https://instagram.com/rayadesislavova",
+    "featuredImage": "/models/raya/image10.webp"
   },
   {
     "id": "2",
     "slug": "gabriela",
-    "name": "Gabriela Martinez",
-    "bio": "International runway model with expertise in high fashion and couture.",
+    "name": "Gabriela",
     "stats": {
-      "weight": "118 lbs",
-      "height": "5'11\"",
-      "hips": "35\"",
-      "waist": "23\"",
-      "bust": "33\"",
-      "shoeSize": "9",
+      "height": "183 cm",
+      "hips": "97cm",
+      "waist": "64 cm",
+      "bust": "84 cm",
+      "shoeSize": "41",
       "hairColor": "Black",
       "eyeColor": "Hazel"
     },
-    "instagram": "https://instagram.com/gabrielamartinez",
-    "featuredImage": "/models/gabriela/featured.webp",
-    "gallery": []
+    "instagram": "https://instagram.com/gabriella.spasova",
+    "featuredImage": "/models/gabriela/featured.webp"
   },
   {
     "id": "3",
-    "slug": "model-1",
-    "name": "Sophia Chen",
-    "bio": "Commercial and beauty model known for versatile portfolio and professional work ethic.",
+    "slug": "kaloyan",
+    "name": "Kaloyan",
     "stats": {
-      "weight": "115 lbs",
-      "height": "5'8\"",
-      "hips": "34\"",
-      "waist": "24\"",
-      "bust": "32\"",
-      "shoeSize": "7.5",
-      "hairColor": "Black",
-      "eyeColor": "Brown"
-    },
-    "instagram": "https://instagram.com/sophiachen",
-    "featuredImage": "/models/model-1/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "4",
-    "slug": "model-2",
-    "name": "Isabella Rodriguez",
-    "bio": "Fashion and lifestyle model with a passion for sustainable fashion.",
-    "stats": {
-      "weight": "122 lbs",
-      "height": "5'9\"",
-      "hips": "36\"",
-      "waist": "25\"",
-      "bust": "34\"",
-      "shoeSize": "8",
-      "hairColor": "Brown",
-      "eyeColor": "Green"
-    },
-    "instagram": "https://instagram.com/isabellarodriguez",
-    "featuredImage": "/models/model-2/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "5",
-    "slug": "model-3",
-    "name": "Maya Patel",
-    "bio": "Editorial and commercial model specializing in diverse representation.",
-    "stats": {
-      "weight": "119 lbs",
-      "height": "5'10\"",
-      "hips": "35\"",
-      "waist": "24\"",
-      "bust": "33\"",
-      "shoeSize": "8.5",
-      "hairColor": "Black",
-      "eyeColor": "Brown"
-    },
-    "instagram": "https://instagram.com/mayapatel",
-    "featuredImage": "/models/model-3/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "6",
-    "slug": "model-4",
-    "name": "Emma Thompson",
-    "bio": "Runway and print model with extensive experience in European fashion weeks.",
-    "stats": {
-      "weight": "117 lbs",
-      "height": "5'11\"",
-      "hips": "34\"",
-      "waist": "23\"",
-      "bust": "32\"",
-      "shoeSize": "9",
-      "hairColor": "Blonde",
-      "eyeColor": "Blue"
-    },
-    "instagram": "https://instagram.com/emmathompson",
-    "featuredImage": "/models/model-4/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "7",
-    "slug": "model-5",
-    "name": "Ava Johnson",
-    "bio": "Fitness and swimwear model with a focus on health and wellness.",
-    "stats": {
-      "weight": "125 lbs",
-      "height": "5'8\"",
-      "hips": "37\"",
-      "waist": "25\"",
-      "bust": "35\"",
-      "shoeSize": "8",
-      "hairColor": "Blonde",
-      "eyeColor": "Green"
-    },
-    "instagram": "https://instagram.com/avajohnson",
-    "featuredImage": "/models/model-5/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "8",
-    "slug": "model-6",
-    "name": "Olivia White",
-    "bio": "Commercial model specializing in beauty campaigns and brand partnerships.",
-    "stats": {
-      "weight": "113 lbs",
-      "height": "5'7\"",
-      "hips": "33\"",
-      "waist": "23\"",
-      "bust": "31\"",
-      "shoeSize": "7",
-      "hairColor": "Red",
+      "height": "185 cm",
+      "hips": "96 cm",
+      "waist": "78 cm",
+      "bust": "95 cm",
+      "shoeSize": "44",
+      "hairColor": "Light Brown",
       "eyeColor": "Hazel"
     },
-    "instagram": "https://instagram.com/oliviawhite",
-    "featuredImage": "/models/model-6/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "9",
-    "slug": "model-7",
-    "name": "Charlotte Davis",
-    "bio": "High fashion model with editorial work featured in top international magazines.",
-    "stats": {
-      "weight": "116 lbs",
-      "height": "5'10\"",
-      "hips": "35\"",
-      "waist": "24\"",
-      "bust": "33\"",
-      "shoeSize": "8.5",
-      "hairColor": "Brown",
-      "eyeColor": "Brown"
-    },
-    "instagram": "https://instagram.com/charlottedavis",
-    "featuredImage": "/models/model-7/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "10",
-    "slug": "model-8",
-    "name": "Amelia Wilson",
-    "bio": "Versatile model working across fashion, commercial, and lifestyle campaigns.",
-    "stats": {
-      "weight": "121 lbs",
-      "height": "5'9\"",
-      "hips": "36\"",
-      "waist": "25\"",
-      "bust": "34\"",
-      "shoeSize": "8",
-      "hairColor": "Brunette",
-      "eyeColor": "Blue"
-    },
-    "instagram": "https://instagram.com/ameliawilson",
-    "featuredImage": "/models/model-8/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "11",
-    "slug": "model-9",
-    "name": "Harper Lee",
-    "bio": "Editorial and artistic model with a unique look and creative portfolio.",
-    "stats": {
-      "weight": "114 lbs",
-      "height": "5'8\"",
-      "hips": "34\"",
-      "waist": "23\"",
-      "bust": "32\"",
-      "shoeSize": "7.5",
-      "hairColor": "Black",
-      "eyeColor": "Brown"
-    },
-    "instagram": "https://instagram.com/harperlee",
-    "featuredImage": "/models/model-9/featured.webp",
-    "gallery": []
-  },
-  {
-    "id": "12",
-    "slug": "model-10",
-    "name": "Luna Anderson",
-    "bio": "Fashion and runway model with a strong presence in international markets.",
-    "stats": {
-      "weight": "118 lbs",
-      "height": "5'11\"",
-      "hips": "35\"",
-      "waist": "24\"",
-      "bust": "33\"",
-      "shoeSize": "9",
-      "hairColor": "Blonde",
-      "eyeColor": "Green"
-    },
-    "instagram": "https://instagram.com/lunaanderson",
-    "featuredImage": "/models/model-10/featured.webp",
-    "gallery": []
+    "instagram": "https://www.instagram.com/kaloyan_mitov/",
+    "featuredImage": "/models/model-1/featured.webp"
   }
 ]

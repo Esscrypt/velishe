@@ -25,8 +25,7 @@ export default function SearchPage() {
     return allModels.filter(
       (model) =>
         model.name.toLowerCase().includes(query) ||
-        model.slug.toLowerCase().includes(query) ||
-        (model.bio && model.bio.toLowerCase().includes(query))
+        model.slug.toLowerCase().includes(query)
     );
   }, [searchQuery, allModels]);
 
@@ -76,11 +75,6 @@ export default function SearchPage() {
                   <h3 className="text-xl font-semibold text-gray-900 mb-1">
                     {model.name}
                   </h3>
-                  {model.bio && (
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                      {model.bio}
-                    </p>
-                  )}
                 </div>
               ))}
             </div>

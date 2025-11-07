@@ -1,0 +1,18 @@
+<svg width="2000" height="2000" viewBox="0 0 2000 2000" 
+xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .main {
+      font-family: "Didot", "Bodoni", serif;
+      font-size: 200px;
+      text-anchor: middle;
+    }
+    .sub {
+      font-family: "Helvetica Neue", sans-serif;
+      font-size: 70px;
+      letter-spacing: 8px;
+      text-anchor: middle;
+    }
+  </style>
+  <text x="1000.0" y="950.0" class="main">V È L I S H E</text>
+  <text x="1000.0" y="1120.0" class="sub">MGMT</text>
+</svg>

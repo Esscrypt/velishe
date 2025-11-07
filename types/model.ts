@@ -1,12 +1,11 @@
 export interface ModelStats {
-  weight: string;
   height: string;
-  hips: string;
+  bust: string;
   waist: string;
-  bust?: string;
-  shoeSize?: string;
-  hairColor?: string;
-  eyeColor?: string;
+  hips: string;
+  shoeSize: string;
+  hairColor: string;
+  eyeColor: string;
 }
 
 export interface ModelMedia {
@@ -20,7 +19,6 @@ export interface Model {
   id: string;
   slug: string;
   name: string;
-  bio?: string;
   stats: ModelStats;
   instagram?: string;
   featuredImage: string;

@@ -27,7 +27,6 @@ export default async function ModelPage({
 
   const stats = [
     { label: "Height", value: model.stats.height },
-    { label: "Weight", value: model.stats.weight },
     { label: "Hips", value: model.stats.hips },
     { label: "Waist", value: model.stats.waist },
     ...(model.stats.bust ? [{ label: "Bust", value: model.stats.bust }] : []),
@@ -43,6 +42,7 @@ export default async function ModelPage({
   ];
 
   // Combine featured image with gallery for carousel
+  // Featured image is already excluded from gallery, so we add it first
   const allMedia = [
     {
       type: "image" as const,
@@ -70,15 +70,9 @@ export default async function ModelPage({
 
         {/* Info section - comes second on mobile */}
         <div className="order-2 lg:order-2">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
             {model.name}
           </h1>
-
-          {model.bio && (
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-              {model.bio}
-            </p>
-          )}
 
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">

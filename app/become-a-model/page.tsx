@@ -58,7 +58,7 @@ export default function BecomeAModelPage() {
   // Formspree endpoint - replace with your Formspree form ID
   // Get your form endpoint from https://formspree.io/
   // Example: https://formspree.io/f/YOUR_FORM_ID
-  const FORMSPREE_ENDPOINT = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT || "https://formspree.io/f/YOUR_FORM_ID";
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xovvozyz"
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -144,7 +144,7 @@ export default function BecomeAModelPage() {
     }
   };
 
-  const validateForm = (): boolean => {
+  const validateForm = (): { isValid: boolean; errors: FormErrors } => {
     const newErrors: FormErrors = {};
 
     // Required fields
@@ -180,7 +180,7 @@ export default function BecomeAModelPage() {
       newErrors.dateOfBirth = "You must be at least 16 years old";
     }
 
-    // Validate files
+    // Validate files (optional, but if provided must be valid)
     const headshotError = validateFile(formData.headshot, "Headshot");
     if (headshotError) {
       newErrors.headshot = headshotError;
@@ -206,18 +206,24 @@ export default function BecomeAModelPage() {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      // Scroll to first error
-      const firstErrorField = Object.keys(errors)[0];
+    const validation = validateForm();
+    if (!validation.isValid) {
+      // Scroll to first error field
+      const firstErrorField = Object.keys(validation.errors)[0];
       if (firstErrorField) {
-        const element = document.querySelector(`[name="${firstErrorField}"]`);
-        element?.scrollIntoView({ behavior: "smooth", block: "center" });
+        // Try to find the input element
+        const element = document.querySelector(`[name="${firstErrorField}"]`) as HTMLElement;
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          // Focus the element to highlight it
+          element.focus();
+        }
       }
       return;
     }
