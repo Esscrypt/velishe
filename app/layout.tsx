@@ -11,8 +11,72 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Velishe Model Management",
-  description: "Professional modeling portfolio website based in Sofia, Bulgaria",
+  title: {
+    default: "Velishe Model Management",
+    template: "%s | Velishe Model Management",
+  },
+  description: "Professional modeling portfolio website based in Sofia, Bulgaria. Representing talented models with diverse backgrounds and unique beauty.",
+  keywords: [
+    "modeling agency",
+    "Sofia",
+    "Bulgaria",
+    "fashion models",
+    "model portfolio",
+    "model management",
+    "Velishe",
+    "professional models",
+  ],
+  authors: [{ name: "Velishe Model Management" }],
+  creator: "Velishe Model Management",
+  publisher: "Velishe Model Management",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com",
+    siteName: "Velishe Model Management",
+    title: "Velishe Model Management",
+    description: "Boutique model agency",
+    images: [
+      {
+        url: "/logo/logo.svg",
+        width: 2000,
+        height: 2000,
+        alt: "Velishe Model Management Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Velishe Model Management",
+    description: "Boutique model agency",
+    images: ["/logo/logo.svg"],
+    creator: "@velishe.mgmt",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    // Add your verification codes here when available
+    // google: "your-google-verification-code",
+    // yandex: "your-yandex-verification-code",
+  },
 };
 
 export default function RootLayout({
