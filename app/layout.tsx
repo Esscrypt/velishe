@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import GoogleTagManager from "@/components/GoogleTagManager";
+import PageViewTracker from "@/components/PageViewTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -83,9 +85,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "G-PQJ4JZ1BC7";
+
   return (
     <html lang="en" className={inter.variable}>
-      <body className="antialiased bg-white text-gray-900">
+      <body
+        className="antialiased bg-white text-gray-900"
+        suppressHydrationWarning
+      >
+        {gtmId && <GoogleTagManager gtmId={gtmId} />}
+        <PageViewTracker />
         <Header />
         <main className="min-h-screen">
           {children}

@@ -5,6 +5,7 @@ import { getModelBySlugAsync } from "@/lib/models-server";
 import { discoverAllModels } from "@/lib/discover-images";
 import SocialIcons from "@/components/SocialIcons";
 import ImageCarousel from "@/components/ImageCarousel";
+import ModelPageTracker from "@/components/ModelPageTracker";
 
 export async function generateStaticParams() {
   const slugs = await discoverAllModels();
@@ -54,6 +55,7 @@ export default async function ModelPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <ModelPageTracker modelSlug={slug} modelName={model.name} />
       <Link
         href="/"
         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"

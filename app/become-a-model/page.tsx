@@ -1,6 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  trackFormSubmission,
+  trackFormStart,
+  trackPrivacyPolicyClick,
+} from "@/lib/gtm";
 
 interface FormErrors {
   gender?: string;
@@ -8,8 +14,22 @@ interface FormErrors {
   lastName?: string;
   email?: string;
   contactNumber?: string;
-  height?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
   dateOfBirth?: string;
+  height?: string;
+  bust?: string;
+  waist?: string;
+  hips?: string;
+  shoeSize?: string;
+  hairColor?: string;
+  eyeColor?: string;
+  instagram?: string;
+  tiktok?: string;
+  message?: string;
   headshot?: string;
   fullProfile?: string;
   halfProfile?: string;
@@ -58,6 +78,21 @@ export default function BecomeAModelPage() {
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+  const [hasStartedForm, setHasStartedForm] = useState(false);
+
+  // Track form start when user begins filling out the form
+  useEffect(() => {
+    if (
+      !hasStartedForm &&
+      (formData.firstName ||
+        formData.lastName ||
+        formData.email ||
+        formData.contactNumber)
+    ) {
+      setHasStartedForm(true);
+      trackFormStart("become_a_model");
+    }
+  }, [formData.firstName, formData.lastName, formData.email, formData.contactNumber, hasStartedForm]);
 
   // Formspree endpoint - replace with your Formspree form ID
   // Get your form endpoint from https://formspree.io/
@@ -175,69 +210,192 @@ export default function BecomeAModelPage() {
     }
   };
 
-  const validateForm = (): { isValid: boolean; errors: FormErrors } => {
+  const validateForm = (): { isValid: boolean; errors: FormErrors; errorSummary: string[] } => {
     const newErrors: FormErrors = {};
+    const errorSummary: string[] = [];
 
     // Required fields
     if (!formData.gender) {
       newErrors.gender = "Gender is required";
+      errorSummary.push("Gender");
     }
 
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
+      errorSummary.push("First name");
     }
 
     if (!formData.lastName.trim()) {
       newErrors.lastName = "Last name is required";
+      errorSummary.push("Last name");
     }
 
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
+      errorSummary.push("Email");
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "Please enter a valid email address";
+      errorSummary.push("Valid email address");
     }
 
     if (!formData.contactNumber.trim()) {
       newErrors.contactNumber = "Contact number is required";
+      errorSummary.push("Contact number");
     } else if (!validatePhone(formData.contactNumber)) {
       newErrors.contactNumber = "Please enter a valid phone number";
+      errorSummary.push("Valid phone number");
     }
 
-    if (formData.height && !validateHeight(formData.height)) {
-      newErrors.height = "Please enter height in format like 5'8\" or 173cm";
+    if (!formData.address.trim()) {
+      newErrors.address = "Address is required";
+      errorSummary.push("Address");
     }
 
-    if (formData.dateOfBirth && !validateDateOfBirth(formData.dateOfBirth)) {
+    if (!formData.city.trim()) {
+      newErrors.city = "City is required";
+      errorSummary.push("City");
+    }
+
+    if (!formData.state.trim()) {
+      newErrors.state = "State is required";
+      errorSummary.push("State");
+    }
+
+    if (!formData.zipCode.trim()) {
+      newErrors.zipCode = "Zip code is required";
+      errorSummary.push("Zip code");
+    }
+
+    if (!formData.country.trim()) {
+      newErrors.country = "Country is required";
+      errorSummary.push("Country");
+    }
+
+    if (!formData.dateOfBirth.trim()) {
+      newErrors.dateOfBirth = "Date of birth is required";
+      errorSummary.push("Date of birth");
+    } else if (!validateDateOfBirth(formData.dateOfBirth)) {
       newErrors.dateOfBirth = "You must be at least 16 years old";
+      errorSummary.push("Valid date of birth (must be at least 16 years old)");
     }
 
-    // Validate files (optional, but if provided must be valid)
+    if (!formData.height.trim()) {
+      newErrors.height = "Height is required";
+      errorSummary.push("Height");
+    } else if (!validateHeight(formData.height)) {
+      newErrors.height = "Please enter height in format like 5'8\" or 173cm";
+      errorSummary.push("Valid height format");
+    }
+
+    if (!formData.bust.trim()) {
+      newErrors.bust = "Bust measurement is required";
+      errorSummary.push("Bust");
+    }
+
+    if (!formData.waist.trim()) {
+      newErrors.waist = "Waist measurement is required";
+      errorSummary.push("Waist");
+    }
+
+    if (!formData.hips.trim()) {
+      newErrors.hips = "Hips measurement is required";
+      errorSummary.push("Hips");
+    }
+
+    if (!formData.shoeSize.trim()) {
+      newErrors.shoeSize = "Shoe size is required";
+      errorSummary.push("Shoe size");
+    }
+
+    if (!formData.hairColor.trim()) {
+      newErrors.hairColor = "Hair color is required";
+      errorSummary.push("Hair color");
+    }
+
+    if (!formData.eyeColor.trim()) {
+      newErrors.eyeColor = "Eye color is required";
+      errorSummary.push("Eye color");
+    }
+
+    if (!formData.instagram.trim()) {
+      newErrors.instagram = "Instagram handle is required";
+      errorSummary.push("Instagram");
+    }
+
+    if (!formData.tiktok.trim()) {
+      newErrors.tiktok = "TikTok handle is required";
+      errorSummary.push("TikTok");
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required";
+      errorSummary.push("Message");
+    }
+
+    // Check for missing images
+    const missingImages: string[] = [];
+    if (!formData.headshot) {
+      missingImages.push("Headshot");
+    }
+    if (!formData.fullProfile) {
+      missingImages.push("Full Profile");
+    }
+    if (!formData.halfProfile) {
+      missingImages.push("Half Profile");
+    }
+    if (!formData.fullLengthProfile) {
+      missingImages.push("Full Length Profile");
+    }
+
+    // Validate files (if provided must be valid)
     const headshotError = validateFile(formData.headshot, "Headshot");
     if (headshotError) {
       newErrors.headshot = headshotError;
+      if (!errorSummary.includes("Valid headshot image")) {
+        errorSummary.push("Valid headshot image");
+      }
     }
 
     const fullProfileError = validateFile(formData.fullProfile, "Full profile");
     if (fullProfileError) {
       newErrors.fullProfile = fullProfileError;
+      if (!errorSummary.includes("Valid full profile image")) {
+        errorSummary.push("Valid full profile image");
+      }
     }
 
     const halfProfileError = validateFile(formData.halfProfile, "Half profile");
     if (halfProfileError) {
       newErrors.halfProfile = halfProfileError;
+      if (!errorSummary.includes("Valid half profile image")) {
+        errorSummary.push("Valid half profile image");
+      }
     }
 
     const fullLengthProfileError = validateFile(formData.fullLengthProfile, "Full length profile");
     if (fullLengthProfileError) {
       newErrors.fullLengthProfile = fullLengthProfileError;
+      if (!errorSummary.includes("Valid full length profile image")) {
+        errorSummary.push("Valid full length profile image");
+      }
+    }
+
+    // Add missing images to summary if any
+    if (missingImages.length > 0) {
+      errorSummary.push(`Missing images: ${missingImages.join(", ")}`);
     }
 
     if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "You must agree to the terms and conditions";
+      newErrors.agreeToTerms = "You must agree to the privacy policy";
+      errorSummary.push("Privacy policy acceptance");
     }
 
     setErrors(newErrors);
-    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
+    return { 
+      isValid: Object.keys(newErrors).length === 0, 
+      errors: newErrors,
+      errorSummary 
+    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -245,22 +403,46 @@ export default function BecomeAModelPage() {
     
     const validation = validateForm();
     if (!validation.isValid) {
-      // Scroll to first error field
-      const firstErrorField = Object.keys(validation.errors)[0];
-      if (firstErrorField) {
-        // Try to find the input element
-        const element = document.querySelector(`[name="${firstErrorField}"]`) as HTMLElement;
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "center" });
-          // Focus the element to highlight it
-          element.focus();
+      // Show error summary with formatted message
+      const errorMessage = validation.errorSummary.length > 0
+        ? validation.errorSummary
+            .map((item, index) => `${index + 1}. ${item}`)
+            .join("\n")
+        : "Please fill in all required fields and accept the privacy policy.";
+      
+      // Set error status immediately
+      setSubmitStatus({
+        type: "error",
+        message: errorMessage,
+      });
+      
+      // Scroll to first error field after status message renders
+      setTimeout(() => {
+        const firstErrorField = Object.keys(validation.errors)[0];
+        if (firstErrorField) {
+          const element = document.querySelector(`[name="${firstErrorField}"]`) as HTMLElement;
+          if (element) {
+            // Scroll to the element with some offset from top
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - 100; // 100px offset from top
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth"
+            });
+            
+            // Focus the element to highlight it
+            setTimeout(() => {
+              element.focus();
+            }, 300);
+          }
         }
-      }
+      }, 150);
+      
       return;
     }
 
     setIsSubmitting(true);
-    setSubmitStatus({ type: null, message: "" });
 
     try {
       // Create JSON payload for Formspree (works with CORS and static builds)
@@ -362,6 +544,17 @@ export default function BecomeAModelPage() {
       const data = await response.json();
 
       if (response.ok) {
+        // Track successful form submission
+        trackFormSubmission("become_a_model", {
+          gender: formData.gender,
+          has_images: !!(
+            formData.headshotBase64 ||
+            formData.fullProfileBase64 ||
+            formData.halfProfileBase64 ||
+            formData.fullLengthProfileBase64
+          ),
+        });
+
         setSubmitStatus({
           type: "success",
           message: "Thank you for your application! We will contact you if you are successful.",
@@ -457,19 +650,38 @@ export default function BecomeAModelPage() {
           </ul>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Status message */}
-          {submitStatus.type && (
-            <div
-              className={`p-4 rounded-lg ${
-                submitStatus.type === "success"
-                  ? "bg-green-50 border border-green-200 text-green-800"
-                  : "bg-red-50 border border-red-200 text-red-800"
-              }`}
-            >
+        {/* Status message - outside form so it persists */}
+        {submitStatus.type && submitStatus.message ? (
+          <div
+            id="form-status-message"
+            className={`p-4 rounded-lg mb-6 ${
+              submitStatus.type === "success"
+                ? "bg-green-50 border border-green-200 text-green-800"
+                : "bg-red-50 border border-red-200 text-red-800"
+            }`}
+            role="alert"
+          >
+            {submitStatus.type === "error" && submitStatus.message.includes("\n") ? (
+              <div>
+                <p className="font-medium mb-2">Please fix the following issues:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  {submitStatus.message
+                    .split("\n")
+                    .filter((line) => line.trim())
+                    .map((line, index) => (
+                      <li key={index} className="text-sm">
+                        {line.replace(/^\d+\.\s*/, "")}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            ) : (
               <p className="font-medium">{submitStatus.message}</p>
-            </div>
-          )}
+            )}
+          </div>
+        ) : null}
+
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -596,79 +808,120 @@ export default function BecomeAModelPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Address
+              Address *
             </label>
             <input
               type="text"
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              required
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.address
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-black"
+              }`}
             />
+            {errors.address && (
+              <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                City
+                City *
               </label>
               <input
                 type="text"
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.city
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.city && (
+                <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                State
+                State *
               </label>
               <input
                 type="text"
                 name="state"
                 value={formData.state}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.state
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.state && (
+                <p className="mt-1 text-sm text-red-600">{errors.state}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Zip Code
+                Zip Code *
               </label>
               <input
                 type="text"
                 name="zipCode"
                 value={formData.zipCode}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.zipCode
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.zipCode && (
+                <p className="mt-1 text-sm text-red-600">{errors.zipCode}</p>
+              )}
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Country
+              Country *
             </label>
             <input
               type="text"
               name="country"
               value={formData.country}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              required
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.country
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-black"
+              }`}
             />
+            {errors.country && (
+              <p className="mt-1 text-sm text-red-600">{errors.country}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Date Of Birth
+                Date Of Birth *
               </label>
               <input
                 type="date"
                 name="dateOfBirth"
                 value={formData.dateOfBirth}
                 onChange={handleInputChange}
+                required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.dateOfBirth
                     ? "border-red-500 focus:ring-red-500"
@@ -681,7 +934,7 @@ export default function BecomeAModelPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Height
+                Height *
               </label>
               <input
                 type="text"
@@ -689,6 +942,7 @@ export default function BecomeAModelPage() {
                 value={formData.height}
                 onChange={handleInputChange}
                 placeholder="e.g., 5'8&quot;"
+                required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.height
                     ? "border-red-500 focus:ring-red-500"
@@ -704,119 +958,191 @@ export default function BecomeAModelPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bust
+                Bust *
               </label>
               <input
                 type="text"
                 name="bust"
                 value={formData.bust}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.bust
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.bust && (
+                <p className="mt-1 text-sm text-red-600">{errors.bust}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Waist
+                Waist *
               </label>
               <input
                 type="text"
                 name="waist"
                 value={formData.waist}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.waist
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.waist && (
+                <p className="mt-1 text-sm text-red-600">{errors.waist}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hips
+                Hips *
               </label>
               <input
                 type="text"
                 name="hips"
                 value={formData.hips}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.hips
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.hips && (
+                <p className="mt-1 text-sm text-red-600">{errors.hips}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Shoe Size
+                Shoe Size *
               </label>
               <input
                 type="text"
                 name="shoeSize"
                 value={formData.shoeSize}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.shoeSize
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.shoeSize && (
+                <p className="mt-1 text-sm text-red-600">{errors.shoeSize}</p>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hair Color
+                Hair Color *
               </label>
               <input
                 type="text"
                 name="hairColor"
                 value={formData.hairColor}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.hairColor
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.hairColor && (
+                <p className="mt-1 text-sm text-red-600">{errors.hairColor}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Eye Color
+                Eye Color *
               </label>
               <input
                 type="text"
                 name="eyeColor"
                 value={formData.eyeColor}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.eyeColor
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.eyeColor && (
+                <p className="mt-1 text-sm text-red-600">{errors.eyeColor}</p>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Instagram
+                Instagram *
               </label>
               <input
                 type="text"
                 name="instagram"
                 value={formData.instagram}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.instagram
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.instagram && (
+                <p className="mt-1 text-sm text-red-600">{errors.instagram}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                TikTok
+                TikTok *
               </label>
               <input
                 type="text"
                 name="tiktok"
                 value={formData.tiktok}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.tiktok
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-black"
+                }`}
               />
+              {errors.tiktok && (
+                <p className="mt-1 text-sm text-red-600">{errors.tiktok}</p>
+              )}
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Message
+              Message *
             </label>
             <textarea
               name="message"
               value={formData.message}
               onChange={handleInputChange}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              required
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.message
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-black"
+              }`}
             />
+            {errors.message && (
+              <p className="mt-1 text-sm text-red-600">{errors.message}</p>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -908,7 +1234,17 @@ export default function BecomeAModelPage() {
               className="mt-1 mr-3"
             />
             <label className="text-sm text-gray-700">
-              BY SENDING US YOUR APPLICATION, YOU AGREE WITH OUR TERMS AND CONDITIONS AND THE TREATMENT OF YOUR PERSONAL DATA BY OUR AGENCY
+              BY SENDING US YOUR APPLICATION, YOU AGREE WITH OUR{" "}
+              <Link
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackPrivacyPolicyClick("become_a_model_form")}
+                className="text-gray-900 underline hover:text-gray-600 transition-colors"
+              >
+                PRIVACY POLICY
+              </Link>{" "}
+              AND THE TREATMENT OF YOUR PERSONAL DATA BY OUR AGENCY
             </label>
           </div>
           {errors.agreeToTerms && (

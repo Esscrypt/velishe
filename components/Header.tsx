@@ -53,13 +53,15 @@ export default function Header() {
               >
                 <Instagram size={32} />
               </a>
-              <button
-                onClick={toggleMenu}
-                className="md:hidden text-black hover:text-gray-600 transition-colors p-2"
-                aria-label="Toggle menu"
-              >
-                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
+              {!isMenuOpen && (
+                <button
+                  onClick={toggleMenu}
+                  className="md:hidden text-black hover:text-gray-600 transition-colors p-2"
+                  aria-label="Toggle menu"
+                >
+                  <Menu size={28} />
+                </button>
+              )}
             </div>
           </div>
         </div>
