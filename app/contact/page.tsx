@@ -63,17 +63,28 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-          <Link href="/terms" className="hover:text-gray-900 transition-colors">
-            Terms & Conditions
-          </Link>
-          <span>|</span>
-          <Link
-            href="/privacy"
-            className="hover:text-gray-900 transition-colors"
-          >
-            Privacy and cookies policy
-          </Link>
+        <div className="space-y-6">
+
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Legal
+            </h2>
+            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+              <Link
+                href="/terms"
+                className="hover:text-gray-900 transition-colors"
+              >
+                Terms & Conditions
+              </Link>
+              <span>|</span>
+              <Link
+                href="/privacy"
+                className="hover:text-gray-900 transition-colors"
+              >
+                Privacy and cookies policy
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>

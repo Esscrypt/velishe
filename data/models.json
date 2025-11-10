@@ -17,6 +17,22 @@
   },
   {
     "id": "2",
+    "slug": "christiana",
+    "name": "Christiana Velichkova",
+    "stats": {
+      "height": "176 cm",
+      "hips": "88 cm",
+      "waist": "59 cm",
+      "bust": "85 cm",
+      "shoeSize": "38",
+      "hairColor": "Ginger",
+      "eyeColor": "Blue"
+    },
+    "instagram": "https://www.instagram.com/christiana.velichkova/",
+    "featuredImage": "/models/christiana/featured.webp"
+  },
+  {
+    "id": "3",
     "slug": "kaloyan",
     "name": "Kaloyan",
     "stats": {
@@ -32,7 +48,7 @@
     "featuredImage": "/models/model-1/featured.webp"
   },
   {
-    "id": "3",
+    "id": "4",
     "slug": "gabriela",
     "name": "Gabriela",
     "stats": {

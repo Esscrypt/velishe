@@ -47,11 +47,19 @@ export async function getAllModels(): Promise<Model[]> {
     models.push(model);
   }
 
-  // Sort models by id (numeric)
+  // Sort models by id (numeric), ensuring proper ordering
   return models.sort((a, b) => {
     const idA = Number.parseInt(a.id || "0", 10);
     const idB = Number.parseInt(b.id || "0", 10);
-    return idA - idB;
+    // If both are valid numbers, sort numerically
+    if (!Number.isNaN(idA) && !Number.isNaN(idB)) {
+      return idA - idB;
+    }
+    // If one is NaN, put it at the end
+    if (Number.isNaN(idA)) return 1;
+    if (Number.isNaN(idB)) return -1;
+    // Fallback to string comparison
+    return (a.id || "").localeCompare(b.id || "");
   });
 }
 
