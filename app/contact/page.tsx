@@ -13,7 +13,7 @@ export default function ContactPage() {
         </p>
 
         <p className="text-lg text-gray-700 mb-4">
-          We represent, develop, and elevate talent — women and men with
+          We represent, develop, and elevate talent - women and men with
           distinct presence, attitude, and authenticity.
         </p>
 
@@ -24,7 +24,7 @@ export default function ContactPage() {
         </p>
 
         <p className="text-lg text-gray-700 mb-8">
-          VÈLISHE is a statement — selective, bold, and quietly assured. We
+          VÈLISHE is a statement - selective, bold, and quietly assured. We
           exist to shape faces, stories, and moments that leave an imprint.
         </p>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 mb-8">
