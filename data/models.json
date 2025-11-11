@@ -62,5 +62,21 @@
     },
     "instagram": "https://instagram.com/gabriella.spasova",
     "featuredImage": "/models/gabriela/featured.webp"
+  },
+  {
+    "id": "5",
+    "slug": "stan",
+    "name": "Stan",
+    "stats": {
+      "height": "188 cm",
+      "hips": "93cm",
+      "waist": "73 cm",
+      "bust": "93 cm",
+      "shoeSize": "44.5",
+      "hairColor": "Hazel",
+      "eyeColor": "Blue"
+    },
+    "instagram": "https://instagram.com/stan_mladenov",
+    "featuredImage": "/models/stan/featured.webp"
   }
 ]
