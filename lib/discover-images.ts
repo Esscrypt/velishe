@@ -65,8 +65,8 @@ export async function discoverModelImages(slug: string): Promise<ModelImages> {
     }
   }
 
-  // Sort images by name for consistent ordering
-  images.sort((a, b) => a.name.localeCompare(b.name));
+  // Sort images by name for consistent ordering (numeric sort)
+  images.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }));
 
   // If no featured image found, use first image
   if (!featuredImage && images.length > 0 && images[0].type === "image") {
