@@ -94,5 +94,21 @@
     },
     "instagram": "https://instagram.com/simonaharalanovaa",
     "featuredImage": "/models/simona/featured.webp"
+  },
+  {
+    "id": "7",
+    "slug": "darina",
+    "name": "Darina",
+    "stats": {
+      "height": "176 cm",
+      "hips": "91 cm",
+      "waist": "65 cm",
+      "bust": "83 cm",
+      "shoeSize": "40",
+      "hairColor": "Brown",
+      "eyeColor": "Blue"
+    },
+    "instagram": "https://instagram.com/darinaharalanova",
+    "featuredImage": "/models/simona/featured.webp"
   }
 ]
