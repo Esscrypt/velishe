@@ -78,5 +78,21 @@
     },
     "instagram": "https://instagram.com/stan_mladenov",
     "featuredImage": "/models/stan/featured.webp"
+  },
+  {
+    "id": "6",
+    "slug": "simona",
+    "name": "Simona",
+    "stats": {
+      "height": "171 cm",
+      "hips": "89 cm",
+      "waist": "62 cm",
+      "bust": "87 cm",
+      "shoeSize": "39",
+      "hairColor": "Blonde",
+      "eyeColor": "Blue"
+    },
+    "instagram": "https://instagram.com/simonaharalanovaa",
+    "featuredImage": "/models/simona/featured.webp"
   }
 ]

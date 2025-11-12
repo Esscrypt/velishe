@@ -9,7 +9,7 @@ interface PreloadThumbnailsProps {
 
 export default function PreloadThumbnails({ models }: PreloadThumbnailsProps) {
   useEffect(() => {
-    // Preload featured images for faster initial load
+    // Preload featured image of each model card
     models.forEach((model) => {
       const link = document.createElement("link");
       link.rel = "preload";

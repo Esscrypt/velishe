@@ -12,32 +12,25 @@ interface SpotlightProps {
 export default function Spotlight({ models }: SpotlightProps) {
   const [currentSetIndex, setCurrentSetIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [shuffleKey, setShuffleKey] = useState(() => Date.now() + Math.random());
-  const [isDesktop, setIsDesktop] = useState(() => {
-    // Check window size on initial render (client-side only)
-    if (globalThis.window !== undefined) {
-      return globalThis.window.innerWidth >= 768;
-    }
-    return true; // Default to true for SSR
-  });
+  const [mounted, setMounted] = useState(false);
+  const [shuffleKey, setShuffleKey] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
 
-  // Check if we're on desktop (client-side only)
+  // Initialize on client mount only to avoid hydration mismatch
   useEffect(() => {
+    setMounted(true);
     const checkDesktop = () => {
       setIsDesktop(globalThis.window.innerWidth >= 768);
     };
     
     checkDesktop();
+    // Generate initial shuffle key after mount
+    setShuffleKey(Date.now() + Math.random());
+    setCurrentSetIndex(0);
+    
     globalThis.window.addEventListener("resize", checkDesktop);
     return () => globalThis.window.removeEventListener("resize", checkDesktop);
   }, []);
-
-  // Always reshuffle on mount (empty deps) and when models change
-  useEffect(() => {
-    // Generate a new shuffle key on every mount to ensure fresh randomization
-    setShuffleKey(Date.now() + Math.random());
-    setCurrentSetIndex(0); // Reset to first set when reshuffling
-  }, []); // Empty deps = run once on mount
 
   // Also reshuffle when models actually change (by ID, not just reference)
   const modelIds = useMemo(() => models.map((m) => m.id).join(","), [models]);
@@ -50,13 +43,20 @@ export default function Spotlight({ models }: SpotlightProps) {
   // Create sets of 3 models, shuffled fresh based on models and shuffleKey
   const CARDS_PER_SET = 3;
   const modelSets = useMemo(() => {
-    if (models.length === 0) return [];
+    if (models.length === 0 || shuffleKey === 0) return [];
     
-    // Shuffle models array (Fisher-Yates shuffle) - fresh shuffle each time
-    // The shuffleKey dependency ensures this recalculates, and Math.random() provides true randomness
+    // Use shuffleKey as seed for consistent shuffling (avoid hydration mismatch)
+    // Create a simple seeded random number generator
+    let seed = shuffleKey;
+    const seededRandom = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+    
+    // Shuffle models array (Fisher-Yates shuffle) using seeded random
     const shuffledModels = [...models];
     for (let i = shuffledModels.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(seededRandom() * (i + 1));
       [shuffledModels[i], shuffledModels[j]] = [shuffledModels[j], shuffledModels[i]];
     }
     
@@ -91,15 +91,16 @@ export default function Spotlight({ models }: SpotlightProps) {
       // Generate a new shuffle key to trigger a complete reshuffle
       setShuffleKey(Date.now() + Math.random());
       setCurrentSetIndex(0); // Always show the first set after reshuffle
-    }, 5000); // Reshuffle every 5 seconds
+    }, 3000); // Reshuffle every 3 seconds
 
     return () => clearInterval(interval);
   }, [models.length, isPaused]);
 
   const currentModels = modelSets[currentSetIndex] || [];
 
+  // Don't render until mounted (client-side only) to avoid hydration mismatch
   // Don't render on mobile (mobile users are redirected to /models)
-  if (!isDesktop || models.length === 0 || modelSets.length === 0) {
+  if (!mounted || !isDesktop || models.length === 0 || modelSets.length === 0) {
     return null;
   }
 
