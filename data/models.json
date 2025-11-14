@@ -110,5 +110,21 @@
     },
     "instagram": "https://instagram.com/darinaharalanova",
     "featuredImage": "/models/simona/featured.webp"
+  },
+  {
+    "id": "8",
+    "slug": "ksenya",
+    "name": "Ksenya",
+    "stats": {
+      "height": "178 cm",
+      "hips": "93 cm",
+      "waist": "61 cm",
+      "bust": "84 cm",
+      "shoeSize": "40",
+      "hairColor": "Dark Blonde",
+      "eyeColor": "Brown"
+    },
+    "instagram": "https://instagram.com/darinaharalanova",
+    "featuredImage": "/models/simona/featured.webp"
   }
 ]

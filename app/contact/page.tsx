@@ -41,10 +41,10 @@ export default function ContactPage() {
             <div>
               <p className="font-medium mb-1">Email:</p>
               <a
-                href="mailto:models@velishemodelmanage.com"
+                href="mailto:models@velishemodelmanagement.com"
                 className="text-gray-900 hover:text-gray-600 transition-colors"
               >
-                models@velishemodelmanage.com
+                models@velishemodelmanagement.com
               </a>
             </div>
 

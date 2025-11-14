@@ -54,10 +54,10 @@ export default function PrivacyPage() {
               <br />
               Email:{" "}
               <a
-                href="mailto:models@velishemodelmanage.com"
+                href="mailto:models@velishemodelmanagement.com"
                 className="text-gray-900 hover:text-gray-600 transition-colors"
               >
-                models@velishemodelmanage.com
+                models@velishemodelmanagement.com
               </a>
             </p>
           </div>
@@ -792,10 +792,10 @@ export default function PrivacyPage() {
               <br />
               Email:{" "}
               <a
-                href="mailto:models@velishemodelmanage.com"
+                href="mailto:models@velishemodelmanagement.com"
                 className="text-gray-900 hover:text-gray-600 transition-colors"
               >
-                models@velishemodelmanage.com
+                models@velishemodelmanagement.com
               </a>
             </p>
           </div>
