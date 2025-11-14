@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     description: "Boutique model agency",
     images: [
       {
-        url: "/logo/logo.svg",
+        url: "/logo/image2.webp",
         width: 2000,
         height: 2000,
         alt: "Velishe Model Management Logo",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Velishe Model Management",
     description: "Boutique model agency",
-    images: ["/logo/logo.svg"],
+    images: ["/logo/image2.webp"],
     creator: "@velishe.mgmt",
   },
   robots: {
