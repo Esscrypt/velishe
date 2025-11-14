@@ -21,7 +21,6 @@ interface FormData {
   hairColor: string;
   eyeColor: string;
   instagram: string;
-  tiktok: string;
   message: string;
   headshot?: string;
   headshot_filename?: string;
@@ -45,23 +44,70 @@ export async function POST(request: NextRequest) {
     const recipientEmail = process.env.RECIPIENT_EMAIL || smtpUser;
 
     if (!smtpHost || !smtpPort || !smtpUser || !smtpPassword) {
-      console.error("Missing SMTP configuration");
+      console.error("Missing SMTP configuration", {
+        hasHost: !!smtpHost,
+        hasPort: !!smtpPort,
+        hasUser: !!smtpUser,
+        hasPassword: !!smtpPassword,
+      });
       return NextResponse.json(
         { error: "Server configuration error" },
         { status: 500 }
       );
     }
 
-    // Create transporter
+    // Create transporter with Zoho-specific configuration
+    const port = parseInt(smtpPort, 10);
+    const isSecure = port === 465;
+    
+    // Log configuration (without sensitive data)
+    console.log("SMTP Configuration:", {
+      host: smtpHost,
+      port: port,
+      secure: isSecure,
+      user: smtpUser,
+      passwordLength: smtpPassword?.length || 0,
+    });
+
     const transporter = nodemailer.createTransport({
       host: smtpHost,
-      port: parseInt(smtpPort, 10),
-      secure: parseInt(smtpPort, 10) === 465, // true for 465, false for other ports
+      port: port,
+      secure: isSecure, // true for 465 (SSL), false for 587 (TLS)
       auth: {
-        user: smtpUser,
-        pass: smtpPassword,
+        user: smtpUser.trim(), // Trim whitespace
+        pass: smtpPassword.trim(), // Trim whitespace
       },
+      // Zoho-specific TLS configuration
+      tls: {
+        rejectUnauthorized: false,
+        minVersion: "TLSv1.2",
+      },
+      // Force TLS upgrade for port 587
+      requireTLS: !isSecure,
+      // Connection timeout
+      connectionTimeout: 10000,
+      // Greeting timeout
+      greetingTimeout: 10000,
+      // Socket timeout
+      socketTimeout: 10000,
     });
+
+    // Verify connection before sending
+    try {
+      await transporter.verify();
+      console.log("SMTP connection verified successfully");
+    } catch (verifyError) {
+      console.error("SMTP verification failed:", verifyError);
+      return NextResponse.json(
+        {
+          error:
+            verifyError instanceof Error
+              ? `SMTP connection failed: ${verifyError.message}`
+              : "SMTP connection failed. Please check your credentials.",
+        },
+        { status: 500 }
+      );
+    }
 
     // Prepare attachments from base64 images
     const attachments: Array<{
@@ -215,10 +261,6 @@ export async function POST(request: NextRequest) {
                 <div class="label">Instagram:</div>
                 <div class="value">${body.instagram}</div>
               </div>
-              <div class="field">
-                <div class="label">TikTok:</div>
-                <div class="value">${body.tiktok}</div>
-              </div>
             </div>
 
             <div class="section">
@@ -269,7 +311,6 @@ Physical Measurements:
 
 Social Media:
 - Instagram: ${body.instagram}
-- TikTok: ${body.tiktok}
 
 Message:
 ${body.message}
@@ -296,12 +337,20 @@ ${attachments.length > 0 ? `\nPortfolio Images: ${attachments.length} image(s) a
     );
   } catch (error) {
     console.error("Error sending email:", error);
+    
+    // Provide more detailed error information for debugging
+    let errorMessage = "Failed to send email. Please try again later.";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      // Check for common authentication errors
+      if (error.message.includes("535") || error.message.includes("Authentication")) {
+        errorMessage = "SMTP Authentication failed. Please check your credentials. For Zoho, make sure you're using an app-specific password, not your regular account password.";
+      }
+    }
+    
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to send email. Please try again later.",
+        error: errorMessage,
       },
       { status: 500 }
     );
