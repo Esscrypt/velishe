@@ -7,6 +7,10 @@ import SocialIcons from "@/components/SocialIcons";
 import ImageCarousel from "@/components/ImageCarousel";
 import ModelPageTracker from "@/components/ModelPageTracker";
 
+// Force static generation to prevent RSC requests and 404s
+export const dynamic = 'force-static';
+export const dynamicParams = false; // Return 404 for unknown routes
+
 export async function generateStaticParams() {
   const slugs = await discoverAllModels();
   return slugs.map((slug) => ({

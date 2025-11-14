@@ -3,6 +3,9 @@ import Spotlight from "@/components/Spotlight";
 import PreloadThumbnails from "@/components/PreloadThumbnails";
 import MobileRedirect from "@/components/MobileRedirect";
 
+// Force static generation to prevent RSC requests and 404s
+export const dynamic = 'force-static';
+
 export default async function Home() {
   const models = await getAllModels();
 

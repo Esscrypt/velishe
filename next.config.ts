@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
     // For production, consider using Cloudinary, Imgix, or similar
   },
   trailingSlash: true,
+  // Ensure proper static generation for model pages
+  experimental: {
+    // Optimize server components
+    optimizePackageImports: ["lucide-react"],
+  },
 };
 
 export default nextConfig;

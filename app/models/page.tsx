@@ -2,6 +2,9 @@ import { getAllModels } from "@/lib/models-server";
 import ModelGrid from "@/components/ModelGrid";
 import PreloadThumbnails from "@/components/PreloadThumbnails";
 
+// Force static generation to prevent RSC requests and 404s
+export const dynamic = 'force-static';
+
 export default async function ModelsPage() {
   const models = await getAllModels();
 
