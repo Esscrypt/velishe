@@ -2,7 +2,11 @@
 
 ## Image Optimization Options
 
-Since this is a static export, Next.js image optimization is disabled. Here are your options:
+**Note**: This project now uses Next.js API routes (for the contact form), so it's no longer a static export. Image optimization can be enabled if deploying to Vercel.
+
+### Current Setup
+- Images are set to `unoptimized: true` for compatibility
+- For better performance, consider the options below:
 
 ### Option 1: Pre-optimize Images (Recommended for Best Performance)
 
@@ -137,11 +141,74 @@ const nextConfig: NextConfig = {
 };
 ```
 
-### Vercel (Easiest)
+### Vercel (Recommended for Next.js with API Routes)
 
-1. Push code to GitHub
-2. Import project in Vercel dashboard
-3. Deploy automatically
+#### Pricing
+- **Free Tier (Hobby Plan)**: 
+  - ✅ Unlimited personal projects
+  - ✅ 100GB bandwidth/month
+  - ✅ Serverless functions (API routes)
+  - ✅ Automatic HTTPS
+  - ✅ Custom domains
+  - ✅ Preview deployments
+  - ✅ Analytics (limited)
+  - Perfect for most portfolios and small projects!
+
+- **Pro Plan** ($20/month): 
+  - Everything in Hobby
+  - More bandwidth (1TB)
+  - Team collaboration
+  - Advanced analytics
+  - Priority support
+
+**For your modeling portfolio, the free tier is more than enough!**
+
+#### Step-by-Step Deployment
+
+1. **Push your code to GitHub** (if not already):
+   ```bash
+   git add .
+   git commit -m "Add SMTP contact form"
+   git push origin main
+   ```
+
+2. **Sign up/Login to Vercel**:
+   - Go to [vercel.com](https://vercel.com)
+   - Sign up with GitHub (recommended) or email
+
+3. **Import your project**:
+   - Click "Add New..." → "Project"
+   - Import your GitHub repository
+   - Vercel will auto-detect Next.js settings
+
+4. **Configure Environment Variables**:
+   - In project settings, go to "Environment Variables"
+   - Add the following (from `.env.example`):
+     ```
+     SMTP_HOST=smtp.zoho.com
+     SMTP_PORT=587
+     SMTP_USER=your-zoho-email@zoho.com
+     SMTP_PASSWORD=your-app-specific-password
+     RECIPIENT_EMAIL=where-to-receive@example.com
+     ```
+   - Make sure to add them for **Production**, **Preview**, and **Development** environments
+
+5. **Deploy**:
+   - Click "Deploy"
+   - Vercel will build and deploy automatically
+   - Your site will be live at `your-project.vercel.app`
+
+6. **Custom Domain** (Optional):
+   - Go to Project Settings → Domains
+   - Add your custom domain
+   - Follow DNS configuration instructions
+
+#### Important Notes for Your Project
+
+- ✅ **API Routes Work**: Since we removed `output: "export"`, your `/api/contact` route will work as a serverless function
+- ✅ **No Build Changes Needed**: Vercel auto-detects Next.js and uses the correct build settings
+- ✅ **Environment Variables**: Make sure to add all SMTP credentials in Vercel dashboard
+- ✅ **Automatic Deployments**: Every push to `main` branch triggers a new deployment
 
 ### Netlify
 

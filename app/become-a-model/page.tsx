@@ -94,10 +94,8 @@ export default function BecomeAModelPage() {
     }
   }, [formData.firstName, formData.lastName, formData.email, formData.contactNumber, hasStartedForm]);
 
-  // Formspree endpoint - replace with your Formspree form ID
-  // Get your form endpoint from https://formspree.io/
-  // Example: https://formspree.io/f/YOUR_FORM_ID
-  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xovvozyz"
+  // API route endpoint for form submission
+  const API_ENDPOINT = "/api/contact"
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -471,68 +469,26 @@ export default function BecomeAModelPage() {
         agreeToTerms: formData.agreeToTerms.toString(),
       };
 
-      // Add base64 images if they exist
-      // Create HTML content with embedded images for email display
-      const imageHtmlParts: string[] = [];
-      
+      // Add base64 images if they exist (will be sent as email attachments)
       if (formData.headshotBase64) {
         payload.headshot = formData.headshotBase64;
         payload.headshot_filename = formData.headshot?.name || "headshot.jpg";
-        imageHtmlParts.push(`
-          <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px;">Headshot</h3>
-            <img src="${formData.headshotBase64}" alt="Headshot" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
-            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.headshot?.name || "headshot.jpg"}</p>
-          </div>
-        `);
       }
       if (formData.fullProfileBase64) {
         payload.fullProfile = formData.fullProfileBase64;
         payload.fullProfile_filename = formData.fullProfile?.name || "fullProfile.jpg";
-        imageHtmlParts.push(`
-          <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px;">Full Profile</h3>
-            <img src="${formData.fullProfileBase64}" alt="Full Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
-            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.fullProfile?.name || "fullProfile.jpg"}</p>
-          </div>
-        `);
       }
       if (formData.halfProfileBase64) {
         payload.halfProfile = formData.halfProfileBase64;
         payload.halfProfile_filename = formData.halfProfile?.name || "halfProfile.jpg";
-        imageHtmlParts.push(`
-          <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px;">Half Profile</h3>
-            <img src="${formData.halfProfileBase64}" alt="Half Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
-            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.halfProfile?.name || "halfProfile.jpg"}</p>
-          </div>
-        `);
       }
       if (formData.fullLengthProfileBase64) {
         payload.fullLengthProfile = formData.fullLengthProfileBase64;
         payload.fullLengthProfile_filename = formData.fullLengthProfile?.name || "fullLengthProfile.jpg";
-        imageHtmlParts.push(`
-          <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px;">Full Length Profile</h3>
-            <img src="${formData.fullLengthProfileBase64}" alt="Full Length Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
-            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.fullLengthProfile?.name || "fullLengthProfile.jpg"}</p>
-          </div>
-        `);
       }
 
-      // Add HTML-formatted images section that Formspree can include in email
-      if (imageHtmlParts.length > 0) {
-        const imagesHtml = `
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
-            <h2 style="margin-bottom: 20px;">Portfolio Images</h2>
-            ${imageHtmlParts.join("")}
-          </div>
-        `;
-        payload._images_html = imagesHtml;
-      }
-
-      // Submit directly to Formspree using JSON (CORS-compatible for static builds)
-      const response = await fetch(FORMSPREE_ENDPOINT, {
+      // Submit to our API route
+      const response = await fetch(API_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
