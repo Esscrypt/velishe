@@ -28,7 +28,6 @@ interface FormErrors {
   hairColor?: string;
   eyeColor?: string;
   instagram?: string;
-  tiktok?: string;
   message?: string;
   headshot?: string;
   fullProfile?: string;
@@ -59,7 +58,6 @@ export default function BecomeAModelPage() {
     hairColor: "",
     eyeColor: "",
     instagram: "",
-    tiktok: "",
     message: "",
     headshot: null as File | null,
     fullProfile: null as File | null,
@@ -94,10 +92,8 @@ export default function BecomeAModelPage() {
     }
   }, [formData.firstName, formData.lastName, formData.email, formData.contactNumber, hasStartedForm]);
 
-  // Formspree endpoint - replace with your Formspree form ID
-  // Get your form endpoint from https://formspree.io/
-  // Example: https://formspree.io/f/YOUR_FORM_ID
-  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xovvozyz"
+  // API route endpoint for form submission
+  const API_ENDPOINT = "/api/contact"
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -110,9 +106,58 @@ export default function BecomeAModelPage() {
   };
 
   const validateHeight = (height: string): boolean => {
+    if (!height.trim()) return false;
+    
     // Accept formats like: 5'8", 5'8, 5ft 8in, 5 feet 8 inches, 173cm, 173
     const heightRegex = /^(\d+['"]?\s*\d*[""]?|\d+\s*(ft|feet|')\s*\d+\s*(in|inches|")|\d+\s*cm|\d+)$/i;
-    return heightRegex.test(height.trim());
+    
+    if (!heightRegex.test(height.trim())) {
+      return false;
+    }
+    
+    // Extract all numeric parts and check each is max 3 digits
+    const numericParts = height.match(/\d+/g);
+    if (numericParts) {
+      for (const part of numericParts) {
+        if (part.length > 3) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
+  };
+
+  const validateNumeric = (value: string, allowDecimal: boolean = true, maxDigits: number = 3): boolean => {
+    if (!value.trim()) return false;
+    // Allow positive numbers, optionally with one decimal point
+    const regex = allowDecimal ? /^\d+(\.\d+)?$/ : /^\d+$/;
+    if (!regex.test(value.trim())) {
+      return false;
+    }
+    
+    const num = parseFloat(value);
+    if (num <= 0 || num >= 1000) {
+      return false;
+    }
+    
+    // Check max digits before decimal point
+    const parts = value.trim().split(".");
+    const integerPart = parts[0];
+    if (integerPart.length > maxDigits) {
+      return false;
+    }
+    
+    return true;
+  };
+
+  const validateSocialHandle = (handle: string): boolean => {
+    if (!handle.trim()) return false;
+    // Remove @ if present, then validate
+    const cleanHandle = handle.replace(/^@/, "").trim();
+    // Instagram handles: 1-30 chars, alphanumeric, underscores, periods
+    const handleRegex = /^[a-zA-Z0-9._]{1,30}$/;
+    return handleRegex.test(cleanHandle);
   };
 
   const validateDateOfBirth = (dob: string): boolean => {
@@ -151,7 +196,44 @@ export default function BecomeAModelPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Restrict numeric fields to numbers and decimal point only, with max 3 digits
+    if (name === "bust" || name === "waist" || name === "hips" || name === "shoeSize") {
+      // Only allow numbers and one decimal point
+      const numericValue = value.replace(/[^\d.]/g, "");
+      // Ensure only one decimal point
+      const parts = numericValue.split(".");
+      let finalValue = parts.length > 2 
+        ? parts[0] + "." + parts.slice(1).join("")
+        : numericValue;
+      
+      // Limit to max 3 digits before decimal point
+      const integerPart = finalValue.split(".")[0];
+      if (integerPart.length > 3) {
+        finalValue = integerPart.slice(0, 3) + (finalValue.includes(".") ? "." + finalValue.split(".")[1] : "");
+      }
+      
+      setFormData((prev) => ({ ...prev, [name]: finalValue }));
+    } else if (name === "height") {
+      // For height, allow various formats but limit numeric parts to 3 digits
+      let finalValue = value;
+      
+      // Extract all numeric parts
+      const numericParts = value.match(/\d+/g);
+      if (numericParts) {
+        for (const part of numericParts) {
+          if (part.length > 3) {
+            // Replace with truncated version
+            const truncated = part.slice(0, 3);
+            finalValue = finalValue.replace(part, truncated);
+          }
+        }
+      }
+      
+      setFormData((prev) => ({ ...prev, [name]: finalValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
     
     // Clear error when user starts typing
     if (errors[name]) {
@@ -283,28 +365,40 @@ export default function BecomeAModelPage() {
       newErrors.height = "Height is required";
       errorSummary.push("Height");
     } else if (!validateHeight(formData.height)) {
-      newErrors.height = "Please enter height in format like 5'8\" or 173cm";
+      newErrors.height = "Please enter height in cm, e.g. 173cm (max 3 digits per number)";
       errorSummary.push("Valid height format");
     }
 
     if (!formData.bust.trim()) {
       newErrors.bust = "Bust measurement is required";
       errorSummary.push("Bust");
+    } else if (!validateNumeric(formData.bust, true, 3)) {
+      newErrors.bust = "Bust must be a valid number with max 3 digits (e.g., 80-90 cm)";
+      errorSummary.push("Valid bust measurement");
     }
 
     if (!formData.waist.trim()) {
       newErrors.waist = "Waist measurement is required";
       errorSummary.push("Waist");
+    } else if (!validateNumeric(formData.waist, true, 3)) {
+      newErrors.waist = "Waist must be a valid number with max 3 digits (e.g., 60-70 cm)";
+      errorSummary.push("Valid waist measurement");
     }
 
     if (!formData.hips.trim()) {
       newErrors.hips = "Hips measurement is required";
       errorSummary.push("Hips");
+    } else if (!validateNumeric(formData.hips, true, 3)) {
+      newErrors.hips = "Hips must be a valid number with max 3 digits (e.g., 90-100 cm)";
+      errorSummary.push("Valid hips measurement");
     }
 
     if (!formData.shoeSize.trim()) {
       newErrors.shoeSize = "Shoe size is required";
       errorSummary.push("Shoe size");
+    } else if (!validateNumeric(formData.shoeSize, true, 2)) {
+      newErrors.shoeSize = "Shoe size must be a valid number with max 2 digits (e.g., 40)";
+      errorSummary.push("Valid shoe size");
     }
 
     if (!formData.hairColor.trim()) {
@@ -320,11 +414,9 @@ export default function BecomeAModelPage() {
     if (!formData.instagram.trim()) {
       newErrors.instagram = "Instagram handle is required";
       errorSummary.push("Instagram");
-    }
-
-    if (!formData.tiktok.trim()) {
-      newErrors.tiktok = "TikTok handle is required";
-      errorSummary.push("TikTok");
+    } else if (!validateSocialHandle(formData.instagram)) {
+      newErrors.instagram = "Please enter a valid Instagram handle (e.g., username or @username)";
+      errorSummary.push("Valid Instagram handle");
     }
 
     if (!formData.message.trim()) {
@@ -445,7 +537,10 @@ export default function BecomeAModelPage() {
     setIsSubmitting(true);
 
     try {
-      // Create JSON payload for Formspree (works with CORS and static builds)
+      // Create JSON payload
+      // Clean social handle (remove @ if present)
+      const cleanInstagram = formData.instagram.replace(/^@/, "").trim();
+      
       const payload: Record<string, string> = {
         gender: formData.gender,
         firstName: formData.firstName,
@@ -465,74 +560,31 @@ export default function BecomeAModelPage() {
         shoeSize: formData.shoeSize,
         hairColor: formData.hairColor,
         eyeColor: formData.eyeColor,
-        instagram: formData.instagram,
-        tiktok: formData.tiktok,
+        instagram: cleanInstagram,
         message: formData.message,
         agreeToTerms: formData.agreeToTerms.toString(),
       };
 
-      // Add base64 images if they exist
-      // Create HTML content with embedded images for email display
-      const imageHtmlParts: string[] = [];
-      
+      // Add base64 images if they exist (will be sent as email attachments)
       if (formData.headshotBase64) {
         payload.headshot = formData.headshotBase64;
         payload.headshot_filename = formData.headshot?.name || "headshot.jpg";
-        imageHtmlParts.push(`
-          <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px;">Headshot</h3>
-            <img src="${formData.headshotBase64}" alt="Headshot" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
-            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.headshot?.name || "headshot.jpg"}</p>
-          </div>
-        `);
       }
       if (formData.fullProfileBase64) {
         payload.fullProfile = formData.fullProfileBase64;
         payload.fullProfile_filename = formData.fullProfile?.name || "fullProfile.jpg";
-        imageHtmlParts.push(`
-          <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px;">Full Profile</h3>
-            <img src="${formData.fullProfileBase64}" alt="Full Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
-            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.fullProfile?.name || "fullProfile.jpg"}</p>
-          </div>
-        `);
       }
       if (formData.halfProfileBase64) {
         payload.halfProfile = formData.halfProfileBase64;
         payload.halfProfile_filename = formData.halfProfile?.name || "halfProfile.jpg";
-        imageHtmlParts.push(`
-          <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px;">Half Profile</h3>
-            <img src="${formData.halfProfileBase64}" alt="Half Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
-            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.halfProfile?.name || "halfProfile.jpg"}</p>
-          </div>
-        `);
       }
       if (formData.fullLengthProfileBase64) {
         payload.fullLengthProfile = formData.fullLengthProfileBase64;
         payload.fullLengthProfile_filename = formData.fullLengthProfile?.name || "fullLengthProfile.jpg";
-        imageHtmlParts.push(`
-          <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px;">Full Length Profile</h3>
-            <img src="${formData.fullLengthProfileBase64}" alt="Full Length Profile" style="max-width: 500px; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
-            <p style="margin-top: 5px; color: #666; font-size: 12px;">Filename: ${formData.fullLengthProfile?.name || "fullLengthProfile.jpg"}</p>
-          </div>
-        `);
       }
 
-      // Add HTML-formatted images section that Formspree can include in email
-      if (imageHtmlParts.length > 0) {
-        const imagesHtml = `
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
-            <h2 style="margin-bottom: 20px;">Portfolio Images</h2>
-            ${imageHtmlParts.join("")}
-          </div>
-        `;
-        payload._images_html = imagesHtml;
-      }
-
-      // Submit directly to Formspree using JSON (CORS-compatible for static builds)
-      const response = await fetch(FORMSPREE_ENDPOINT, {
+      // Submit to our API route
+      const response = await fetch(API_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -581,7 +633,6 @@ export default function BecomeAModelPage() {
           hairColor: "",
           eyeColor: "",
           instagram: "",
-          tiktok: "",
           message: "",
           headshot: null,
           fullProfile: null,
@@ -958,13 +1009,15 @@ export default function BecomeAModelPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bust *
+                Bust (inches) *
               </label>
               <input
                 type="text"
+                inputMode="decimal"
                 name="bust"
                 value={formData.bust}
                 onChange={handleInputChange}
+                placeholder="e.g., 34 or 34.5"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.bust
@@ -978,13 +1031,15 @@ export default function BecomeAModelPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Waist *
+                Waist (inches) *
               </label>
               <input
                 type="text"
+                inputMode="decimal"
                 name="waist"
                 value={formData.waist}
                 onChange={handleInputChange}
+                placeholder="e.g., 24 or 24.5"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.waist
@@ -998,13 +1053,15 @@ export default function BecomeAModelPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hips *
+                Hips (inches) *
               </label>
               <input
                 type="text"
+                inputMode="decimal"
                 name="hips"
                 value={formData.hips}
                 onChange={handleInputChange}
+                placeholder="e.g., 36 or 36.5"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.hips
@@ -1018,13 +1075,15 @@ export default function BecomeAModelPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Shoe Size *
+                Shoe Size (US) *
               </label>
               <input
                 type="text"
+                inputMode="decimal"
                 name="shoeSize"
                 value={formData.shoeSize}
                 onChange={handleInputChange}
+                placeholder="e.g., 8 or 8.5"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.shoeSize
@@ -1081,47 +1140,26 @@ export default function BecomeAModelPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Instagram *
-              </label>
-              <input
-                type="text"
-                name="instagram"
-                value={formData.instagram}
-                onChange={handleInputChange}
-                required
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                  errors.instagram
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-black"
-                }`}
-              />
-              {errors.instagram && (
-                <p className="mt-1 text-sm text-red-600">{errors.instagram}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                TikTok *
-              </label>
-              <input
-                type="text"
-                name="tiktok"
-                value={formData.tiktok}
-                onChange={handleInputChange}
-                required
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                  errors.tiktok
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-black"
-                }`}
-              />
-              {errors.tiktok && (
-                <p className="mt-1 text-sm text-red-600">{errors.tiktok}</p>
-              )}
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Instagram *
+            </label>
+            <input
+              type="text"
+              name="instagram"
+              value={formData.instagram}
+              onChange={handleInputChange}
+              placeholder="username or @username"
+              required
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.instagram
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-black"
+              }`}
+            />
+            {errors.instagram && (
+              <p className="mt-1 text-sm text-red-600">{errors.instagram}</p>
+            )}
           </div>
 
           <div>

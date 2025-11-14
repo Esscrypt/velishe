@@ -1,9 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  // Removed static export to enable API routes for Vercel deployment
+  // If you need static export for other deployments, you can make this conditional
+  // output: "export",
   images: {
-    unoptimized: true, // Required for static export - use external service for optimization
+    unoptimized: true,
     // For production, consider using Cloudinary, Imgix, or similar
   },
   trailingSlash: true,
