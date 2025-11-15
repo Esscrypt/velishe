@@ -126,5 +126,20 @@
     },
     "instagram": "https://instagram.com/faleevaxenia",
     "featuredImage": "/models/kseniya/featured.webp"
+  }, {
+    "id": "9",
+    "slug": "frank",
+    "name": "Frank",
+    "stats": {
+      "height": "190 cm",
+      "hips": "98 cm",
+      "waist": "102 cm",
+      "bust": "103 cm",
+      "shoeSize": "45",
+      "hairColor": "DarkBrown",
+      "eyeColor": "Black"
+    },
+    "instagram": "https://instagram.com/fr.aank_aj",
+    "featuredImage": "/models/frank/featured.webp"
   }
 ]
