@@ -1,24 +1,22 @@
-import { getAllModels } from "@/lib/models-server";
-import Spotlight from "@/components/Spotlight";
-import PreloadThumbnails from "@/components/PreloadThumbnails";
+import { getAllModelsSync } from "@/lib/models";
 import MobileRedirect from "@/components/MobileRedirect";
+import { ModelsProvider } from "@/components/ModelsProvider";
+import { HomeModelsContent } from "@/components/ModelsContent";
 
 // Force static generation to prevent RSC requests and 404s
 export const dynamic = 'force-static';
 
-export default async function Home() {
-  const models = await getAllModels();
+export default function Home() {
+  // Load statically from models.json first
+  const initialModels = getAllModelsSync();
 
   return (
     <>
       {/* Redirect mobile users to /models page */}
       <MobileRedirect />
-      {/* Preload all models for smooth rotation */}
-      <PreloadThumbnails models={models} />
-      <div className="w-full">
-        {/* Spotlight: 3 cards that rotate every 5 seconds (desktop only) */}
-        <Spotlight models={models} />
-      </div>
+      <ModelsProvider initialModels={initialModels}>
+        <HomeModelsContent />
+      </ModelsProvider>
     </>
   );
 }
