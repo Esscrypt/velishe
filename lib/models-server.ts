@@ -29,7 +29,7 @@ export async function getAllModels(): Promise<Model[]> {
     const featuredImagePath = discovered.featuredImage || sourceModel?.featuredImage || "";
     
     // Prefer gallery from database if available, otherwise use filesystem discovery
-    let gallery = sourceModel?.gallery || [];
+    let gallery = (sourceModel && "gallery" in sourceModel) ? sourceModel.gallery : [];
     if (gallery.length === 0) {
       // Fallback to filesystem discovery if DB gallery is empty
       gallery = discovered.gallery

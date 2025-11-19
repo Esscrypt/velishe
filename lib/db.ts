@@ -7,7 +7,7 @@ import { eq, asc } from "drizzle-orm";
  * Returns null if database is not available or query fails
  */
 export async function fetchModelsFromDb(): Promise<Model[] | null> {
-  const db = getDb();
+  const db = await getDb();
   if (!db) {
     return null;
   }
@@ -58,12 +58,12 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
       }
       
       // Add image to gallery if it exists
-      if (row.imageId) {
+      if (row.imageId && row.imageSrc) {
         const model = modelsMap.get(row.modelId)!;
         model.gallery.push({
           type: row.imageType as "image" | "video",
           src: row.imageSrc,
-          alt: row.imageAlt,
+          alt: row.imageAlt || "",
         });
       }
     }
@@ -89,7 +89,7 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
 export async function fetchModelBySlugFromDb(
   slug: string
 ): Promise<Model | null> {
-  const db = getDb();
+  const db = await getDb();
   if (!db) {
     return null;
   }
@@ -121,11 +121,11 @@ export async function fetchModelBySlugFromDb(
 
     const firstRow = rows[0];
     const gallery = rows
-      .filter((row) => row.imageId !== null)
+      .filter((row) => row.imageId !== null && row.imageSrc !== null)
       .map((row) => ({
         type: row.imageType as "image" | "video",
-        src: row.imageSrc,
-        alt: row.imageAlt,
+        src: row.imageSrc!,
+        alt: row.imageAlt || "",
       }));
 
     return {

@@ -27,15 +27,16 @@ interface ModelJson {
   featuredImage?: string;
 }
 
-const db = getDb();
+async function main() {
+  const db = await getDb();
 
-if (!db) {
-  console.error("❌ DATABASE_URL environment variable is not set.");
-  console.error("Please set DATABASE_URL to connect to your database.");
-  process.exit(1);
-}
+  if (!db) {
+    console.error("❌ DATABASE_URL environment variable is not set.");
+    console.error("Please set DATABASE_URL to connect to your database.");
+    process.exit(1);
+  }
 
-try {
+  try {
   // Read models.json
   const modelsJsonPath = join(process.cwd(), "data", "models.json");
   const modelsJsonContent = readFileSync(modelsJsonPath, "utf-8");
@@ -237,12 +238,15 @@ try {
     }
   }
 
-  // Verify the insertions
-  const finalCount = await db.select().from(schema.models);
-  console.log(`\n✅ Database population complete!`);
-  console.log(`📊 Total models in database: ${finalCount.length}`);
-} catch (error) {
-  console.error("❌ Error populating database:", error);
-  process.exit(1);
+    // Verify the insertions
+    const finalCount = await db.select().from(schema.models);
+    console.log(`\n✅ Database population complete!`);
+    console.log(`📊 Total models in database: ${finalCount.length}`);
+  } catch (error) {
+    console.error("❌ Error populating database:", error);
+    process.exit(1);
+  }
 }
+
+main();
 
