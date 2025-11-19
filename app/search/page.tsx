@@ -9,11 +9,30 @@ import { Model } from "@/types/model";
 export default function SearchPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [allModels, setAllModels] = useState<Model[]>([]);
+  const [allModels, setAllModels] = useState<Model[]>(getAllModelsSync());
 
   useEffect(() => {
-    // Use sync version for client component
+    // Load statically first, then fetch from API
     setAllModels(getAllModelsSync());
+    
+    // Fetch models from API asynchronously
+    fetch("/api/models")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch models");
+        }
+        return res.json();
+      })
+      .then((dbModels: Model[]) => {
+        // Only update if we got models from DB
+        if (dbModels && dbModels.length > 0) {
+          setAllModels(dbModels);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching models from API:", error);
+        // Keep using initial models on error
+      });
   }, []);
 
   const filteredModels = useMemo(() => {

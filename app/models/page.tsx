@@ -1,21 +1,18 @@
-import { getAllModels } from "@/lib/models-server";
-import ModelGrid from "@/components/ModelGrid";
-import PreloadThumbnails from "@/components/PreloadThumbnails";
+import { getAllModelsSync } from "@/lib/models";
+import { ModelsProvider } from "@/components/ModelsProvider";
+import { ModelsGridContent } from "@/components/ModelsGridContent";
 
 // Force static generation to prevent RSC requests and 404s
 export const dynamic = 'force-static';
 
-export default async function ModelsPage() {
-  const models = await getAllModels();
+export default function ModelsPage() {
+  // Load statically from models.json first
+  const initialModels = getAllModelsSync();
 
   return (
-    <>
-      {/* Preload only above-the-fold images: 3-4 on desktop, 1-2 on mobile */}
-      <PreloadThumbnails models={models.slice(0, 4)} />
-      <div className="w-full py-8">
-        <ModelGrid models={models} />
-      </div>
-    </>
+    <ModelsProvider initialModels={initialModels}>
+      <ModelsGridContent />
+    </ModelsProvider>
   );
 }
 
