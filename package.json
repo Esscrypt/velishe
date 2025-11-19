@@ -8,26 +8,34 @@
     "start": "bunx serve@latest out",
     "preview": "bun run build && bun run start",
     "lint": "eslint",
-    "optimize-images": "bun run scripts/optimize-images.ts"
+    "optimize-images": "bun run scripts/optimize-images.ts",
+    "populate-db": "bun run scripts/populate-db.ts",
+    "clear-db": "bun run scripts/clear-db.ts",
+    "db:generate": "drizzle-kit generate --config ./drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config ./drizzle.config.ts"
   },
   "dependencies": {
-    "framer-motion": "^12.23.24",
-    "lucide-react": "^0.553.0",
+    "drizzle-orm": "0.36.4",
+    "framer-motion": "12.23.24",
+    "lucide-react": "0.553.0",
     "next": "16.0.1",
-    "nodemailer": "^7.0.10",
+    "nodemailer": "7.0.10",
+    "postgres": "3.4.5",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "sharp": "^0.34.5"
+    "sharp": "0.34.5"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/nodemailer": "^7.0.3",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
+    "@tailwindcss/postcss": "4.0.0",
+    "@types/node": "24.10.1",
+    "@types/nodemailer": "7.0.3",
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "dotenv": "16.4.7",
+    "drizzle-kit": "0.30.0",
+    "eslint": "9.17.0",
     "eslint-config-next": "16.0.1",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "tailwindcss": "4.0.0",
+    "typescript": "5.7.2"
   }
 }
