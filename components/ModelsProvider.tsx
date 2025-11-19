@@ -19,8 +19,47 @@ interface ModelsProviderProps {
 }
 
 /**
+ * Merge DB models with static models
+ * - If DB has equal or more items: override completely with DB response
+ * - If DB is empty: keep static models (do nothing)
+ * - If DB has some items (fewer than static): override only matching items by slug
+ */
+function mergeModels(staticModels: Model[], dbModels: Model[]): Model[] {
+  // If DB is empty, return static models
+  if (!dbModels || dbModels.length === 0) {
+    return staticModels;
+  }
+
+  // If DB has equal or more items, use DB completely
+  if (dbModels.length >= staticModels.length) {
+    return dbModels;
+  }
+
+  // DB has fewer items - merge: override matching items, keep static for others
+  const dbModelsMap = new Map<string, Model>();
+  dbModels.forEach((model) => {
+    dbModelsMap.set(model.slug, model);
+  });
+
+  // Start with static models, override with DB models where they exist
+  const merged = staticModels.map((staticModel) => {
+    const dbModel = dbModelsMap.get(staticModel.slug);
+    return dbModel || staticModel;
+  });
+
+  // Add any DB models that don't exist in static (shouldn't happen, but handle it)
+  dbModels.forEach((dbModel) => {
+    if (!staticModels.find((m) => m.slug === dbModel.slug)) {
+      merged.push(dbModel);
+    }
+  });
+
+  return merged;
+}
+
+/**
  * Client component that loads models statically first, then fetches from DB
- * and updates the UI when new data arrives
+ * and merges/updates the UI when new data arrives
  */
 export function ModelsProvider({ initialModels, children }: ModelsProviderProps) {
   const [models, setModels] = useState<Model[]>(initialModels);
@@ -38,9 +77,17 @@ export function ModelsProvider({ initialModels, children }: ModelsProviderProps)
         return res.json();
       })
       .then((dbModels: Model[]) => {
-        // Only update if we got models from DB
-        if (dbModels && dbModels.length > 0) {
-          setModels(dbModels);
+        if (Array.isArray(dbModels)) {
+          const merged = mergeModels(initialModels, dbModels);
+          setModels(merged);
+          
+          if (dbModels.length === 0) {
+            console.log("⚠️  Database returned empty array, keeping static models");
+          } else if (dbModels.length >= initialModels.length) {
+            console.log(`✅ Overrode all models with database: ${dbModels.length} models`);
+          } else {
+            console.log(`✅ Merged database models (${dbModels.length}) with static models (${initialModels.length})`);
+          }
         }
       })
       .catch((error) => {
@@ -50,7 +97,7 @@ export function ModelsProvider({ initialModels, children }: ModelsProviderProps)
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [initialModels]);
 
   return (
     <ModelsContext.Provider value={{ models, isLoading }}>

@@ -12,8 +12,8 @@ export default function SearchPage() {
   const [allModels, setAllModels] = useState<Model[]>(getAllModelsSync());
 
   useEffect(() => {
-    // Load statically first, then fetch from API
-    setAllModels(getAllModelsSync());
+    const staticModels = getAllModelsSync();
+    setAllModels(staticModels);
     
     // Fetch models from API asynchronously
     fetch("/api/models")
@@ -24,9 +24,30 @@ export default function SearchPage() {
         return res.json();
       })
       .then((dbModels: Model[]) => {
-        // Only update if we got models from DB
-        if (dbModels && dbModels.length > 0) {
-          setAllModels(dbModels);
+        if (Array.isArray(dbModels)) {
+          // Merge logic: override all if DB has equal/more, merge if fewer, keep static if empty
+          if (dbModels.length === 0) {
+            // Keep static models
+            return;
+          } else if (dbModels.length >= staticModels.length) {
+            // Override completely
+            setAllModels(dbModels);
+            console.log(`✅ Overrode all models with database: ${dbModels.length} models`);
+          } else {
+            // Merge: override matching items by slug
+            const dbModelsMap = new Map<string, Model>();
+            dbModels.forEach((model) => {
+              dbModelsMap.set(model.slug, model);
+            });
+            
+            const merged = staticModels.map((staticModel) => {
+              const dbModel = dbModelsMap.get(staticModel.slug);
+              return dbModel || staticModel;
+            });
+            
+            setAllModels(merged);
+            console.log(`✅ Merged database models (${dbModels.length}) with static models (${staticModels.length})`);
+          }
         }
       })
       .catch((error) => {

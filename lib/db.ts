@@ -9,10 +9,12 @@ import { eq, asc } from "drizzle-orm";
 export async function fetchModelsFromDb(): Promise<Model[] | null> {
   const db = await getDb();
   if (!db) {
+    console.warn("⚠️  Database connection not available in fetchModelsFromDb");
     return null;
   }
 
   try {
+    console.log("📖 Fetching models from database...");
     // Single query with LEFT JOIN to get all models with their images
     const rows = await db
       .select({
@@ -77,6 +79,7 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
       .sort((a, b) => a.displayOrder - b.displayOrder)
       .map((entry) => entry.model);
 
+    console.log(`✅ Fetched ${models.length} models from database`);
     return models;
   } catch (error) {
     console.error("Failed to fetch models from database:", error);
