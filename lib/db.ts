@@ -34,33 +34,37 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
       .orderBy(asc(schema.models.displayOrder), asc(schema.images.order));
     
     // Group by model and collect images
-    const modelsMap = new Map<number, Model>();
+    // Use a Map with displayOrder for proper sorting
+    const modelsMap = new Map<number, { model: Model; displayOrder: number }>();
     
     for (const row of rows) {
       if (!modelsMap.has(row.modelId)) {
         modelsMap.set(row.modelId, {
-          id: String(row.modelId), // Convert to string for Model type
-          slug: row.slug,
-          name: row.name,
-          stats: row.stats || {
-            height: "",
-            bust: "",
-            waist: "",
-            hips: "",
-            shoeSize: "",
-            hairColor: "",
-            eyeColor: "",
+          model: {
+            id: String(row.modelId), // Convert to string for Model type
+            slug: row.slug,
+            name: row.name,
+            stats: row.stats || {
+              height: "",
+              bust: "",
+              waist: "",
+              hips: "",
+              shoeSize: "",
+              hairColor: "",
+              eyeColor: "",
+            },
+            instagram: row.instagram || undefined,
+            featuredImage: row.featuredImage || "",
+            gallery: [],
           },
-          instagram: row.instagram || undefined,
-          featuredImage: row.featuredImage || "",
-          gallery: [],
+          displayOrder: row.displayOrder,
         });
       }
       
       // Add image to gallery if it exists
       if (row.imageId && row.imageSrc) {
-        const model = modelsMap.get(row.modelId)!;
-        model.gallery.push({
+        const entry = modelsMap.get(row.modelId)!;
+        entry.model.gallery.push({
           type: row.imageType as "image" | "video",
           src: row.imageSrc,
           alt: row.imageAlt || "",
@@ -69,11 +73,9 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
     }
     
     // Convert to array and sort by display order
-    const models = Array.from(modelsMap.values()).sort((a, b) => {
-      // Models are already sorted by displayOrder from the query
-      // This is just a safety sort in case
-      return 0;
-    });
+    const models = Array.from(modelsMap.values())
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .map((entry) => entry.model);
 
     return models;
   } catch (error) {
