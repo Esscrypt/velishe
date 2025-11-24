@@ -27,16 +27,15 @@ interface ModelJson {
   featuredImage?: string;
 }
 
-async function main() {
-  const db = await getDb();
+const db = getDb();
 
-  if (!db) {
-    console.error("❌ DATABASE_URL environment variable is not set.");
-    console.error("Please set DATABASE_URL to connect to your database.");
-    process.exit(1);
-  }
+if (!db) {
+  console.error("❌ DATABASE_URL environment variable is not set.");
+  console.error("Please set DATABASE_URL to connect to your database.");
+  process.exit(1);
+}
 
-  try {
+try {
   // Read models.json
   const modelsJsonPath = join(process.cwd(), "data", "models.json");
   const modelsJsonContent = readFileSync(modelsJsonPath, "utf-8");
@@ -56,31 +55,20 @@ async function main() {
   if (modelsToInsert.length > 0) {
     console.log(`➕ Inserting ${modelsToInsert.length} new models...`);
 
-    // Get current max display order to continue from there
-    const existingModelsForOrder = await db.select({ displayOrder: schema.models.displayOrder }).from(schema.models);
-    let currentMaxOrder = existingModelsForOrder.length > 0
-      ? Math.max(...existingModelsForOrder.map((m) => m.displayOrder))
-      : -1;
-
     // Insert new models
-    for (let i = 0; i < modelsToInsert.length; i++) {
-      const modelJson = modelsToInsert[i];
+    for (const modelJson of modelsToInsert) {
       try {
         // Use discovered featured image if available, otherwise use JSON value
         const discovered = await discoverModelImages(modelJson.slug);
         const featuredImage = discovered.featuredImage || modelJson.featuredImage || null;
 
-        // Set displayOrder based on insertion order
-        const displayOrder = currentMaxOrder + 1 + i;
-
-        const modelToInsert: Omit<ModelInsert, "id"> = {
-          // id is auto-generated (serial), so we don't set it
+        const modelToInsert: ModelInsert = {
+          id: modelJson.id,
           slug: modelJson.slug,
           name: modelJson.name,
           stats: modelJson.stats,
           instagram: modelJson.instagram || null,
           featuredImage,
-          displayOrder,
         };
 
         await db
@@ -88,7 +76,7 @@ async function main() {
           .values(modelToInsert)
           .onConflictDoNothing();
 
-        console.log(`  ✓ Inserted: ${modelJson.name} (${modelJson.slug}) with displayOrder ${displayOrder}`);
+        console.log(`  ✓ Inserted: ${modelJson.name} (${modelJson.slug})`);
       } catch (error) {
         console.error(`  ✗ Failed to insert ${modelJson.name} (${modelJson.slug}):`, error);
       }
@@ -238,15 +226,12 @@ async function main() {
     }
   }
 
-    // Verify the insertions
-    const finalCount = await db.select().from(schema.models);
-    console.log(`\n✅ Database population complete!`);
-    console.log(`📊 Total models in database: ${finalCount.length}`);
-  } catch (error) {
-    console.error("❌ Error populating database:", error);
-    process.exit(1);
-  }
+  // Verify the insertions
+  const finalCount = await db.select().from(schema.models);
+  console.log(`\n✅ Database population complete!`);
+  console.log(`📊 Total models in database: ${finalCount.length}`);
+} catch (error) {
+  console.error("❌ Error populating database:", error);
+  process.exit(1);
 }
-
-main();
 

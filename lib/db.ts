@@ -9,12 +9,10 @@ import { eq, asc } from "drizzle-orm";
 export async function fetchModelsFromDb(): Promise<Model[] | null> {
   const db = await getDb();
   if (!db) {
-    console.warn("⚠️  Database connection not available in fetchModelsFromDb");
     return null;
   }
 
   try {
-    console.log("📖 Fetching models from database...");
     // Single query with LEFT JOIN to get all models with their images
     const rows = await db
       .select({
@@ -36,37 +34,33 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
       .orderBy(asc(schema.models.displayOrder), asc(schema.images.order));
     
     // Group by model and collect images
-    // Use a Map with displayOrder for proper sorting
-    const modelsMap = new Map<number, { model: Model; displayOrder: number }>();
+    const modelsMap = new Map<number, Model>();
     
     for (const row of rows) {
       if (!modelsMap.has(row.modelId)) {
         modelsMap.set(row.modelId, {
-          model: {
-            id: String(row.modelId), // Convert to string for Model type
-            slug: row.slug,
-            name: row.name,
-            stats: row.stats || {
-              height: "",
-              bust: "",
-              waist: "",
-              hips: "",
-              shoeSize: "",
-              hairColor: "",
-              eyeColor: "",
-            },
-            instagram: row.instagram || undefined,
-            featuredImage: row.featuredImage || "",
-            gallery: [],
+          id: String(row.modelId), // Convert to string for Model type
+          slug: row.slug,
+          name: row.name,
+          stats: row.stats || {
+            height: "",
+            bust: "",
+            waist: "",
+            hips: "",
+            shoeSize: "",
+            hairColor: "",
+            eyeColor: "",
           },
-          displayOrder: row.displayOrder,
+          instagram: row.instagram || undefined,
+          featuredImage: row.featuredImage || "",
+          gallery: [],
         });
       }
       
       // Add image to gallery if it exists
       if (row.imageId && row.imageSrc) {
-        const entry = modelsMap.get(row.modelId)!;
-        entry.model.gallery.push({
+        const model = modelsMap.get(row.modelId)!;
+        model.gallery.push({
           type: row.imageType as "image" | "video",
           src: row.imageSrc,
           alt: row.imageAlt || "",
@@ -75,11 +69,12 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
     }
     
     // Convert to array and sort by display order
-    const models = Array.from(modelsMap.values())
-      .sort((a, b) => a.displayOrder - b.displayOrder)
-      .map((entry) => entry.model);
+    const models = Array.from(modelsMap.values()).sort((a, b) => {
+      // Models are already sorted by displayOrder from the query
+      // This is just a safety sort in case
+      return 0;
+    });
 
-    console.log(`✅ Fetched ${models.length} models from database`);
     return models;
   } catch (error) {
     console.error("Failed to fetch models from database:", error);
