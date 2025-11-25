@@ -5,9 +5,22 @@ import { eq, asc } from "drizzle-orm";
 /**
  * Fetch all models from database with their images using a single JOIN query
  * Returns null if database is not available or query fails
+ * Skips database connection during build time (static generation)
  */
 export async function fetchModelsFromDb(): Promise<Model[] | null> {
-  const db = await getDb();
+  // Skip database during build time to avoid connection attempts
+  // Check for build context via environment variables
+  const isBuildTime = 
+    process.env.NEXT_PHASE === 'phase-production-build' ||
+    process.env.NEXT_PHASE === 'phase-development-build' ||
+    process.env.CI === 'true' ||
+    process.env.VERCEL === '1';
+  
+  if (isBuildTime) {
+    return null;
+  }
+  
+  const db = getDb();
   if (!db) {
     return null;
   }
@@ -77,7 +90,16 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
 
     return models;
   } catch (error) {
-    console.error("Failed to fetch models from database:", error);
+    // Only log errors if not in build context
+    const isBuildTime = 
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      process.env.NEXT_PHASE === 'phase-development-build' ||
+      process.env.CI === 'true' ||
+      process.env.VERCEL === '1';
+    
+    if (!isBuildTime) {
+      console.error("Failed to fetch models from database:", error);
+    }
     return null;
   }
 }
@@ -85,11 +107,24 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
 /**
  * Fetch a single model by slug from database with its images using a single JOIN query
  * Returns null if database is not available or query fails
+ * Skips database connection during build time (static generation)
  */
 export async function fetchModelBySlugFromDb(
   slug: string
 ): Promise<Model | null> {
-  const db = await getDb();
+  // Skip database during build time to avoid connection attempts
+  // Check for build context via environment variables
+  const isBuildTime = 
+    process.env.NEXT_PHASE === 'phase-production-build' ||
+    process.env.NEXT_PHASE === 'phase-development-build' ||
+    process.env.CI === 'true' ||
+    process.env.VERCEL === '1';
+  
+  if (isBuildTime) {
+    return null;
+  }
+  
+  const db = getDb();
   if (!db) {
     return null;
   }
@@ -146,7 +181,16 @@ export async function fetchModelBySlugFromDb(
       gallery,
     };
   } catch (error) {
-    console.error(`Failed to fetch model ${slug} from database:`, error);
+    // Only log errors if not in build context
+    const isBuildTime = 
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      process.env.NEXT_PHASE === 'phase-development-build' ||
+      process.env.CI === 'true' ||
+      process.env.VERCEL === '1';
+    
+    if (!isBuildTime) {
+      console.error(`Failed to fetch model ${slug} from database:`, error);
+    }
     return null;
   }
 }
