@@ -63,7 +63,6 @@ try {
         const featuredImage = discovered.featuredImage || modelJson.featuredImage || null;
 
         const modelToInsert: ModelInsert = {
-          id: modelJson.id,
           slug: modelJson.slug,
           name: modelJson.name,
           stats: modelJson.stats,

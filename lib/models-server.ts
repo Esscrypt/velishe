@@ -1,4 +1,4 @@
-import { Model } from "@/types/model";
+import { Model, ModelMedia } from "@/types/model";
 import modelsData from "@/data/models.json";
 import { discoverModelImages, discoverAllModels } from "./discover-images";
 import { fetchModelsFromDb } from "./db";
@@ -29,7 +29,13 @@ export async function getAllModels(): Promise<Model[]> {
     const featuredImagePath = discovered.featuredImage || sourceModel?.featuredImage || "";
     
     // Prefer gallery from database if available, otherwise use filesystem discovery
-    let gallery = sourceModel?.gallery || [];
+    // dbModel is always a Model type, jsonModel might not have gallery property
+    let gallery: ModelMedia[] = [];
+    if (dbModel) {
+      gallery = dbModel.gallery || [];
+    } else if (jsonModel && 'gallery' in jsonModel) {
+      gallery = (jsonModel as Model).gallery || [];
+    }
     if (gallery.length === 0) {
       // Fallback to filesystem discovery if DB gallery is empty
       gallery = discovered.gallery
