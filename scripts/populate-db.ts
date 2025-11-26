@@ -60,7 +60,27 @@ try {
       try {
         // Use discovered featured image if available, otherwise use JSON value
         const discovered = await discoverModelImages(modelJson.slug);
-        const featuredImage = discovered.featuredImage || modelJson.featuredImage || null;
+        let featuredImage = discovered.featuredImage || modelJson.featuredImage || null;
+        
+        // Convert featured image to base64 if it's a file path (consistent with admin upload)
+        if (featuredImage && featuredImage.startsWith("/")) {
+          try {
+            const featuredImagePath = join(process.cwd(), "public", featuredImage);
+            const imageBuffer = await readFile(featuredImagePath);
+            // Detect MIME type from file extension
+            const ext = featuredImage.split(".").pop()?.toLowerCase();
+            let mimeType = "image/webp";
+            if (ext === "jpg" || ext === "jpeg") mimeType = "image/jpeg";
+            else if (ext === "png") mimeType = "image/png";
+            else if (ext === "gif") mimeType = "image/gif";
+            else if (ext === "mp4") mimeType = "video/mp4";
+            else if (ext === "webm") mimeType = "video/webm";
+            featuredImage = `data:${mimeType};base64,${imageBuffer.toString("base64")}`;
+          } catch (error) {
+            console.warn(`  ⚠️  Could not read featured image ${featuredImage} for initial insert:`, error);
+            // Keep file path as fallback
+          }
+        }
 
         const modelToInsert: ModelInsert = {
           slug: modelJson.slug,

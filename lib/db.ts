@@ -143,6 +143,7 @@ export async function fetchModelBySlugFromDb(
         imageType: schema.images.type,
         imageSrc: schema.images.src,
         imageAlt: schema.images.alt,
+        imageData: schema.images.data,
         imageOrder: schema.images.order,
       })
       .from(schema.models)
@@ -156,10 +157,11 @@ export async function fetchModelBySlugFromDb(
 
     const firstRow = rows[0];
     const gallery = rows
-      .filter((row) => row.imageId !== null && row.imageSrc !== null)
+      .filter((row) => row.imageId !== null && (row.imageSrc !== null || row.imageData !== null))
       .map((row) => ({
         type: row.imageType as "image" | "video",
-        src: row.imageSrc!,
+        // Use base64 data if available, otherwise use src path
+        src: row.imageData || row.imageSrc!,
         alt: row.imageAlt || "",
       }));
 

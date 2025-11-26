@@ -46,17 +46,6 @@ export default async function ModelPage({
       : []),
   ];
 
-  // Combine featured image with gallery for carousel
-  // Featured image is already excluded from gallery, so we add it first
-  const allMedia = [
-    {
-      type: "image" as const,
-      src: model.featuredImage,
-      alt: `${model.name} - Featured`,
-    },
-    ...model.gallery,
-  ];
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <ModelPageTracker modelSlug={slug} modelName={model.name} />
@@ -70,8 +59,9 @@ export default async function ModelPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
         {/* Image carousel - comes first on mobile due to grid order */}
+        {/* Carousel uses featured image initially, then fetches full gallery from backend after load */}
         <div className="order-1 lg:order-1">
-          <ImageCarousel media={allMedia} />
+          <ImageCarousel slug={slug} featuredImage={model.featuredImage} modelName={model.name} />
         </div>
 
         {/* Info section - comes second on mobile */}

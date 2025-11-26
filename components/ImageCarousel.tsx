@@ -3,47 +3,90 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { ModelMedia } from "@/types/model";
+import { ModelMedia, Model } from "@/types/model";
 import OptimizedImage from "./OptimizedImage";
 import VideoPlayer from "./VideoPlayer";
 
 interface ImageCarouselProps {
-  media: ModelMedia[];
+  media?: ModelMedia[];
+  slug?: string;
+  featuredImage?: string;
+  modelName?: string;
   className?: string;
 }
 
-export default function ImageCarousel({ media, className = "" }: ImageCarouselProps) {
+export default function ImageCarousel({ 
+  media: initialMedia, 
+  slug, 
+  featuredImage,
+  modelName,
+  className = "" 
+}: ImageCarouselProps) {
+  // Initialize with featured image if provided, otherwise use initialMedia
+  const initialMediaState: ModelMedia[] = featuredImage
+    ? [{ type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }]
+    : (initialMedia || []);
+
+  const [media, setMedia] = useState<ModelMedia[]>(initialMediaState);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
 
-  if (media.length === 0) {
-    return null;
-  }
-
-  const currentMedia = media[currentIndex];
-
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? media.length - 1 : prev - 1));
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev === media.length - 1 ? 0 : prev + 1));
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const openFullscreen = () => {
-    setIsFullscreen(true);
-    document.body.style.overflow = "hidden";
-  };
-
+  // Define functions before hooks that use them
   const closeFullscreen = () => {
     setIsFullscreen(false);
     document.body.style.overflow = "";
   };
+
+  // Fetch images from backend after component loads (silently, no loading state)
+  useEffect(() => {
+    if (!slug) return;
+
+    const fetchModelImages = async () => {
+      try {
+        const response = await fetch(`/api/models/${slug}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch model images");
+        }
+        const model: Model = await response.json();
+        
+        // Filter out invalid blob URLs (they're domain-specific and won't work)
+        const isValidImageSrc = (src: string): boolean => {
+          // Allow base64 data URLs, file paths, and http/https URLs
+          // Reject blob URLs as they're temporary and domain-specific
+          return (
+            src.startsWith('data:') ||
+            src.startsWith('/') ||
+            src.startsWith('http://') ||
+            src.startsWith('https://')
+          ) && !src.startsWith('blob:');
+        };
+        
+        // Combine featured image with gallery
+        // Use base64 data if available, otherwise use file path
+        const allMedia: ModelMedia[] = [
+          {
+            type: "image" as const,
+            src: model.featuredImage,
+            alt: `${model.name} - Featured`,
+          },
+          ...model.gallery,
+        ].filter((item): item is ModelMedia => isValidImageSrc(item.src));
+        
+        // Always update when we get data from API (even if it's just the featured image)
+        // This ensures we get the correct format (base64 if available)
+        if (allMedia.length > 0) {
+          setMedia(allMedia);
+        }
+      } catch (error) {
+        console.error("Error fetching model images:", error);
+        // Keep the initial featured image on error - user won't see any loading state
+      }
+    };
+
+    // Fetch in background without blocking UI
+    fetchModelImages();
+  }, [slug, featuredImage]);
 
   // Prefetch next image for smooth transitions (low priority, non-blocking)
   useEffect(() => {
@@ -95,6 +138,30 @@ export default function ImageCarousel({ media, className = "" }: ImageCarouselPr
       return () => document.removeEventListener("keydown", handleEscape);
     }
   }, [isFullscreen]);
+
+  // Now we can do conditional returns after all hooks
+  if (media.length === 0) {
+    return null;
+  }
+
+  const currentMedia = media[currentIndex];
+
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? media.length - 1 : prev - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev === media.length - 1 ? 0 : prev + 1));
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  const openFullscreen = () => {
+    setIsFullscreen(true);
+    document.body.style.overflow = "hidden";
+  };
 
   return (
     <>
