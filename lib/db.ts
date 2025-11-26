@@ -9,12 +9,10 @@ import { eq, asc } from "drizzle-orm";
  */
 export async function fetchModelsFromDb(): Promise<Model[] | null> {
   // Skip database during build time to avoid connection attempts
-  // Check for build context via environment variables
+  // Only check for actual build phases, not runtime on Vercel
   const isBuildTime = 
     process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NEXT_PHASE === 'phase-development-build' ||
-    process.env.CI === 'true' ||
-    process.env.VERCEL === '1';
+    process.env.NEXT_PHASE === 'phase-development-build';
   
   if (isBuildTime) {
     return null;
@@ -90,12 +88,10 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
 
     return models;
   } catch (error) {
-    // Only log errors if not in build context
+    // Log errors (except during build)
     const isBuildTime = 
       process.env.NEXT_PHASE === 'phase-production-build' ||
-      process.env.NEXT_PHASE === 'phase-development-build' ||
-      process.env.CI === 'true' ||
-      process.env.VERCEL === '1';
+      process.env.NEXT_PHASE === 'phase-development-build';
     
     if (!isBuildTime) {
       console.error("Failed to fetch models from database:", error);
@@ -113,12 +109,10 @@ export async function fetchModelBySlugFromDb(
   slug: string
 ): Promise<Model | null> {
   // Skip database during build time to avoid connection attempts
-  // Check for build context via environment variables
+  // Only check for actual build phases, not runtime on Vercel
   const isBuildTime = 
     process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NEXT_PHASE === 'phase-development-build' ||
-    process.env.CI === 'true' ||
-    process.env.VERCEL === '1';
+    process.env.NEXT_PHASE === 'phase-development-build';
   
   if (isBuildTime) {
     return null;
@@ -183,12 +177,10 @@ export async function fetchModelBySlugFromDb(
       gallery,
     };
   } catch (error) {
-    // Only log errors if not in build context
+    // Log errors (except during build)
     const isBuildTime = 
       process.env.NEXT_PHASE === 'phase-production-build' ||
-      process.env.NEXT_PHASE === 'phase-development-build' ||
-      process.env.CI === 'true' ||
-      process.env.VERCEL === '1';
+      process.env.NEXT_PHASE === 'phase-development-build';
     
     if (!isBuildTime) {
       console.error(`Failed to fetch model ${slug} from database:`, error);
