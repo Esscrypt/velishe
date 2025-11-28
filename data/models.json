@@ -141,5 +141,50 @@
     },
     "instagram": "https://instagram.com/fr.aank_aj",
     "featuredImage": "/models/frank/featured.webp"
+  }, {
+    "id": "10",
+    "slug": "anna",
+    "name": "Anna",
+    "stats": {
+      "height": "168 cm",
+      "hips": "93 cm",
+      "waist": "61 cm",
+      "bust": "86 cm",
+      "shoeSize": "38",
+      "hairColor": "Light Brown",
+      "eyeColor": "Hazel"
+    },
+    "instagram": "https://instagram.com/annabodakova71",
+    "featuredImage": "/models/anna/featured.webp"
+  }, {
+    "id": "11",
+    "slug": "arnau",
+    "name": "Arnau",
+    "stats": {
+      "height": "187 cm",
+      "hips": "93 cm",
+      "waist": "76 cm",
+      "bust": "99 cm",
+      "shoeSize": "45",
+      "hairColor": "Brown",
+      "eyeColor": "Hazel"
+    },
+    "instagram": "https://instagram.com/arnauvisa",
+    "featuredImage": "/models/arnau/featured.webp"
+  }, {
+    "id": "12",
+    "slug": "ariamna",
+    "name": "Ariamna",
+    "stats": {
+      "height": "176 cm",
+      "hips": "100 cm",
+      "waist": "72 cm",
+      "bust": "93 cm",
+      "shoeSize": "39",
+      "hairColor": "Brown",
+      "eyeColor": "Hazel"
+    },
+    "instagram": "https://instagram.com/giarna_keshn",
+    "featuredImage": "/models/ariamna/featured.webp"
   }
 ]
