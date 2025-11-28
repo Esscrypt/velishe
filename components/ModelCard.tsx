@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import OptimizedImage from "./OptimizedImage";
@@ -20,6 +21,12 @@ export default function ModelCard({
   stats,
   index,
 }: ModelCardProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const statsList = [
     { label: "Height", value: stats.height },
     ...(stats.bust ? [{ label: "Bust", value: stats.bust }] : []),
@@ -35,10 +42,12 @@ export default function ModelCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ scale: 1.02 }}
+      {...(mounted ? {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, delay: index * 0.1 },
+        whileHover: { scale: 1.02 }
+      } : {})}
       className="group"
     >
       <Link href={`/models/${slug}/`} className="block">

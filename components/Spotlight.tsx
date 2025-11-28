@@ -115,9 +115,9 @@ export default function Spotlight({ models }: SpotlightProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={shuffleKey}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={mounted ? { opacity: 0 } : false}
+            animate={mounted ? { opacity: 1 } : false}
+            exit={mounted ? { opacity: 0 } : false}
             transition={{ 
               duration: 0.8,
               ease: [0.4, 0, 0.2, 1] // Smooth easing curve
@@ -127,13 +127,13 @@ export default function Spotlight({ models }: SpotlightProps) {
             {currentModels.map((model, index) => (
               <motion.div
                 key={`${model.id}-${shuffleKey}`}
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{
+                initial={mounted ? { opacity: 0, y: 30, scale: 0.95 } : false}
+                animate={mounted ? { opacity: 1, y: 0, scale: 1 } : false}
+                transition={mounted ? {
                   duration: 0.6,
                   delay: index * 0.15,
                   ease: [0.4, 0, 0.2, 1]
-                }}
+                } : {}}
               >
                 <ModelCard
                   slug={model.slug}
