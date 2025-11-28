@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ModelMedia, Model } from "@/types/model";
@@ -31,6 +31,8 @@ export default function ImageCarousel({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [loadedCount, setLoadedCount] = useState(0); // Track how many images we've loaded
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // Prevent duplicate loads
 
   // Define functions before hooks that use them
   const closeFullscreen = () => {
@@ -38,55 +40,158 @@ export default function ImageCarousel({
     document.body.style.overflow = "";
   };
 
-  // Fetch images from backend after component loads (silently, no loading state)
+  // Helper function to filter valid image sources
+  const isValidImageSrc = (src: string): boolean => {
+    return (
+      src.startsWith('data:') ||
+      src.startsWith('/') ||
+      src.startsWith('http://') ||
+      src.startsWith('https://')
+    ) && !src.startsWith('blob:');
+  };
+
+  // Load more images function
+  const loadMoreImages = useCallback(async (offset: number, limit: number) => {
+    if (!slug || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      const response = await fetch(`/api/models/${slug}?offset=${offset}&limit=${limit}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch more images");
+      }
+      const model: Model = await response.json();
+      
+      if (model.gallery.length > 0) {
+        const newMedia: ModelMedia[] = model.gallery
+          .filter((item): item is ModelMedia => isValidImageSrc(item.src));
+        
+        // Append new images to existing media
+        setMedia((prevMedia) => {
+          // Avoid duplicates by checking if image already exists
+          const existingSrcs = new Set(prevMedia.map(m => m.src));
+          const uniqueNewMedia = newMedia.filter(m => !existingSrcs.has(m.src));
+          return [...prevMedia, ...uniqueNewMedia];
+        });
+        
+        setLoadedCount((prev) => prev + newMedia.length);
+        
+        // Preload new images in parallel (non-blocking)
+        const imagePreloadPromises = newMedia
+          .filter((item) => item.type === "image")
+          .map((item) => {
+            return new Promise<void>((resolve) => {
+              const img = new Image();
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+              img.src = item.src;
+            });
+          });
+        
+        Promise.all(imagePreloadPromises).catch(() => {
+          // Silently handle any errors during preloading
+        });
+      }
+    } catch (error) {
+      console.error("Error loading more images:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [slug, isLoadingMore]);
+
+  // Initial load: first 2 images, then 7 more (total 10)
   useEffect(() => {
     if (!slug) return;
 
     const fetchModelImages = async () => {
       try {
-        const response = await fetch(`/api/models/${slug}`);
-        if (!response.ok) {
+        // First, fetch the first 2 gallery images for faster initial load
+        const initialResponse = await fetch(`/api/models/${slug}?limit=2`);
+        if (!initialResponse.ok) {
           throw new Error("Failed to fetch model images");
         }
-        const model: Model = await response.json();
+        const initialModel: Model = await initialResponse.json();
         
-        // Filter out invalid blob URLs (they're domain-specific and won't work)
-        const isValidImageSrc = (src: string): boolean => {
-          // Allow base64 data URLs, file paths, and http/https URLs
-          // Reject blob URLs as they're temporary and domain-specific
-          return (
-            src.startsWith('data:') ||
-            src.startsWith('/') ||
-            src.startsWith('http://') ||
-            src.startsWith('https://')
-          ) && !src.startsWith('blob:');
-        };
-        
-        // Combine featured image with gallery
-        // Use base64 data if available, otherwise use file path
-        const allMedia: ModelMedia[] = [
+        // Combine featured image with first 2 gallery images
+        const initialMedia: ModelMedia[] = [
           {
             type: "image" as const,
-            src: model.featuredImage,
-            alt: `${model.name} - Featured`,
+            src: initialModel.featuredImage,
+            alt: `${initialModel.name} - Featured`,
           },
-          ...model.gallery,
+          ...initialModel.gallery,
         ].filter((item): item is ModelMedia => isValidImageSrc(item.src));
         
-        // Always update when we get data from API (even if it's just the featured image)
-        // This ensures we get the correct format (base64 if available)
-        if (allMedia.length > 0) {
-          setMedia(allMedia);
+        // Update with initial images immediately for faster load
+        if (initialMedia.length > 0) {
+          setMedia(initialMedia);
+          setLoadedCount(initialModel.gallery.length); // Track gallery images (excluding featured)
+        }
+
+        // Then fetch next 8 images to reach 10 total gallery images (offset=2, limit=8)
+        const nextBatchResponse = await fetch(`/api/models/${slug}?offset=2&limit=8`);
+        if (nextBatchResponse.ok) {
+          const nextBatchModel: Model = await nextBatchResponse.json();
+          
+          if (nextBatchModel.gallery.length > 0) {
+            const nextBatchMedia: ModelMedia[] = nextBatchModel.gallery
+              .filter((item): item is ModelMedia => isValidImageSrc(item.src));
+            
+            // Update media state with all images (featured + first 2 + next 8)
+            const allMedia: ModelMedia[] = [
+              {
+                type: "image" as const,
+                src: initialModel.featuredImage,
+                alt: `${initialModel.name} - Featured`,
+              },
+              ...initialModel.gallery,
+              ...nextBatchMedia,
+            ].filter((item): item is ModelMedia => isValidImageSrc(item.src));
+            
+            setMedia(allMedia);
+            setLoadedCount(initialModel.gallery.length + nextBatchMedia.length);
+            
+            // Preload images in parallel (non-blocking)
+            const imagePreloadPromises = nextBatchMedia
+              .filter((item) => item.type === "image")
+              .map((item) => {
+                return new Promise<void>((resolve) => {
+                  const img = new Image();
+                  img.onload = () => resolve();
+                  img.onerror = () => resolve();
+                  img.src = item.src;
+                });
+              });
+            
+            Promise.all(imagePreloadPromises).catch(() => {
+              // Silently handle any errors during preloading
+            });
+          }
         }
       } catch (error) {
         console.error("Error fetching model images:", error);
-        // Keep the initial featured image on error - user won't see any loading state
       }
     };
 
     // Fetch in background without blocking UI
     fetchModelImages();
   }, [slug, featuredImage]);
+
+  // Load next batch when user approaches the end (at image 8/10, or 8/loadedCount)
+  useEffect(() => {
+    if (!slug || isLoadingMore) return;
+    
+    // currentIndex 0 = featured image, gallery images start at index 1
+    // So when currentIndex = 8, we're at the 8th gallery image (gallery index 7)
+    // We want to load when we're at gallery image 8 (currentIndex = 8) and within 2 of the end
+    // Example: if loadedCount = 10, load when currentIndex = 8 (which is 2 away from index 10)
+    if (currentIndex >= 8 && loadedCount > 0 && currentIndex >= loadedCount - 2) {
+      // Calculate next offset: API offset is for gallery images only (0-indexed)
+      // We have loadedCount gallery images, so next batch starts at offset = loadedCount
+      const nextOffset = loadedCount;
+      loadMoreImages(nextOffset, 10);
+    }
+  }, [currentIndex, loadedCount, slug, isLoadingMore, loadMoreImages]);
 
   // Prefetch next image for smooth transitions (low priority, non-blocking)
   useEffect(() => {
@@ -119,12 +224,22 @@ export default function ImageCarousel({
       return;
     }
 
+    // Ensure we have a valid interval duration
+    const intervalDuration = 3000;
+    if (intervalDuration <= 0) {
+      return;
+    }
+
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev === media.length - 1 ? 0 : prev + 1));
-    }, 3000);
+      setCurrentIndex((prev) => {
+        // Ensure prev is within valid bounds
+        if (media.length <= 1) return prev;
+        return prev === media.length - 1 ? 0 : prev + 1;
+      });
+    }, intervalDuration);
 
     return () => clearInterval(interval);
-  }, [currentIndex, isFullscreen, isPaused, media.length]);
+  }, [isFullscreen, isPaused, media.length]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

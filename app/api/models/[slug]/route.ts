@@ -21,8 +21,31 @@ export async function GET(
         { status: 400 }
       );
     }
+
+    // Parse query parameters for pagination
+    const url = new URL(request.url);
+    const limitParam = url.searchParams.get('limit');
+    const offsetParam = url.searchParams.get('offset');
     
-    const model = await fetchModelBySlugFromDb(cleanSlug);
+    const imageLimit = limitParam ? Number.parseInt(limitParam, 10) : undefined;
+    const imageOffset = offsetParam ? Number.parseInt(offsetParam, 10) : undefined;
+    
+    // Validate pagination parameters
+    if (limitParam && (Number.isNaN(imageLimit) || imageLimit! < 0)) {
+      return NextResponse.json(
+        { error: "Invalid limit parameter" },
+        { status: 400 }
+      );
+    }
+    
+    if (offsetParam && (Number.isNaN(imageOffset) || imageOffset! < 0)) {
+      return NextResponse.json(
+        { error: "Invalid offset parameter" },
+        { status: 400 }
+      );
+    }
+    
+    const model = await fetchModelBySlugFromDb(cleanSlug, imageLimit, imageOffset);
     
     if (!model) {
       console.log(`Model not found for slug: ${cleanSlug}`);

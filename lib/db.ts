@@ -104,9 +104,14 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
  * Fetch a single model by slug from database with its images using a single JOIN query
  * Returns null if database is not available or query fails
  * Skips database connection during build time (static generation)
+ * @param slug - Model slug to fetch
+ * @param imageLimit - Optional limit for number of images to return (default: all)
+ * @param imageOffset - Optional offset for pagination (default: 0)
  */
 export async function fetchModelBySlugFromDb(
-  slug: string
+  slug: string,
+  imageLimit?: number,
+  imageOffset?: number
 ): Promise<Model | null> {
   // Skip database during build time to avoid connection attempts
   // Only check for actual build phases, not runtime on Vercel
@@ -124,8 +129,8 @@ export async function fetchModelBySlugFromDb(
   }
 
   try {
-    // Single query with LEFT JOIN
-    const rows = await db
+    // First, get the model info without images to ensure it exists
+    const modelRow = await db
       .select({
         modelId: schema.models.id,
         slug: schema.models.slug,
@@ -133,6 +138,20 @@ export async function fetchModelBySlugFromDb(
         stats: schema.models.stats,
         instagram: schema.models.instagram,
         featuredImage: schema.models.featuredImage,
+      })
+      .from(schema.models)
+      .where(eq(schema.models.slug, slug))
+      .limit(1);
+
+    if (modelRow.length === 0) {
+      return null;
+    }
+
+    const modelData = modelRow[0];
+
+    // Then fetch images with pagination if specified
+    const baseQuery = db
+      .select({
         imageId: schema.images.id,
         imageType: schema.images.type,
         imageSrc: schema.images.src,
@@ -140,17 +159,22 @@ export async function fetchModelBySlugFromDb(
         imageData: schema.images.data,
         imageOrder: schema.images.order,
       })
-      .from(schema.models)
-      .leftJoin(schema.images, eq(schema.models.id, schema.images.modelId))
-      .where(eq(schema.models.slug, slug))
+      .from(schema.images)
+      .where(eq(schema.images.modelId, modelData.modelId))
       .orderBy(asc(schema.images.order));
 
-    if (rows.length === 0) {
-      return null;
-    }
+    const imagesQuery = 
+      imageLimit !== undefined && imageLimit > 0
+        ? imageOffset !== undefined && imageOffset > 0
+          ? baseQuery.limit(imageLimit).offset(imageOffset)
+          : baseQuery.limit(imageLimit)
+        : imageOffset !== undefined && imageOffset > 0
+          ? baseQuery.offset(imageOffset)
+          : baseQuery;
 
-    const firstRow = rows[0];
-    const gallery = rows
+    const imageRows = await imagesQuery;
+
+    const gallery = imageRows
       .filter((row) => row.imageId !== null && (row.imageSrc !== null || row.imageData !== null))
       .map((row) => ({
         type: row.imageType as "image" | "video",
@@ -160,10 +184,10 @@ export async function fetchModelBySlugFromDb(
       }));
 
     return {
-      id: String(firstRow.modelId), // Convert to string for Model type
-      slug: firstRow.slug,
-      name: firstRow.name,
-      stats: firstRow.stats || {
+      id: String(modelData.modelId), // Convert to string for Model type
+      slug: modelData.slug,
+      name: modelData.name,
+      stats: modelData.stats || {
         height: "",
         bust: "",
         waist: "",
@@ -172,8 +196,8 @@ export async function fetchModelBySlugFromDb(
         hairColor: "",
         eyeColor: "",
       },
-      instagram: firstRow.instagram || undefined,
-      featuredImage: firstRow.featuredImage || "",
+      instagram: modelData.instagram || undefined,
+      featuredImage: modelData.featuredImage || "",
       gallery,
     };
   } catch (error) {
