@@ -115,9 +115,9 @@ export default function Spotlight({ models }: SpotlightProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={shuffleKey}
-            initial={mounted ? { opacity: 0 } : false}
-            animate={mounted ? { opacity: 1 } : false}
-            exit={mounted ? { opacity: 0 } : false}
+            initial={mounted ? { opacity: 0 } : undefined}
+            animate={mounted ? { opacity: 1 } : undefined}
+            exit={mounted ? { opacity: 0 } : undefined}
             transition={{ 
               duration: 0.8,
               ease: [0.4, 0, 0.2, 1] // Smooth easing curve

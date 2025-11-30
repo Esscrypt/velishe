@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getModelBySlugAsync } from "@/lib/models-server";
-import { discoverAllModels } from "@/lib/discover-images";
+import { getModelBySlugAsync, getAllModels } from "@/lib/models-server";
 import SocialIcons from "@/components/SocialIcons";
 import ImageCarousel from "@/components/ImageCarousel";
 import ModelPageTracker from "@/components/ModelPageTracker";
@@ -12,9 +11,10 @@ export const dynamic = 'force-static';
 export const dynamicParams = false; // Return 404 for unknown routes
 
 export async function generateStaticParams() {
-  const slugs = await discoverAllModels();
-  return slugs.map((slug) => ({
-    slug,
+  // Get slugs from database (or JSON fallback)
+  const models = await getAllModels();
+  return models.map((model) => ({
+    slug: model.slug,
   }));
 }
 

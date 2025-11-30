@@ -32,12 +32,12 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
         name: schema.models.name,
         stats: schema.models.stats,
         instagram: schema.models.instagram,
-        featuredImage: schema.models.featuredImage,
         displayOrder: schema.models.displayOrder,
         imageId: schema.images.id,
         imageType: schema.images.type,
         imageSrc: schema.images.src,
         imageAlt: schema.images.alt,
+        imageData: schema.images.data,
         imageOrder: schema.images.order,
       })
       .from(schema.models)
@@ -51,8 +51,8 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
       if (!modelsMap.has(row.modelId)) {
         modelsMap.set(row.modelId, {
           id: String(row.modelId), // Convert to string for Model type
-          slug: row.slug,
-          name: row.name,
+          slug: row.slug || "",
+          name: row.name || "",
           stats: row.stats || {
             height: "",
             bust: "",
@@ -63,19 +63,27 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
             eyeColor: "",
           },
           instagram: row.instagram || undefined,
-          featuredImage: row.featuredImage || "",
+          featuredImage: "", // Will be set from order 0 image
           gallery: [],
         });
       }
       
-      // Add image to gallery if it exists
-      if (row.imageId && row.imageSrc) {
+      // Add image to gallery or set as featured if order is 0
+      if (row.imageId && (row.imageSrc || row.imageData)) {
         const model = modelsMap.get(row.modelId)!;
-        model.gallery.push({
-          type: row.imageType as "image" | "video",
-          src: row.imageSrc,
-          alt: row.imageAlt || "",
-        });
+        const imageSrc = row.imageData || row.imageSrc!;
+        
+        if (row.imageOrder === 0) {
+          // Image with order 0 is the featured image
+          model.featuredImage = imageSrc;
+        } else {
+          // Other images go to gallery
+          model.gallery.push({
+            type: row.imageType as "image" | "video",
+            src: imageSrc,
+            alt: row.imageAlt || "",
+          });
+        }
       }
     }
     
@@ -137,7 +145,6 @@ export async function fetchModelBySlugFromDb(
         name: schema.models.name,
         stats: schema.models.stats,
         instagram: schema.models.instagram,
-        featuredImage: schema.models.featuredImage,
       })
       .from(schema.models)
       .where(eq(schema.models.slug, slug))
@@ -174,19 +181,31 @@ export async function fetchModelBySlugFromDb(
 
     const imageRows = await imagesQuery;
 
+    // Separate featured image (order 0) from gallery
+    let featuredImage = "";
     const gallery = imageRows
       .filter((row) => row.imageId !== null && (row.imageSrc !== null || row.imageData !== null))
-      .map((row) => ({
-        type: row.imageType as "image" | "video",
-        // Use base64 data if available, otherwise use src path
-        src: row.imageData || row.imageSrc!,
-        alt: row.imageAlt || "",
-      }));
+      .map((row) => {
+        const imageSrc = row.imageData || row.imageSrc!;
+        
+        // Image with order 0 is the featured image
+        if (row.imageOrder === 0) {
+          featuredImage = imageSrc;
+          return null; // Don't include in gallery
+        }
+        
+        return {
+          type: row.imageType as "image" | "video",
+          src: imageSrc,
+          alt: row.imageAlt || "",
+        };
+      })
+      .filter((item): item is { type: "image" | "video"; src: string; alt: string } => item !== null);
 
     return {
       id: String(modelData.modelId), // Convert to string for Model type
-      slug: modelData.slug,
-      name: modelData.name,
+      slug: modelData.slug || "",
+      name: modelData.name || "",
       stats: modelData.stats || {
         height: "",
         bust: "",
@@ -197,7 +216,7 @@ export async function fetchModelBySlugFromDb(
         eyeColor: "",
       },
       instagram: modelData.instagram || undefined,
-      featuredImage: modelData.featuredImage || "",
+      featuredImage,
       gallery,
     };
   } catch (error) {
