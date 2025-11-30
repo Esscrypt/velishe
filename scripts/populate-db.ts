@@ -87,13 +87,29 @@ try {
           name: modelJson.name,
           stats: modelJson.stats,
           instagram: modelJson.instagram || null,
-          featuredImage,
         };
 
-        await db
+        const insertedModels = await db
           .insert(schema.models)
           .values(modelToInsert)
-          .onConflictDoNothing();
+          .onConflictDoNothing()
+          .returning();
+
+        const modelId = insertedModels[0]?.id;
+        
+        // If model was inserted and we have a featured image, insert it with order 0
+        if (modelId && featuredImage) {
+          const featuredImageId = randomUUID();
+          await db.insert(schema.images).values({
+            id: featuredImageId,
+            modelId: modelId,
+            type: "image",
+            src: `db://${featuredImageId}`,
+            alt: `${modelJson.name} - Featured`,
+            data: featuredImage,
+            order: 0, // Featured images have order 0
+          } as ImageInsert);
+        }
 
         console.log(`  ✓ Inserted: ${modelJson.name} (${modelJson.slug})`);
       } catch (error) {
@@ -110,6 +126,10 @@ try {
   
   for (const dbModel of allModels) {
     try {
+      if (!dbModel.slug) {
+        console.warn(`  ⚠️  Model ${dbModel.id} has no slug, skipping`);
+        continue;
+      }
       // Discover images from filesystem
       const discovered = await discoverModelImages(dbModel.slug);
       
@@ -121,8 +141,11 @@ try {
       
       const existingImageSrcs = new Set(existingImages.map((img) => img.src));
       
+      // Get existing featured image (order 0) from database
+      const existingFeaturedImage = existingImages.find((img) => img.order === 0);
+      
       // Transform discovered gallery images (exclude featured image)
-      const featuredImagePath = discovered.featuredImage || dbModel.featuredImage || "";
+      const featuredImagePath = discovered.featuredImage || "";
       const galleryImages = await Promise.all(
         discovered.gallery
           .filter((img) => img.path !== featuredImagePath)
@@ -130,6 +153,10 @@ try {
             // Read image file and convert to base64
             let base64Data: string | null = null;
             try {
+              if (!img.path) {
+                console.warn(`  ⚠️  Image has no path, skipping`);
+                return null;
+              }
               const imagePath = join(process.cwd(), "public", img.path);
               const imageBuffer = await readFile(imagePath);
               // Detect MIME type from file extension
@@ -147,17 +174,20 @@ try {
             
             return {
               type: img.type,
-              src: img.path,
+              src: img.path!,
               alt: `${dbModel.slug} - ${img.name}`,
               data: base64Data,
-              order: index,
+              order: index + 1, // Gallery images start at order 1 (order 0 is for featured)
             };
           })
       );
+      
+      // Filter out nulls from failed image reads
+      const validGalleryImages = galleryImages.filter((img): img is NonNullable<typeof img> => img !== null);
 
-      // Delete images that no longer exist in filesystem
-      const imageSrcsToKeep = new Set(galleryImages.map((img) => img.src));
-      const imagesToDelete = existingImages.filter((img) => !imageSrcsToKeep.has(img.src));
+      // Delete images that no longer exist in filesystem (but keep order 0 featured image)
+      const imageSrcsToKeep = new Set(validGalleryImages.map((img) => img.src));
+      const imagesToDelete = existingImages.filter((img) => img.order !== 0 && !imageSrcsToKeep.has(img.src));
       
       if (imagesToDelete.length > 0) {
         // Delete in parallel
@@ -170,7 +200,7 @@ try {
       }
 
       // Insert new images that don't exist in database
-      const imagesToInsert: ImageInsert[] = galleryImages
+      const imagesToInsert: ImageInsert[] = validGalleryImages
         .filter((img) => !existingImageSrcs.has(img.src))
         .map((img) => ({
           id: randomUUID(),
@@ -188,7 +218,7 @@ try {
       }
 
       // Update order and data for existing images in parallel
-      const updatePromises = galleryImages.map(async (img) => {
+      const updatePromises = validGalleryImages.map(async (img) => {
         const existingImage = existingImages.find((e) => e.src === img.src);
         if (existingImage) {
           const updates: { order?: number; data?: string | null } = {};
@@ -209,8 +239,10 @@ try {
       });
       await Promise.all(updatePromises);
 
-      // Update featured image if discovered and different
-      let featuredImage = discovered.featuredImage || dbModel.featuredImage || null;
+      // Update featured image (order 0) if discovered and different
+      let featuredImage = discovered.featuredImage || null;
+      let featuredImageData: string | null = null;
+      
       if (featuredImage && featuredImage.startsWith("/")) {
         // Convert featured image to base64 if it's a file path
         try {
@@ -224,19 +256,38 @@ try {
           else if (ext === "gif") mimeType = "image/gif";
           else if (ext === "mp4") mimeType = "video/mp4";
           else if (ext === "webm") mimeType = "video/webm";
-          featuredImage = `data:${mimeType};base64,${imageBuffer.toString("base64")}`;
+          featuredImageData = `data:${mimeType};base64,${imageBuffer.toString("base64")}`;
         } catch (error) {
           console.warn(`  ⚠️  Could not read featured image ${featuredImage}:`, error);
         }
       }
-      if (featuredImage !== dbModel.featuredImage) {
-        await db
-          .update(schema.models)
-          .set({ featuredImage })
-          .where(eq(schema.models.id, dbModel.id));
+      
+      // Update or insert featured image with order 0
+      if (featuredImageData) {
+        if (existingFeaturedImage) {
+          // Update existing featured image
+          if (existingFeaturedImage.data !== featuredImageData) {
+            await db
+              .update(schema.images)
+              .set({ data: featuredImageData })
+              .where(eq(schema.images.id, existingFeaturedImage.id));
+          }
+        } else {
+          // Insert new featured image with order 0
+          const featuredImageId = randomUUID();
+          await db.insert(schema.images).values({
+            id: featuredImageId,
+            modelId: dbModel.id,
+            type: "image",
+            src: `db://${featuredImageId}`,
+            alt: `${dbModel.name} - Featured`,
+            data: featuredImageData,
+            order: 0, // Featured images have order 0
+          } as ImageInsert);
+        }
       }
 
-      const totalImages = galleryImages.length;
+      const totalImages = validGalleryImages.length;
       if (totalImages > 0 || imagesToInsert.length > 0 || imagesToDelete.length > 0) {
         console.log(`  ✓ Updated: ${dbModel.name} (${dbModel.slug}) - ${totalImages} gallery images`);
       }
