@@ -1,6 +1,6 @@
 import { getDb, schema } from "./db/index";
 import { Model } from "@/types/model";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, and } from "drizzle-orm";
 
 /**
  * Fetch all models from database with only featured images (no gallery)
@@ -27,8 +27,8 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
 
   try {
     console.log("[fetchModelsListFromDb] Attempting to fetch models list from database...");
-    // Query only for featured images (order 0)
-    // First get all models, then join only featured images
+    // Optimized query: Filter for featured images (order 0) in SQL, not JavaScript
+    // This reduces data transfer and processing time
     const rows = await db
       .select({
         modelId: schema.models.id,
@@ -48,55 +48,48 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         imageOrder: schema.images.order,
       })
       .from(schema.models)
-      .leftJoin(schema.images, eq(schema.models.id, schema.images.modelId))
-      .orderBy(asc(schema.models.displayOrder), asc(schema.images.order));
+      .leftJoin(
+        schema.images,
+        and(
+          eq(schema.models.id, schema.images.modelId),
+          eq(schema.images.order, 0) // Only join featured images (order 0)
+        )
+      )
+      .orderBy(asc(schema.models.displayOrder));
     
-    // Group by model - only keep featured image (order 0), ignore gallery images
-    const modelsMap = new Map<number, Model>();
+    // Build models array - each row is already a model with its featured image
+    const models: Model[] = [];
+    const processedIds = new Set<number>();
     
     for (const row of rows) {
-      if (!modelsMap.has(row.modelId)) {
-        modelsMap.set(row.modelId, {
-          id: String(row.modelId),
-          slug: row.slug || "",
-          name: row.name || "",
-          stats: {
-            height: row.height || "",
-            bust: row.bust || "",
-            waist: row.waist || "",
-            hips: row.hips || "",
-            shoeSize: row.shoeSize || "",
-            hairColor: row.hairColor || "",
-            eyeColor: row.eyeColor || "",
-          },
-          instagram: row.instagram || undefined,
-          featuredImage: "", // Will be set from order 0 image
-          gallery: [], // Empty gallery for list view
-        });
+      if (processedIds.has(row.modelId)) {
+        continue;
       }
       
-      // Only set featured image if it's order 0
-      if (row.imageId && row.imageData && row.imageOrder === 0) {
-        const model = modelsMap.get(row.modelId)!;
-        model.featuredImage = row.imageData;
-      }
+      processedIds.add(row.modelId);
+      
+      const featuredImage = (row.imageId && row.imageData && row.imageOrder === 0) 
+        ? row.imageData 
+        : "";
+      
+      models.push({
+        id: String(row.modelId),
+        slug: row.slug || "",
+        name: row.name || "",
+        stats: {
+          height: row.height || "",
+          bust: row.bust || "",
+          waist: row.waist || "",
+          hips: row.hips || "",
+          shoeSize: row.shoeSize || "",
+          hairColor: row.hairColor || "",
+          eyeColor: row.eyeColor || "",
+        },
+        instagram: row.instagram || undefined,
+        featuredImage,
+        gallery: [], // Empty gallery for list view
+      });
     }
-    
-    // For models without a featured image (order 0), use the first available image
-    for (const model of modelsMap.values()) {
-      if (!model.featuredImage || model.featuredImage.trim() === "") {
-        // Try to find any image for this model (fallback)
-        const modelRows = rows.filter(r => r.modelId === Number.parseInt(model.id, 10) && r.imageData);
-        if (modelRows.length > 0) {
-          model.featuredImage = modelRows[0].imageData || "";
-        }
-      }
-    }
-    
-    // Convert to array and sort by display order
-    const models = Array.from(modelsMap.values()).sort((a, b) => {
-      return 0; // Already sorted by query
-    });
 
     console.log(`[fetchModelsListFromDb] Successfully fetched ${models.length} models from database`);
     return models;

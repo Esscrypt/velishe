@@ -22,7 +22,7 @@ export async function GET(
       );
     }
 
-    // Parse query parameters for pagination
+    // Parse query parameters for pagination (optional - if not provided, fetch all images)
     const url = new URL(request.url);
     const limitParam = url.searchParams.get('limit');
     const offsetParam = url.searchParams.get('offset');
@@ -45,6 +45,8 @@ export async function GET(
       );
     }
     
+    // Fetch model with all images (no pagination) unless pagination params are explicitly provided
+    // The model page always fetches all images in one query
     const model = await fetchModelBySlugFromDb(cleanSlug, imageLimit, imageOffset);
     
     if (!model) {

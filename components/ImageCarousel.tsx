@@ -48,7 +48,8 @@ export default function ImageCarousel({
     );
   };
 
-  // Load more images function
+  // Load more images function (pagination)
+  // Offset is relative to gallery images (excluding featured image at order 0)
   const loadMoreImages = useCallback(async (offset: number, limit: number) => {
     if (!slug || isLoadingMore || hasReachedEnd || isFetchingRef.current) return;
     if (lastLoadedOffset !== null && offset <= lastLoadedOffset) return;
@@ -57,7 +58,8 @@ export default function ImageCarousel({
     setIsLoadingMore(true);
     
     try {
-      const response = await fetch(`/api/models/${slug}?offset=${offset}&limit=${limit}`);
+      // Offset + 1 to skip the featured image (order 0)
+      const response = await fetch(`/api/models/${slug}?offset=${offset + 1}&limit=${limit}`);
       if (!response.ok) throw new Error("Failed to fetch more images");
       
       const model: Model = await response.json();
@@ -112,18 +114,20 @@ export default function ImageCarousel({
 
     const fetchModelImages = async () => {
       try {
-        // Fetch first 10 gallery images
-        const response = await fetch(`/api/models/${slug}?limit=10`);
+        // Fetch first 10 gallery images (skip featured image which we already have from props)
+        // Offset 1 to skip the featured image (order 0)
+        const response = await fetch(`/api/models/${slug}?offset=1&limit=10`);
         if (!response.ok) throw new Error("Failed to fetch model images");
         
         const model: Model = await response.json();
         
+        // Use featuredImage from props, add gallery images from fetch
         const allMedia: ModelMedia[] = [
-          {
+          ...(featuredImage ? [{
             type: "image" as const,
-            src: model.featuredImage,
-            alt: `${model.name} - Featured`,
-          },
+            src: featuredImage,
+            alt: `${modelName || "Model"} - Featured`,
+          }] : []),
           ...model.gallery,
         ].filter((item): item is ModelMedia => isValidImageSrc(item.src));
         

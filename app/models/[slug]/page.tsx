@@ -15,55 +15,40 @@ export default function ModelPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
-  const { getFullModel, fetchFullModel } = useModels();
+  const { getModelBySlug, getFullModel } = useModels();
   const [model, setModel] = useState<Model | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!slug) return;
 
-    // Priority order: context cache > API > JSON fallback
-    
-    // 1. Check context cache first
-    const cachedModel = getFullModel(slug);
-    if (cachedModel) {
-      console.log(`[ModelPage] Using cached model for ${slug}`);
-      setModel(cachedModel);
+    // 1. Check full model cache first (for metadata, not gallery - ImageCarousel handles gallery)
+    const cachedFullModel = getFullModel(slug);
+    if (cachedFullModel) {
+      console.log(`[ModelPage] Using cached model metadata for ${slug}`);
+      setModel(cachedFullModel);
       setLoading(false);
       return;
     }
 
-    // 2. Fetch from API (will be cached in context)
-    fetchFullModel(slug)
-      .then((fetchedModel) => {
-        if (fetchedModel) {
-          setModel(fetchedModel);
-        } else {
-          // Fallback to JSON
-          const jsonModels = getAllModelsSync();
-          const jsonModel = jsonModels.find((m) => m.slug === slug);
-          if (jsonModel) {
-            setModel(jsonModel);
-          } else {
-            router.push("/404");
-          }
-        }
-      })
-      .catch((error) => {
-        console.error(`[ModelPage] Error fetching model ${slug}:`, error);
-        // Fallback to JSON
-        const jsonModels = getAllModelsSync();
-        const jsonModel = jsonModels.find((m) => m.slug === slug);
-        if (jsonModel) {
-          setModel(jsonModel);
-        } else {
-          router.push("/404");
-        }
-      })
-      .finally(() => {
+    // 2. Use model from list context for immediate render (has featured image)
+    const listModel = getModelBySlug(slug);
+    if (listModel) {
+      console.log(`[ModelPage] Using model from list context for ${slug}`);
+      setModel(listModel);
+      setLoading(false);
+    } else {
+      // Fallback to JSON
+      const jsonModels = getAllModelsSync();
+      const jsonModel = jsonModels.find((m) => m.slug === slug);
+      if (jsonModel) {
+        setModel(jsonModel);
         setLoading(false);
-      });
-  }, [slug, router, getFullModel, fetchFullModel]);
+      } else {
+        router.push("/404");
+      }
+    }
+  }, [slug, router, getModelBySlug, getFullModel]);
 
   if (loading) {
     return (
@@ -108,9 +93,13 @@ export default function ModelPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
         {/* Image carousel - comes first on mobile due to grid order */}
-        {/* Carousel uses featured image initially, then fetches full gallery from backend after load */}
+        {/* Carousel receives featured image from props, then fetches gallery with pagination */}
         <div className="order-1 lg:order-1">
-          <ImageCarousel slug={slug} featuredImage={model.featuredImage} modelName={model.name} />
+          <ImageCarousel 
+            slug={slug} 
+            featuredImage={model.featuredImage} 
+            modelName={model.name}
+          />
         </div>
 
         {/* Info section - comes second on mobile */}
