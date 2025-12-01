@@ -1,11 +1,16 @@
-import { pgTable, text, jsonb, integer, timestamp, serial } from "drizzle-orm/pg-core";
-import { ModelStats } from "@/types/model";
+import { pgTable, text, integer, timestamp, serial } from "drizzle-orm/pg-core";
 
 export const models = pgTable("models", {
   id: serial("id").primaryKey(),
   slug: text("slug").unique(),
   name: text("name"),
-  stats: jsonb("stats").$type<ModelStats>(),
+  height: text("height"),
+  bust: text("bust"),
+  waist: text("waist"),
+  hips: text("hips"),
+  shoeSize: text("shoe_size"),
+  hairColor: text("hair_color"),
+  eyeColor: text("eye_color"),
   instagram: text("instagram"),
   displayOrder: integer("display_order").default(0),
 });
@@ -15,10 +20,7 @@ export const images = pgTable("images", {
   modelId: integer("model_id")
     .notNull()
     .references(() => models.id, { onDelete: "cascade" }),
-  type: text("type").notNull().$type<"image" | "video">(),
-  src: text("src").notNull(),
-  alt: text("alt").notNull(),
-  data: text("data"), // Base64 encoded image data
+  data: text("data").notNull(), // Base64 encoded image data
   order: integer("order").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

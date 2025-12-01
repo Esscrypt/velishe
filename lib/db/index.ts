@@ -11,15 +11,22 @@ let sqlInstance: ReturnType<typeof postgres> | null = null;
  */
 export function getDb() {
   if (!process.env.DATABASE_URL) {
+    console.warn("[getDb] DATABASE_URL environment variable is not set");
     return null;
   }
 
   if (!sqlInstance) {
-    sqlInstance = postgres(process.env.DATABASE_URL, {
-      max: 1,
-      idle_timeout: 20,
-      connect_timeout: 10,
-    });
+    try {
+      sqlInstance = postgres(process.env.DATABASE_URL, {
+        max: 1,
+        idle_timeout: 20,
+        connect_timeout: 10,
+      });
+      console.log("[getDb] Database connection instance created");
+    } catch (error) {
+      console.error("[getDb] Failed to create database connection:", error);
+      return null;
+    }
   }
 
   if (!dbInstance) {

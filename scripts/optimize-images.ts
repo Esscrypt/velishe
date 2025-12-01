@@ -23,11 +23,6 @@ async function optimizeImage(inputPath: string, outputPath: string, isLogo: bool
   const inputStats = await stat(inputPath);
   const originalSize = inputStats.size;
 
-  // Get image dimensions
-  const metadata = await sharp(inputPath).metadata();
-  const width = metadata.width || 1200;
-  const height = metadata.height || 1600;
-
   // Determine target dimensions based on filename and context
   let targetWidth: number | null = null;
   let targetHeight: number | null = null;
@@ -61,7 +56,7 @@ async function optimizeImage(inputPath: string, outputPath: string, isLogo: bool
   // Ensure output directory exists
   await ensureDir(dirname(outputPath));
 
-  // Optimize and convert to WebP
+  // Optimize and convert to WebP - reuse single sharp instance
   const resizeOptions: { width?: number; height?: number; fit: "inside"; withoutEnlargement: boolean } = {
     fit: "inside",
     withoutEnlargement: true,
@@ -70,7 +65,11 @@ async function optimizeImage(inputPath: string, outputPath: string, isLogo: bool
   if (targetWidth) resizeOptions.width = targetWidth;
   if (targetHeight) resizeOptions.height = targetHeight;
 
-  await sharp(inputPath)
+  // Use a single sharp instance and chain operations to reduce memory overhead
+  // limitInputPixels prevents processing extremely large images that could cause memory issues
+  await sharp(inputPath, {
+    limitInputPixels: 268402689, // ~16k x 16k max to prevent memory issues
+  })
     .resize(resizeOptions)
     .webp({ quality, effort: 6 })
     .toFile(outputPath);
@@ -102,16 +101,27 @@ async function processDirectory(dir: string, baseDir: string = dir) {
       const isLogo = dir.toLowerCase().includes("logo");
       
       if (ext === ".jpg" || ext === ".jpeg" || ext === ".png") {
-        // Create WebP version
-        const webpPath = fullPath.replace(/\.(jpg|jpeg|png)$/i, ".webp");
-        const stats = await optimizeImage(fullPath, webpPath, isLogo);
-        processedImages.push(stats);
+        try {
+          // Create WebP version
+          const webpPath = fullPath.replace(/\.(jpg|jpeg|png)$/i, ".webp");
+          const stats = await optimizeImage(fullPath, webpPath, isLogo);
+          processedImages.push(stats);
 
-        console.log(`✓ ${relativePath}`);
-        console.log(`  → ${webpPath.replace(baseDir, "")}`);
-        console.log(
-          `  Size: ${(stats.originalSize / 1024).toFixed(2)}KB → ${(stats.optimizedSize / 1024).toFixed(2)}KB (${stats.savings.toFixed(1)}% smaller)`
-        );
+          console.log(`✓ ${relativePath}`);
+          console.log(`  → ${webpPath.replace(baseDir, "")}`);
+          console.log(
+            `  Size: ${(stats.originalSize / 1024).toFixed(2)}KB → ${(stats.optimizedSize / 1024).toFixed(2)}KB (${stats.savings.toFixed(1)}% smaller)`
+          );
+          
+          // Force garbage collection hint every 10 images to prevent memory buildup
+          if (processedImages.length % 10 === 0) {
+            // Small delay to allow GC to run
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        } catch (error) {
+          console.error(`✗ Failed to process ${relativePath}:`, error);
+          // Continue processing other images
+        }
       }
     }
   }

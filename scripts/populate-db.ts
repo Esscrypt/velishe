@@ -24,7 +24,6 @@ interface ModelJson {
     eyeColor: string;
   };
   instagram?: string;
-  featuredImage?: string;
 }
 
 const db = getDb();
@@ -45,7 +44,7 @@ try {
 
   // Get all existing slugs from database
   const existingModels = await db.select({ slug: schema.models.slug }).from(schema.models);
-  const existingSlugs = new Set(existingModels.map((m) => m.slug));
+  const existingSlugs = new Set(existingModels.map((m) => m.slug).filter((slug): slug is string => slug !== null));
 
   console.log(`📊 Found ${existingSlugs.size} existing models in database`);
 
@@ -58,58 +57,23 @@ try {
     // Insert new models
     for (const modelJson of modelsToInsert) {
       try {
-        // Use discovered featured image if available, otherwise use JSON value
-        const discovered = await discoverModelImages(modelJson.slug);
-        let featuredImage = discovered.featuredImage || modelJson.featuredImage || null;
-        
-        // Convert featured image to base64 if it's a file path (consistent with admin upload)
-        if (featuredImage && featuredImage.startsWith("/")) {
-          try {
-            const featuredImagePath = join(process.cwd(), "public", featuredImage);
-            const imageBuffer = await readFile(featuredImagePath);
-            // Detect MIME type from file extension
-            const ext = featuredImage.split(".").pop()?.toLowerCase();
-            let mimeType = "image/webp";
-            if (ext === "jpg" || ext === "jpeg") mimeType = "image/jpeg";
-            else if (ext === "png") mimeType = "image/png";
-            else if (ext === "gif") mimeType = "image/gif";
-            else if (ext === "mp4") mimeType = "video/mp4";
-            else if (ext === "webm") mimeType = "video/webm";
-            featuredImage = `data:${mimeType};base64,${imageBuffer.toString("base64")}`;
-          } catch (error) {
-            console.warn(`  ⚠️  Could not read featured image ${featuredImage} for initial insert:`, error);
-            // Keep file path as fallback
-          }
-        }
-
         const modelToInsert: ModelInsert = {
           slug: modelJson.slug,
           name: modelJson.name,
-          stats: modelJson.stats,
+          height: modelJson.stats?.height || null,
+          bust: modelJson.stats?.bust || null,
+          waist: modelJson.stats?.waist || null,
+          hips: modelJson.stats?.hips || null,
+          shoeSize: modelJson.stats?.shoeSize || null,
+          hairColor: modelJson.stats?.hairColor || null,
+          eyeColor: modelJson.stats?.eyeColor || null,
           instagram: modelJson.instagram || null,
         };
 
-        const insertedModels = await db
+        await db
           .insert(schema.models)
           .values(modelToInsert)
-          .onConflictDoNothing()
-          .returning();
-
-        const modelId = insertedModels[0]?.id;
-        
-        // If model was inserted and we have a featured image, insert it with order 0
-        if (modelId && featuredImage) {
-          const featuredImageId = randomUUID();
-          await db.insert(schema.images).values({
-            id: featuredImageId,
-            modelId: modelId,
-            type: "image",
-            src: `db://${featuredImageId}`,
-            alt: `${modelJson.name} - Featured`,
-            data: featuredImage,
-            order: 0, // Featured images have order 0
-          } as ImageInsert);
-        }
+          .onConflictDoNothing();
 
         console.log(`  ✓ Inserted: ${modelJson.name} (${modelJson.slug})`);
       } catch (error) {
@@ -121,7 +85,7 @@ try {
   }
 
   // Update images for all models (both new and existing) from filesystem
-  console.log(`\n🔄 Updating images for all models from filesystem...`);
+  console.log(`\n🔄 Updating images for all models from filesystem (webp only)...`);
   const allModels = await db.select().from(schema.models);
   
   for (const dbModel of allModels) {
@@ -130,8 +94,19 @@ try {
         console.warn(`  ⚠️  Model ${dbModel.id} has no slug, skipping`);
         continue;
       }
+      
       // Discover images from filesystem
       const discovered = await discoverModelImages(dbModel.slug);
+      
+      // Filter to only webp images
+      const webpImages = discovered.gallery.filter((img) => 
+        img.path.toLowerCase().endsWith(".webp") && img.type === "image"
+      );
+      
+      if (webpImages.length === 0) {
+        console.log(`  ⚠️  No webp images found for ${dbModel.slug}, skipping`);
+        continue;
+      }
       
       // Get existing images from database
       const existingImages = await db
@@ -139,15 +114,20 @@ try {
         .from(schema.images)
         .where(eq(schema.images.modelId, dbModel.id));
       
-      const existingImageSrcs = new Set(existingImages.map((img) => img.src));
+      // Track existing images by their data (base64) since we no longer have src
+      const existingImageData = new Set(existingImages.map((img) => img.data).filter((d): d is string => d !== null));
       
       // Get existing featured image (order 0) from database
       const existingFeaturedImage = existingImages.find((img) => img.order === 0);
       
-      // Transform discovered gallery images (exclude featured image)
-      const featuredImagePath = discovered.featuredImage || "";
+      // Determine featured image (first webp image or discovered featured if it's webp)
+      const featuredImagePath = discovered.featuredImage?.toLowerCase().endsWith(".webp") 
+        ? discovered.featuredImage 
+        : webpImages[0]?.path || "";
+      
+      // Transform discovered gallery images (exclude featured image, only webp)
       const galleryImages = await Promise.all(
-        discovered.gallery
+        webpImages
           .filter((img) => img.path !== featuredImagePath)
           .map(async (img, index) => {
             // Read image file and convert to base64
@@ -159,23 +139,13 @@ try {
               }
               const imagePath = join(process.cwd(), "public", img.path);
               const imageBuffer = await readFile(imagePath);
-              // Detect MIME type from file extension
-              const ext = img.path.split(".").pop()?.toLowerCase();
-              let mimeType = "image/webp";
-              if (ext === "jpg" || ext === "jpeg") mimeType = "image/jpeg";
-              else if (ext === "png") mimeType = "image/png";
-              else if (ext === "gif") mimeType = "image/gif";
-              else if (ext === "mp4") mimeType = "video/mp4";
-              else if (ext === "webm") mimeType = "video/webm";
-              base64Data = `data:${mimeType};base64,${imageBuffer.toString("base64")}`;
+              // Always use webp MIME type since we only process webp
+              base64Data = `data:image/webp;base64,${Buffer.from(imageBuffer).toString("base64")}`;
             } catch (error) {
               console.warn(`  ⚠️  Could not read image ${img.path}:`, error);
             }
             
             return {
-              type: img.type,
-              src: img.path!,
-              alt: `${dbModel.slug} - ${img.name}`,
               data: base64Data,
               order: index + 1, // Gallery images start at order 1 (order 0 is for featured)
             };
@@ -183,11 +153,11 @@ try {
       );
       
       // Filter out nulls from failed image reads
-      const validGalleryImages = galleryImages.filter((img): img is NonNullable<typeof img> => img !== null);
+      const validGalleryImages = galleryImages.filter((img): img is NonNullable<typeof img> => img !== null && img.data !== null);
 
       // Delete images that no longer exist in filesystem (but keep order 0 featured image)
-      const imageSrcsToKeep = new Set(validGalleryImages.map((img) => img.src));
-      const imagesToDelete = existingImages.filter((img) => img.order !== 0 && !imageSrcsToKeep.has(img.src));
+      const imageDataToKeep = new Set(validGalleryImages.map((img) => img.data!));
+      const imagesToDelete = existingImages.filter((img) => img.order !== 0 && (!img.data || !imageDataToKeep.has(img.data)));
       
       if (imagesToDelete.length > 0) {
         // Delete in parallel
@@ -196,37 +166,35 @@ try {
             db.delete(schema.images).where(eq(schema.images.id, img.id))
           )
         );
-        console.log(`  🗑️  Deleted ${imagesToDelete.length} removed images for ${dbModel.name}`);
+        console.log(`  🗑️  Deleted ${imagesToDelete.length} removed images for ${dbModel.name || dbModel.slug}`);
       }
 
       // Insert new images that don't exist in database
       const imagesToInsert: ImageInsert[] = validGalleryImages
-        .filter((img) => !existingImageSrcs.has(img.src))
+        .filter((img) => img.data && !existingImageData.has(img.data))
         .map((img) => ({
           id: randomUUID(),
           modelId: dbModel.id,
-          type: img.type,
-          src: img.src,
-          alt: img.alt,
-          data: img.data || null,
+          data: img.data!,
           order: img.order,
         }));
 
       if (imagesToInsert.length > 0) {
         await db.insert(schema.images).values(imagesToInsert);
-        console.log(`  ➕ Added ${imagesToInsert.length} new images for ${dbModel.name}`);
+        console.log(`  ➕ Added ${imagesToInsert.length} new images for ${dbModel.name || dbModel.slug}`);
       }
 
       // Update order and data for existing images in parallel
       const updatePromises = validGalleryImages.map(async (img) => {
-        const existingImage = existingImages.find((e) => e.src === img.src);
+        if (!img.data) return;
+        const existingImage = existingImages.find((e) => e.data === img.data);
         if (existingImage) {
-          const updates: { order?: number; data?: string | null } = {};
+          const updates: { order?: number; data?: string } = {};
           if (existingImage.order !== img.order) {
             updates.order = img.order;
           }
           // Update base64 data if it's missing or if we have new data
-          if (img.data && (!existingImage.data || existingImage.data !== img.data)) {
+          if (!existingImage.data || existingImage.data !== img.data) {
             updates.data = img.data;
           }
           if (Object.keys(updates).length > 0) {
@@ -239,60 +207,48 @@ try {
       });
       await Promise.all(updatePromises);
 
-      // Update featured image (order 0) if discovered and different
-      let featuredImage = discovered.featuredImage || null;
-      let featuredImageData: string | null = null;
-      
-      if (featuredImage && featuredImage.startsWith("/")) {
-        // Convert featured image to base64 if it's a file path
+      // Update featured image (order 0) if we have a webp featured image
+      if (featuredImagePath && featuredImagePath.startsWith("/")) {
+        let featuredImageData: string | null = null;
+        
         try {
-          const featuredImagePath = join(process.cwd(), "public", featuredImage);
-          const imageBuffer = await readFile(featuredImagePath);
-          // Detect MIME type from file extension
-          const ext = featuredImage.split(".").pop()?.toLowerCase();
-          let mimeType = "image/webp";
-          if (ext === "jpg" || ext === "jpeg") mimeType = "image/jpeg";
-          else if (ext === "png") mimeType = "image/png";
-          else if (ext === "gif") mimeType = "image/gif";
-          else if (ext === "mp4") mimeType = "video/mp4";
-          else if (ext === "webm") mimeType = "video/webm";
-          featuredImageData = `data:${mimeType};base64,${imageBuffer.toString("base64")}`;
+          const featuredImageFullPath = join(process.cwd(), "public", featuredImagePath);
+          const imageBuffer = await readFile(featuredImageFullPath);
+          // Always use webp MIME type since we only process webp
+          featuredImageData = `data:image/webp;base64,${Buffer.from(imageBuffer).toString("base64")}`;
         } catch (error) {
-          console.warn(`  ⚠️  Could not read featured image ${featuredImage}:`, error);
+          console.warn(`  ⚠️  Could not read featured image ${featuredImagePath}:`, error);
         }
-      }
-      
-      // Update or insert featured image with order 0
-      if (featuredImageData) {
-        if (existingFeaturedImage) {
-          // Update existing featured image
-          if (existingFeaturedImage.data !== featuredImageData) {
-            await db
-              .update(schema.images)
-              .set({ data: featuredImageData })
-              .where(eq(schema.images.id, existingFeaturedImage.id));
+        
+        // Update or insert featured image with order 0
+        if (featuredImageData) {
+          if (existingFeaturedImage) {
+            // Update existing featured image
+            if (existingFeaturedImage.data !== featuredImageData) {
+              await db
+                .update(schema.images)
+                .set({ data: featuredImageData })
+                .where(eq(schema.images.id, existingFeaturedImage.id));
+            }
+          } else {
+            // Insert new featured image with order 0
+            const featuredImageId = randomUUID();
+            await db.insert(schema.images).values({
+              id: featuredImageId,
+              modelId: dbModel.id,
+              data: featuredImageData,
+              order: 0, // Featured images have order 0
+            } as ImageInsert);
           }
-        } else {
-          // Insert new featured image with order 0
-          const featuredImageId = randomUUID();
-          await db.insert(schema.images).values({
-            id: featuredImageId,
-            modelId: dbModel.id,
-            type: "image",
-            src: `db://${featuredImageId}`,
-            alt: `${dbModel.name} - Featured`,
-            data: featuredImageData,
-            order: 0, // Featured images have order 0
-          } as ImageInsert);
         }
       }
 
       const totalImages = validGalleryImages.length;
       if (totalImages > 0 || imagesToInsert.length > 0 || imagesToDelete.length > 0) {
-        console.log(`  ✓ Updated: ${dbModel.name} (${dbModel.slug}) - ${totalImages} gallery images`);
+        console.log(`  ✓ Updated: ${dbModel.name || dbModel.slug} (${dbModel.slug}) - ${totalImages} gallery images`);
       }
     } catch (error) {
-      console.error(`  ✗ Failed to update images for ${dbModel.name} (${dbModel.slug}):`, error);
+      console.error(`  ✗ Failed to update images for ${dbModel.name || dbModel.slug} (${dbModel.slug}):`, error);
     }
   }
 

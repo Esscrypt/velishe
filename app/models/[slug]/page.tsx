@@ -1,33 +1,82 @@
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getModelBySlugAsync, getAllModels } from "@/lib/models-server";
+import { Model } from "@/types/model";
 import SocialIcons from "@/components/SocialIcons";
 import ImageCarousel from "@/components/ImageCarousel";
 import ModelPageTracker from "@/components/ModelPageTracker";
+import { useModels } from "@/contexts/ModelsContext";
+import { getAllModelsSync } from "@/lib/models";
 
-// Force static generation to prevent RSC requests and 404s
-export const dynamic = 'force-static';
-export const dynamicParams = false; // Return 404 for unknown routes
+export default function ModelPage() {
+  const params = useParams();
+  const router = useRouter();
+  const slug = params.slug as string;
+  const { getFullModel, fetchFullModel } = useModels();
+  const [model, setModel] = useState<Model | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export async function generateStaticParams() {
-  // Get slugs from database (or JSON fallback)
-  const models = await getAllModels();
-  return models.map((model) => ({
-    slug: model.slug,
-  }));
-}
+  useEffect(() => {
+    if (!slug) return;
 
-export default async function ModelPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const model = await getModelBySlugAsync(slug);
+    // Priority order: context cache > API > JSON fallback
+    
+    // 1. Check context cache first
+    const cachedModel = getFullModel(slug);
+    if (cachedModel) {
+      console.log(`[ModelPage] Using cached model for ${slug}`);
+      setModel(cachedModel);
+      setLoading(false);
+      return;
+    }
+
+    // 2. Fetch from API (will be cached in context)
+    fetchFullModel(slug)
+      .then((fetchedModel) => {
+        if (fetchedModel) {
+          setModel(fetchedModel);
+        } else {
+          // Fallback to JSON
+          const jsonModels = getAllModelsSync();
+          const jsonModel = jsonModels.find((m) => m.slug === slug);
+          if (jsonModel) {
+            setModel(jsonModel);
+          } else {
+            router.push("/404");
+          }
+        }
+      })
+      .catch((error) => {
+        console.error(`[ModelPage] Error fetching model ${slug}:`, error);
+        // Fallback to JSON
+        const jsonModels = getAllModelsSync();
+        const jsonModel = jsonModels.find((m) => m.slug === slug);
+        if (jsonModel) {
+          setModel(jsonModel);
+        } else {
+          router.push("/404");
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [slug, router, getFullModel, fetchFullModel]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex items-center justify-center min-h-[600px]">
+          <div className="text-gray-500">Loading model...</div>
+        </div>
+      </div>
+    );
+  }
 
   if (!model) {
-    notFound();
+    return null; // Router will handle 404
   }
 
   const stats = [

@@ -11,12 +11,17 @@ CREATE TABLE "images" (
 --> statement-breakpoint
 CREATE TABLE "models" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"slug" text NOT NULL,
-	"name" text NOT NULL,
-	"stats" jsonb NOT NULL,
+	"slug" text,
+	"name" text,
+	"height" text,
+	"bust" text,
+	"waist" text,
+	"hips" text,
+	"shoe_size" text,
+	"hair_color" text,
+	"eye_color" text,
 	"instagram" text,
-	"featured_image" text,
-	"display_order" integer DEFAULT 0 NOT NULL,
+	"display_order" integer DEFAULT 0,
 	CONSTRAINT "models_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint

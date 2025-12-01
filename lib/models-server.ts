@@ -1,5 +1,4 @@
 import { Model } from "@/types/model";
-import modelsData from "@/data/models.json";
 import { fetchModelsFromDb } from "./db";
 
 /**
@@ -28,17 +27,9 @@ export async function getAllModels(): Promise<Model[]> {
       return (a.id || "").localeCompare(b.id || "");
     });
   }
-  
-  // Fallback to local JSON if database is not available
-  return modelsData.map((jsonModel) => ({
-    id: jsonModel.id || jsonModel.slug,
-    slug: jsonModel.slug,
-    name: jsonModel.name,
-    stats: jsonModel.stats,
-    instagram: jsonModel.instagram,
-    featuredImage: jsonModel.featuredImage || "",
-    gallery: (jsonModel as Model).gallery || [],
-  }));
+
+  return []
+
 }
 
 export async function getModelBySlugAsync(slug: string): Promise<Model | undefined> {

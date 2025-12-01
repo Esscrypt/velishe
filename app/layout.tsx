@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import PageViewTracker from "@/components/PageViewTracker";
+import { ModelsProvider } from "@/contexts/ModelsContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -109,10 +110,12 @@ export default function RootLayout({
       >
         {gtmId && <GoogleTagManager gtmId={gtmId} />}
         <PageViewTracker />
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <ModelsProvider>
+          <Header />
+          <main className="min-h-screen">
+            {children}
+          </main>
+        </ModelsProvider>
         <footer className="bg-gray-900 text-white py-4">
           <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
             <p className="text-center text-sm">
