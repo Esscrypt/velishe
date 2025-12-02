@@ -108,20 +108,22 @@ export default function BecomeAModelPage() {
   const validateHeight = (height: string): boolean => {
     if (!height.trim()) return false;
     
-    // Accept formats like: 5'8", 5'8, 5ft 8in, 5 feet 8 inches, 173cm, 173
-    const heightRegex = /^(\d+['"]?\s*\d*[""]?|\d+\s*(ft|feet|')\s*\d+\s*(in|inches|")|\d+\s*cm|\d+)$/i;
+    // Accept formats like: 173cm, 173 cm, 173
+    const heightRegex = /^(\d+\s*cm|\d+)$/i;
     
     if (!heightRegex.test(height.trim())) {
       return false;
     }
     
-    // Extract all numeric parts and check each is max 3 digits
-    const numericParts = height.match(/\d+/g);
-    if (numericParts) {
-      for (const part of numericParts) {
-        if (part.length > 3) {
-          return false;
-        }
+    // Extract numeric value and validate range (100-250 cm)
+    const numericMatch = height.match(/\d+/);
+    if (numericMatch) {
+      const value = parseInt(numericMatch[0], 10);
+      if (value < 100 || value > 250) {
+        return false;
+      }
+      if (numericMatch[0].length > 3) {
+        return false;
       }
     }
     
@@ -178,7 +180,7 @@ export default function BecomeAModelPage() {
   const validateFile = (file: File | null, fieldName: string): string | undefined => {
     if (!file) return undefined;
     
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 1 * 1024 * 1024; // 1MB
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     
     if (!allowedTypes.includes(file.type)) {
@@ -186,10 +188,25 @@ export default function BecomeAModelPage() {
     }
     
     if (file.size > maxSize) {
-      return `${fieldName} must be less than 10MB`;
+      return `${fieldName} (${file.name}) must be less than 1MB. Current size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`;
     }
     
     return undefined;
+  };
+
+  const getTotalFileSize = (): number => {
+    let total = 0;
+    if (formData.headshot) total += formData.headshot.size;
+    if (formData.fullProfile) total += formData.fullProfile.size;
+    if (formData.halfProfile) total += formData.halfProfile.size;
+    if (formData.fullLengthProfile) total += formData.fullLengthProfile.size;
+    return total;
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
   const handleInputChange = (
@@ -215,18 +232,17 @@ export default function BecomeAModelPage() {
       
       setFormData((prev) => ({ ...prev, [name]: finalValue }));
     } else if (name === "height") {
-      // For height, allow various formats but limit numeric parts to 3 digits
+      // For height, allow cm format and limit numeric parts to 3 digits
       let finalValue = value;
       
-      // Extract all numeric parts
-      const numericParts = value.match(/\d+/g);
-      if (numericParts) {
-        for (const part of numericParts) {
-          if (part.length > 3) {
-            // Replace with truncated version
-            const truncated = part.slice(0, 3);
-            finalValue = finalValue.replace(part, truncated);
-          }
+      // Extract numeric part
+      const numericMatch = value.match(/\d+/);
+      if (numericMatch) {
+        const numericPart = numericMatch[0];
+        if (numericPart.length > 3) {
+          // Replace with truncated version
+          const truncated = numericPart.slice(0, 3);
+          finalValue = finalValue.replace(numericPart, truncated);
         }
       }
       
@@ -365,7 +381,7 @@ export default function BecomeAModelPage() {
       newErrors.height = "Height is required";
       errorSummary.push("Height");
     } else if (!validateHeight(formData.height)) {
-      newErrors.height = "Please enter height in cm, e.g. 173cm (max 3 digits per number)";
+      newErrors.height = "Please enter height in cm, e.g. 173cm (100-250 cm)";
       errorSummary.push("Valid height format");
     }
 
@@ -373,7 +389,7 @@ export default function BecomeAModelPage() {
       newErrors.bust = "Bust measurement is required";
       errorSummary.push("Bust");
     } else if (!validateNumeric(formData.bust, true, 3)) {
-      newErrors.bust = "Bust must be a valid number with max 3 digits (e.g., 80-90 cm)";
+      newErrors.bust = "Bust must be a valid number in cm with max 3 digits (e.g., 80-90)";
       errorSummary.push("Valid bust measurement");
     }
 
@@ -381,7 +397,7 @@ export default function BecomeAModelPage() {
       newErrors.waist = "Waist measurement is required";
       errorSummary.push("Waist");
     } else if (!validateNumeric(formData.waist, true, 3)) {
-      newErrors.waist = "Waist must be a valid number with max 3 digits (e.g., 60-70 cm)";
+      newErrors.waist = "Waist must be a valid number in cm with max 3 digits (e.g., 60-70)";
       errorSummary.push("Valid waist measurement");
     }
 
@@ -389,7 +405,7 @@ export default function BecomeAModelPage() {
       newErrors.hips = "Hips measurement is required";
       errorSummary.push("Hips");
     } else if (!validateNumeric(formData.hips, true, 3)) {
-      newErrors.hips = "Hips must be a valid number with max 3 digits (e.g., 90-100 cm)";
+      newErrors.hips = "Hips must be a valid number in cm with max 3 digits (e.g., 90-100)";
       errorSummary.push("Valid hips measurement");
     }
 
@@ -397,7 +413,7 @@ export default function BecomeAModelPage() {
       newErrors.shoeSize = "Shoe size is required";
       errorSummary.push("Shoe size");
     } else if (!validateNumeric(formData.shoeSize, true, 2)) {
-      newErrors.shoeSize = "Shoe size must be a valid number with max 2 digits (e.g., 40)";
+      newErrors.shoeSize = "Shoe size must be a valid EU size with max 2 digits (e.g., 40)";
       errorSummary.push("Valid shoe size");
     }
 
@@ -469,6 +485,17 @@ export default function BecomeAModelPage() {
       newErrors.fullLengthProfile = fullLengthProfileError;
       if (!errorSummary.includes("Valid full length profile image")) {
         errorSummary.push("Valid full length profile image");
+      }
+    }
+
+    // Validate total file size (4MB limit)
+    const totalSize = getTotalFileSize();
+    const maxTotalSize = 4 * 1024 * 1024; // 4MB
+    if (totalSize > maxTotalSize) {
+      const totalSizeError = `Total file size must be less than 4MB. Current total: ${formatFileSize(totalSize)}`;
+      newErrors.headshot = newErrors.headshot || totalSizeError;
+      if (!errorSummary.includes("Total file size limit")) {
+        errorSummary.push("Total file size limit (4MB)");
       }
     }
 
@@ -678,10 +705,10 @@ export default function BecomeAModelPage() {
           </p>
           <ul className="list-disc list-inside space-y-2 text-gray-700 mb-6">
             <li>
-              <strong>Female</strong> minimum 5&apos;8&apos;
+              <strong>Female</strong> minimum 173 cm
             </li>
             <li>
-              <strong>Male</strong> minimum 6&apos;
+              <strong>Male</strong> minimum 183 cm
             </li>
           </ul>
           <p className="text-gray-700 mb-4">
@@ -992,7 +1019,7 @@ export default function BecomeAModelPage() {
                 name="height"
                 value={formData.height}
                 onChange={handleInputChange}
-                placeholder="e.g., 5'8&quot;"
+                placeholder="e.g., 173cm"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.height
@@ -1009,7 +1036,7 @@ export default function BecomeAModelPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bust (inches) *
+                Bust (cm) *
               </label>
               <input
                 type="text"
@@ -1017,7 +1044,7 @@ export default function BecomeAModelPage() {
                 name="bust"
                 value={formData.bust}
                 onChange={handleInputChange}
-                placeholder="e.g., 34 or 34.5"
+                placeholder="e.g., 80-90"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.bust
@@ -1031,7 +1058,7 @@ export default function BecomeAModelPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Waist (inches) *
+                Waist (cm) *
               </label>
               <input
                 type="text"
@@ -1039,7 +1066,7 @@ export default function BecomeAModelPage() {
                 name="waist"
                 value={formData.waist}
                 onChange={handleInputChange}
-                placeholder="e.g., 24 or 24.5"
+                placeholder="e.g., 60-70"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.waist
@@ -1053,7 +1080,7 @@ export default function BecomeAModelPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hips (inches) *
+                Hips (cm) *
               </label>
               <input
                 type="text"
@@ -1061,7 +1088,7 @@ export default function BecomeAModelPage() {
                 name="hips"
                 value={formData.hips}
                 onChange={handleInputChange}
-                placeholder="e.g., 36 or 36.5"
+                placeholder="e.g., 90-100"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.hips
@@ -1075,7 +1102,7 @@ export default function BecomeAModelPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Shoe Size (US) *
+                Shoe Size (EU) *
               </label>
               <input
                 type="text"
@@ -1083,7 +1110,7 @@ export default function BecomeAModelPage() {
                 name="shoeSize"
                 value={formData.shoeSize}
                 onChange={handleInputChange}
-                placeholder="e.g., 8 or 8.5"
+                placeholder="e.g., 40 or 41"
                 required
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.shoeSize
@@ -1184,6 +1211,54 @@ export default function BecomeAModelPage() {
           </div>
 
           <div className="space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-sm font-medium text-blue-900 mb-2">File Size Requirements:</p>
+              <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                <li>Total size of all images must be less than <strong>4MB</strong></li>
+                <li>Each individual image must be less than <strong>1MB</strong></li>
+              </ul>
+              {(() => {
+                const totalSize = getTotalFileSize();
+                const maxTotalSize = 4 * 1024 * 1024;
+                const files = [
+                  { name: "Headshot", file: formData.headshot },
+                  { name: "Full Profile", file: formData.fullProfile },
+                  { name: "Half Profile", file: formData.halfProfile },
+                  { name: "Full Length Profile", file: formData.fullLengthProfile },
+                ];
+                const oversizedFiles = files.filter(f => f.file && f.file.size > 1 * 1024 * 1024);
+                
+                if (totalSize > 0 || oversizedFiles.length > 0) {
+                  return (
+                    <div className="mt-3 pt-3 border-t border-blue-300">
+                      <p className="text-sm font-medium text-blue-900 mb-1">Current Status:</p>
+                      <p className="text-sm text-blue-800">
+                        Total size: <strong>{formatFileSize(totalSize)}</strong> / 4MB
+                        {totalSize > maxTotalSize && (
+                          <span className="text-red-600 font-medium ml-2">(Exceeds limit!)</span>
+                        )}
+                      </p>
+                      {oversizedFiles.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm font-medium text-red-600 mb-1">Images over 1MB:</p>
+                          <ul className="text-sm text-red-600 space-y-1 list-disc list-inside">
+                            {oversizedFiles.map((f, idx) => {
+                              const file = f.file!;
+                              return (
+                                <li key={idx}>
+                                  {f.name} ({file.name}): {formatFileSize(file.size)}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 HEADSHOT
