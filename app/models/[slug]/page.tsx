@@ -15,40 +15,56 @@ export default function ModelPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
-  const { getModelBySlug, getFullModel } = useModels();
+  const { getModelBySlug, getFullModel, fetchFullModel } = useModels();
   const [model, setModel] = useState<Model | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!slug) return;
 
-    // 1. Check full model cache first (for metadata, not gallery - ImageCarousel handles gallery)
-    const cachedFullModel = getFullModel(slug);
-    if (cachedFullModel) {
-      console.log(`[ModelPage] Using cached model metadata for ${slug}`);
-      setModel(cachedFullModel);
-      setLoading(false);
-      return;
-    }
+    const loadModel = async () => {
+      // 1. Check full model cache first (for metadata, not gallery - ImageCarousel handles gallery)
+      const cachedFullModel = getFullModel(slug);
+      if (cachedFullModel) {
+        console.log(`[ModelPage] Using cached model metadata for ${slug}`);
+        setModel(cachedFullModel);
+        setLoading(false);
+        return;
+      }
 
-    // 2. Use model from list context for immediate render (has featured image)
-    const listModel = getModelBySlug(slug);
-    if (listModel) {
-      console.log(`[ModelPage] Using model from list context for ${slug}`);
-      setModel(listModel);
-      setLoading(false);
-    } else {
-      // Fallback to JSON
+      // 2. Fetch from API if not in cache
+      const apiModel = await fetchFullModel(slug);
+      if (apiModel) {
+        console.log(`[ModelPage] Fetched model from API for ${slug}`);
+        setModel(apiModel);
+        setLoading(false);
+        return;
+      }
+
+      // 3. Use model from list context for immediate render (has featured image)
+      const listModel = getModelBySlug(slug);
+      if (listModel) {
+        console.log(`[ModelPage] Using model from list context for ${slug}`);
+        setModel(listModel);
+        setLoading(false);
+        return;
+      }
+
+      // 4. Fallback to JSON
       const jsonModels = getAllModelsSync();
       const jsonModel = jsonModels.find((m) => m.slug === slug);
       if (jsonModel) {
+        console.log(`[ModelPage] Using model from JSON fallback for ${slug}`);
         setModel(jsonModel);
         setLoading(false);
       } else {
+        console.log(`[ModelPage] Model not found for ${slug}, redirecting to 404`);
         router.push("/404");
       }
-    }
-  }, [slug, router, getModelBySlug, getFullModel]);
+    };
+
+    loadModel();
+  }, [slug, router, getModelBySlug, getFullModel, fetchFullModel]);
 
   if (loading) {
     return (

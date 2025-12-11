@@ -1,12 +1,10 @@
 CREATE TABLE "images" (
 	"id" text PRIMARY KEY NOT NULL,
 	"model_id" integer NOT NULL,
-	"type" text NOT NULL,
-	"src" text NOT NULL,
-	"alt" text NOT NULL,
-	"data" text,
+	"data" text NOT NULL,
 	"order" integer DEFAULT 0 NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "images_model_id_order_unique" UNIQUE("model_id","order")
 );
 --> statement-breakpoint
 CREATE TABLE "models" (

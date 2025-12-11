@@ -1,5 +1,5 @@
 {
-  "id": "65d4daac-c333-4417-b198-079c834d6521",
+  "id": "0996650a-a346-467a-ac9c-89ba4b3e4f91",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -20,29 +20,11 @@
           "primaryKey": false,
           "notNull": true
         },
-        "type": {
-          "name": "type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "src": {
-          "name": "src",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "alt": {
-          "name": "alt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "data": {
           "name": "data",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "order": {
           "name": "order",
@@ -76,7 +58,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "images_model_id_order_unique": {
+          "name": "images_model_id_order_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "model_id",
+            "order"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

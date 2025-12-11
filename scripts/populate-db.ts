@@ -117,47 +117,51 @@ try {
       // Track existing images by their data (base64) since we no longer have src
       const existingImageData = new Set(existingImages.map((img) => img.data).filter((d): d is string => d !== null));
       
-      // Get existing featured image (order 0) from database
-      const existingFeaturedImage = existingImages.find((img) => img.order === 0);
-      
       // Determine featured image (first webp image or discovered featured if it's webp)
       const featuredImagePath = discovered.featuredImage?.toLowerCase().endsWith(".webp") 
         ? discovered.featuredImage 
         : webpImages[0]?.path || "";
       
-      // Transform discovered gallery images (exclude featured image, only webp)
-      const galleryImages = await Promise.all(
-        webpImages
-          .filter((img) => img.path !== featuredImagePath)
-          .map(async (img, index) => {
-            // Read image file and convert to base64
-            let base64Data: string | null = null;
-            try {
-              if (!img.path) {
-                console.warn(`  ⚠️  Image has no path, skipping`);
-                return null;
-              }
-              const imagePath = join(process.cwd(), "public", img.path);
-              const imageBuffer = await readFile(imagePath);
-              // Always use webp MIME type since we only process webp
-              base64Data = `data:image/webp;base64,${Buffer.from(imageBuffer).toString("base64")}`;
-            } catch (error) {
-              console.warn(`  ⚠️  Could not read image ${img.path}:`, error);
+      // Combine all images: featured first, then gallery images
+      // All images will be assigned orders starting from 0
+      const allImages = [
+        ...(featuredImagePath ? [{ path: featuredImagePath, isFeatured: true }] : []),
+        ...webpImages.filter((img) => img.path !== featuredImagePath).map((img) => ({ path: img.path, isFeatured: false }))
+      ];
+      
+      // Transform all images and assign orders starting from 0
+      const processedImages = await Promise.all(
+        allImages.map(async (img, index) => {
+          // Read image file and convert to base64
+          let base64Data: string | null = null;
+          try {
+            if (!img.path) {
+              console.warn(`  ⚠️  Image has no path, skipping`);
+              return null;
             }
-            
-            return {
-              data: base64Data,
-              order: index + 1, // Gallery images start at order 1 (order 0 is for featured)
-            };
-          })
+            const imagePath = join(process.cwd(), "public", img.path);
+            const imageBuffer = await readFile(imagePath);
+            // Always use webp MIME type since we only process webp
+            base64Data = `data:image/webp;base64,${Buffer.from(imageBuffer).toString("base64")}`;
+          } catch (error) {
+            console.warn(`  ⚠️  Could not read image ${img.path}:`, error);
+          }
+          
+          return {
+            data: base64Data,
+            order: index, // Orders start from 0
+            isFeatured: img.isFeatured,
+            path: img.path,
+          };
+        })
       );
       
       // Filter out nulls from failed image reads
-      const validGalleryImages = galleryImages.filter((img): img is NonNullable<typeof img> => img !== null && img.data !== null);
+      const validImages = processedImages.filter((img): img is NonNullable<typeof img> => img !== null && img.data !== null);
 
-      // Delete images that no longer exist in filesystem (but keep order 0 featured image)
-      const imageDataToKeep = new Set(validGalleryImages.map((img) => img.data!));
-      const imagesToDelete = existingImages.filter((img) => img.order !== 0 && (!img.data || !imageDataToKeep.has(img.data)));
+      // Delete images that no longer exist in filesystem
+      const imageDataToKeep = new Set(validImages.map((img) => img.data!));
+      const imagesToDelete = existingImages.filter((img) => !img.data || !imageDataToKeep.has(img.data));
       
       if (imagesToDelete.length > 0) {
         // Delete in parallel
@@ -170,7 +174,7 @@ try {
       }
 
       // Insert new images that don't exist in database
-      const imagesToInsert: ImageInsert[] = validGalleryImages
+      const imagesToInsert: ImageInsert[] = validImages
         .filter((img) => img.data && !existingImageData.has(img.data))
         .map((img) => ({
           id: randomUUID(),
@@ -184,8 +188,25 @@ try {
         console.log(`  ➕ Added ${imagesToInsert.length} new images for ${dbModel.name || dbModel.slug}`);
       }
 
-      // Update order and data for existing images in parallel
-      const updatePromises = validGalleryImages.map(async (img) => {
+      // Update order and data for existing images
+      // We need to update orders carefully to avoid unique constraint violations
+      // First, set all orders to negative values temporarily, then set to final values
+      const updatePromises = validImages.map(async (img, index) => {
+        if (!img.data) return;
+        const existingImage = existingImages.find((e) => e.data === img.data);
+        if (existingImage) {
+          // First, set to a temporary negative order to avoid conflicts
+          // Use -(index + 10000) to ensure uniqueness
+          await db
+            .update(schema.images)
+            .set({ order: -(index + 10000) } as any)
+            .where(eq(schema.images.id, existingImage.id));
+        }
+      });
+      await Promise.all(updatePromises);
+      
+      // Now update to final orders
+      const finalUpdatePromises = validImages.map(async (img) => {
         if (!img.data) return;
         const existingImage = existingImages.find((e) => e.data === img.data);
         if (existingImage) {
@@ -205,45 +226,9 @@ try {
           }
         }
       });
-      await Promise.all(updatePromises);
+      await Promise.all(finalUpdatePromises);
 
-      // Update featured image (order 0) if we have a webp featured image
-      if (featuredImagePath && featuredImagePath.startsWith("/")) {
-        let featuredImageData: string | null = null;
-        
-        try {
-          const featuredImageFullPath = join(process.cwd(), "public", featuredImagePath);
-          const imageBuffer = await readFile(featuredImageFullPath);
-          // Always use webp MIME type since we only process webp
-          featuredImageData = `data:image/webp;base64,${Buffer.from(imageBuffer).toString("base64")}`;
-        } catch (error) {
-          console.warn(`  ⚠️  Could not read featured image ${featuredImagePath}:`, error);
-        }
-        
-        // Update or insert featured image with order 0
-        if (featuredImageData) {
-          if (existingFeaturedImage) {
-            // Update existing featured image
-            if (existingFeaturedImage.data !== featuredImageData) {
-              await db
-                .update(schema.images)
-                .set({ data: featuredImageData })
-                .where(eq(schema.images.id, existingFeaturedImage.id));
-            }
-          } else {
-            // Insert new featured image with order 0
-            const featuredImageId = randomUUID();
-            await db.insert(schema.images).values({
-              id: featuredImageId,
-              modelId: dbModel.id,
-              data: featuredImageData,
-              order: 0, // Featured images have order 0
-            } as ImageInsert);
-          }
-        }
-      }
-
-      const totalImages = validGalleryImages.length;
+      const totalImages = validImages.length;
       if (totalImages > 0 || imagesToInsert.length > 0 || imagesToDelete.length > 0) {
         console.log(`  ✓ Updated: ${dbModel.name || dbModel.slug} (${dbModel.slug}) - ${totalImages} gallery images`);
       }
