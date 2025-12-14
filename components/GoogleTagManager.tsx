@@ -1,5 +1,3 @@
-"use client";
-
 import Script from "next/script";
 
 interface GoogleTagManagerProps {
@@ -18,7 +16,7 @@ export default function GoogleTagManager({
       {/* Google Tag Manager */}
       <Script
         id="google-tag-manager"
-        strategy="afterInteractive"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
