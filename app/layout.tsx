@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import Cookiebot from "@/components/Cookiebot";
 import PageViewTracker from "@/components/PageViewTracker";
 import { ModelsProvider } from "@/contexts/ModelsContext";
 
@@ -103,6 +104,7 @@ export default function RootLayout({
 }>) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "G-PQJ4JZ1BC7";
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const cookiebotId = process.env.NEXT_PUBLIC_COOKIEBOT_ID || "0a3be31f-8747-4f7b-8b6a-256aed707f7a";
 
   return (
     <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
@@ -110,6 +112,7 @@ export default function RootLayout({
         className="antialiased bg-white text-gray-900"
         suppressHydrationWarning
       >
+        <Cookiebot cbid={cookiebotId} />
         {gtmId && <GoogleTagManager gtmId={gtmId} />}
         {gaId && <GoogleAnalytics gaId={gaId} />}
         <PageViewTracker />
