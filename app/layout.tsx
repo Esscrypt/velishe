@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import GoogleTagManager from "@/components/GoogleTagManager";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageViewTracker from "@/components/PageViewTracker";
 import { ModelsProvider } from "@/contexts/ModelsContext";
 
@@ -101,6 +102,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "G-PQJ4JZ1BC7";
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
     <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
@@ -109,6 +111,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {gtmId && <GoogleTagManager gtmId={gtmId} />}
+        {gaId && <GoogleAnalytics gaId={gaId} />}
         <PageViewTracker />
         <ModelsProvider>
           <Header />

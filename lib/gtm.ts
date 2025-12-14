@@ -1,8 +1,13 @@
-// Google Tag Manager utility functions
+// Google Tag Manager and Google Analytics utility functions
 
 declare global {
   interface Window {
     dataLayer: Array<Record<string, unknown>>;
+    gtag?: (
+      command: string,
+      targetId: string,
+      config?: Record<string, unknown>
+    ) => void;
   }
 }
 
@@ -22,12 +27,22 @@ export const trackPageView = (url: string, title?: string): void => {
   const pageTitle = title ?? (globalThis.document?.title ?? "");
   const pageLocation = globalThis.window?.location.href ?? "";
   
+  // Track in GTM dataLayer
   pushToDataLayer({
     event: "page_view",
     page_path: url,
     page_title: pageTitle,
     page_location: pageLocation,
   });
+
+  // Track in Google Analytics if gtag is available
+  if (globalThis.window?.gtag && process.env.NEXT_PUBLIC_GA_ID) {
+    globalThis.window.gtag("event", "page_view", {
+      page_path: url,
+      page_title: pageTitle,
+      page_location: pageLocation,
+    });
+  }
 };
 
 /**
