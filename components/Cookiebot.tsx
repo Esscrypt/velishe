@@ -1,5 +1,3 @@
-"use client";
-
 import Script from "next/script";
 
 interface CookiebotProps {
@@ -16,10 +14,21 @@ export default function Cookiebot({
   return (
     <Script
       id="Cookiebot"
-      src="https://consent.cookiebot.com/uc.js"
-      data-cbid={cbid}
-      type="text/javascript"
       strategy="beforeInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `
+          (function(){
+            if(document.getElementById('Cookiebot')) return;
+            var s = document.createElement('script');
+            s.id = 'Cookiebot';
+            s.src = 'https://consent.cookiebot.com/uc.js';
+            s.setAttribute('data-cbid', '${cbid}');
+            s.type = 'text/javascript';
+            s.async = true;
+            document.head.appendChild(s);
+          })();
+        `,
+      }}
     />
   );
 }
