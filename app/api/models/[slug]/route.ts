@@ -10,17 +10,25 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    // Log for debugging on Vercel
+    console.log("[API] GET /api/models/[slug] called");
+    console.log("[API] DATABASE_URL exists:", !!process.env.DATABASE_URL);
+    
     const { slug } = await params;
+    console.log("[API] Received slug:", slug);
     
     // Trim any trailing slashes that might come from the URL
     const cleanSlug = slug.trim().replace(/\/+$/, '');
     
     if (!cleanSlug) {
+      console.log("[API] Empty slug after cleaning");
       return NextResponse.json(
         { error: "Slug is required" },
         { status: 400 }
       );
     }
+    
+    console.log("[API] Clean slug:", cleanSlug);
 
     // Parse query parameters for pagination and type (optional - if not provided, fetch all images)
     const url = new URL(request.url);
@@ -49,15 +57,24 @@ export async function GET(
     
     // Fetch model with all images (no pagination) unless pagination params are explicitly provided
     // The model page always fetches all images in one query
+    console.log("[API] Fetching model from database...");
     const model = await fetchModelBySlugFromDb(cleanSlug, imageLimit, imageOffset, imageType);
     
     if (!model) {
-      console.log(`Model not found for slug: ${cleanSlug}`);
+      console.log(`[API] Model not found for slug: ${cleanSlug}`);
+      // Check if database connection is available
+      const dbAvailable = !!process.env.DATABASE_URL;
       return NextResponse.json(
-        { error: "Model not found", slug: cleanSlug },
+        { 
+          error: "Model not found", 
+          slug: cleanSlug,
+          databaseConfigured: dbAvailable,
+        },
         { status: 404 }
       );
     }
+    
+    console.log(`[API] Model found: ${model.name}`);
 
     // Use base64 data if available, otherwise use file path
     // This matches the pattern used in populate-db and admin upload
@@ -72,9 +89,17 @@ export async function GET(
       featuredImage,
     });
   } catch (error) {
-    console.error("Error fetching model from API:", error);
+    console.error("[API] Error fetching model:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     return NextResponse.json(
-      { error: "Failed to fetch model" },
+      { 
+        error: "Failed to fetch model",
+        message: errorMessage,
+        databaseConfigured: !!process.env.DATABASE_URL,
+        ...(process.env.NODE_ENV === "development" && { stack: errorStack }),
+      },
       { status: 500 }
     );
   }

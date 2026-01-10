@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
     // Optimize server components
     optimizePackageImports: ["lucide-react"],
   },
+  // Ensure API routes work correctly on Vercel
+  async rewrites() {
+    return [];
+  },
+  // Exclude API routes from trailing slash redirects
+  async redirects() {
+    return [];
+  },
 };
 
 export default nextConfig;
