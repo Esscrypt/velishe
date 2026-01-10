@@ -1,5 +1,5 @@
 import { getDb, schema } from "./db/index";
-import { Model } from "@/types/model";
+import { Model, ModelMedia } from "@/types/model";
 import { eq, asc, and } from "drizzle-orm";
 
 /**
@@ -248,7 +248,8 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
 export async function fetchModelBySlugFromDb(
   slug: string,
   imageLimit?: number,
-  imageOffset?: number
+  imageOffset?: number,
+  imageType?: "image" | "digital"
 ): Promise<Model | null> {
   // Skip database during build time to avoid connection attempts
   // Only check for actual build phases, not runtime on Vercel
@@ -297,9 +298,14 @@ export async function fetchModelBySlugFromDb(
         imageId: schema.images.id,
         imageData: schema.images.data,
         imageOrder: schema.images.order,
+        imageType: schema.images.type,
       })
       .from(schema.images)
-      .where(eq(schema.images.modelId, modelData.modelId))
+      .where(
+        imageType 
+          ? and(eq(schema.images.modelId, modelData.modelId), eq(schema.images.type, imageType))
+          : eq(schema.images.modelId, modelData.modelId)
+      )
       .orderBy(asc(schema.images.order));
 
     const imagesQuery = 
@@ -313,28 +319,36 @@ export async function fetchModelBySlugFromDb(
 
     const imageRows = await imagesQuery;
 
-    // Separate featured image (order 0) from gallery
+    // Separate images by type and handle featured image (order 0, type 'image')
     let featuredImage = "";
-    const gallery = imageRows
+    const gallery: ModelMedia[] = [];
+    const digitals: ModelMedia[] = [];
+
+    imageRows
       .filter((row) => row.imageId !== null && row.imageData !== null)
-      .map((row) => {
+      .forEach((row) => {
         const imageSrc = row.imageData!;
-        
-        // Image with order 0 is the featured image
-        if (row.imageOrder === 0) {
-          featuredImage = imageSrc;
-          return null; // Don't include in gallery
-        }
-        
-        return {
+        const mediaItem: ModelMedia = {
           type: "image",
           src: imageSrc,
           alt: "",
         };
-      })
-      .filter((item): item is { type: "image"; src: string; alt: string } => item !== null);
+        
+        // Image with order 0 and type 'image' is the featured image
+        if (row.imageOrder === 0 && row.imageType === "image") {
+          featuredImage = imageSrc;
+          return; // Don't include in gallery
+        }
+        
+        // Separate by type
+        if (row.imageType === "digital") {
+          digitals.push(mediaItem);
+        } else {
+          gallery.push(mediaItem);
+        }
+      });
 
-    return {
+    const result: Model = {
       id: String(modelData.modelId), // Convert to string for Model type
       slug: modelData.slug || "",
       name: modelData.name || "",
@@ -350,7 +364,10 @@ export async function fetchModelBySlugFromDb(
       instagram: modelData.instagram || undefined,
       featuredImage,
       gallery,
+      digitals: digitals.length > 0 ? digitals : undefined,
     };
+
+    return result;
   } catch (error) {
     // Log errors (except during build)
     const isBuildTime = 

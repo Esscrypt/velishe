@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ModelMedia, Model } from "@/types/model";
 import OptimizedImage from "./OptimizedImage";
 import VideoPlayer from "./VideoPlayer";
+import { useModels } from "@/contexts/ModelsContext";
 
 interface ImageCarouselProps {
   media?: ModelMedia[];
@@ -13,6 +14,7 @@ interface ImageCarouselProps {
   featuredImage?: string;
   modelName?: string;
   className?: string;
+  imageType?: "image" | "digital";
 }
 
 export default function ImageCarousel({ 
@@ -20,10 +22,14 @@ export default function ImageCarousel({
   slug, 
   featuredImage,
   modelName,
-  className = "" 
+  className = "",
+  imageType = "image"
 }: ImageCarouselProps) {
-  // Initialize with featured image if provided
-  const initialMediaState: ModelMedia[] = featuredImage
+  const { getFullModel, setFullModel, fullModels } = useModels();
+  const isDigital = imageType === "digital";
+  
+  // Initialize with featured image if provided (only for gallery mode)
+  const initialMediaState: ModelMedia[] = !isDigital && featuredImage
     ? [{ type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }]
     : (initialMedia || []);
 
@@ -35,10 +41,18 @@ export default function ImageCarousel({
   const [lastLoadedOffset, setLastLoadedOffset] = useState<number | null>(null);
   const [hasReachedEnd, setHasReachedEnd] = useState(false);
   
+  // Separate counts for gallery and digitals
+  const [galleryLoadedCount, setGalleryLoadedCount] = useState(0);
+  const [digitalsLoadedCount, setDigitalsLoadedCount] = useState(0);
+  
+  // Track when digitals are added to trigger effect
+  const [digitalsUpdateTrigger, setDigitalsUpdateTrigger] = useState(0);
+  
   // Refs to prevent duplicate fetches and unnecessary updates
   const isFetchingRef = useRef(false);
   const hasInitializedRef = useRef(false);
   const currentSlugRef = useRef(slug);
+  const currentImageTypeRef = useRef(imageType);
 
   const isValidImageSrc = (src: string): boolean => {
     return (
@@ -49,7 +63,7 @@ export default function ImageCarousel({
   };
 
   // Load more images function (pagination)
-  // Offset is relative to gallery images (excluding featured image at order 0)
+  // Offset is relative to gallery images (excluding featured image at order 0) or digitals (starting from 0)
   const loadMoreImages = useCallback(async (offset: number, limit: number) => {
     if (!slug || isLoadingMore || hasReachedEnd || isFetchingRef.current) return;
     if (lastLoadedOffset !== null && offset <= lastLoadedOffset) return;
@@ -58,15 +72,20 @@ export default function ImageCarousel({
     setIsLoadingMore(true);
     
     try {
-      // Offset + 1 to skip the featured image (order 0)
-      const response = await fetch(`/api/models/${slug}?offset=${offset + 1}&limit=${limit}`);
+      // For gallery: offset + 1 to skip the featured image (order 0)
+      // For digitals: offset starts from 0
+      const apiOffset = isDigital ? offset : offset + 1;
+      const typeParam = isDigital ? "&type=digital" : "&type=image";
+      const response = await fetch(`/api/models/${slug}?offset=${apiOffset}&limit=${limit}${typeParam}`);
       if (!response.ok) throw new Error("Failed to fetch more images");
       
       const model: Model = await response.json();
       setLastLoadedOffset(offset);
       
-      if (model.gallery.length > 0) {
-        const newMedia: ModelMedia[] = model.gallery
+      const sourceArray = isDigital ? (model.digitals || []) : model.gallery;
+      
+      if (sourceArray.length > 0) {
+        const newMedia: ModelMedia[] = sourceArray
           .filter((item): item is ModelMedia => isValidImageSrc(item.src));
         
         setMedia((prevMedia) => {
@@ -75,6 +94,11 @@ export default function ImageCarousel({
           return [...prevMedia, ...uniqueNewMedia];
         });
         
+        if (isDigital) {
+          setDigitalsLoadedCount((prev) => prev + newMedia.length);
+        } else {
+          setGalleryLoadedCount((prev) => prev + newMedia.length);
+        }
         setLoadedCount((prev) => prev + newMedia.length);
         if (newMedia.length < limit) setHasReachedEnd(true);
       } else {
@@ -86,27 +110,49 @@ export default function ImageCarousel({
       setIsLoadingMore(false);
       isFetchingRef.current = false;
     }
-  }, [slug, isLoadingMore, hasReachedEnd, lastLoadedOffset]);
+  }, [slug, isLoadingMore, hasReachedEnd, lastLoadedOffset, isDigital]);
 
-  // Initial load - fetch all images in one go to prevent multiple re-renders
+  // Initial load - make 4 requests in parallel ONCE per slug: featured (limit=1), gallery (limit=10), first digital (limit=1), digitals (limit=10)
   useEffect(() => {
     if (!slug) return;
     
-    // Reset if slug changed
+    // Only reset if slug changed (not on imageType change)
     if (currentSlugRef.current !== slug) {
       currentSlugRef.current = slug;
       hasInitializedRef.current = false;
       isFetchingRef.current = false;
       setLastLoadedOffset(null);
       setHasReachedEnd(false);
-      setCurrentIndex(0); // Start at featured image
-      // Reset media to just featured image when slug changes
+      setCurrentIndex(0);
+      setGalleryLoadedCount(0);
+      setDigitalsLoadedCount(0);
+      // Reset media to featured image for gallery mode
       if (featuredImage) {
         setMedia([{ type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }]);
+      } else {
+        setMedia([]);
       }
     }
 
-    // Prevent duplicate fetches
+    // Check cache first before making any requests
+    const cachedModel = getFullModel(slug);
+    const hasGallery = cachedModel?.gallery && cachedModel.gallery.length > 0;
+    const hasDigitals = cachedModel?.digitals && cachedModel.digitals.length > 0;
+    
+    // If we have both gallery and digitals in cache, skip fetching
+    if (hasGallery && hasDigitals) {
+      hasInitializedRef.current = true;
+      isFetchingRef.current = false;
+      // Set loaded counts from cache
+      setGalleryLoadedCount(cachedModel.gallery.length);
+      if (cachedModel.digitals) {
+        setDigitalsLoadedCount(cachedModel.digitals.length);
+      }
+      // Media will be set by the switch effect below
+      return;
+    }
+
+    // Prevent duplicate fetches - only fetch once per slug
     if (isFetchingRef.current || hasInitializedRef.current) return;
     
     isFetchingRef.current = true;
@@ -114,28 +160,199 @@ export default function ImageCarousel({
 
     const fetchModelImages = async () => {
       try {
-        // Fetch first 10 gallery images (skip featured image which we already have from props)
-        // Offset 1 to skip the featured image (order 0)
-        const response = await fetch(`/api/models/${slug}?offset=1&limit=10`);
-        if (!response.ok) throw new Error("Failed to fetch model images");
+        // Check cache first to see what we already have
+        const cachedModel = getFullModel(slug);
+        const hasGallery = cachedModel?.gallery && cachedModel.gallery.length > 0;
+        const hasDigitals = cachedModel?.digitals && cachedModel.digitals.length > 0;
         
-        const model: Model = await response.json();
+        // Initialize state with cached data
+        const state = {
+          featuredMedia: null as ModelMedia | null,
+          featuredModel: cachedModel || null,
+          galleryMedia: (cachedModel?.gallery || []) as ModelMedia[],
+          galleryModel: cachedModel || null,
+          digitalsMedia: (cachedModel?.digitals || []) as ModelMedia[],
+          digitalsModel: cachedModel || null,
+        };
         
-        // Use featuredImage from props, add gallery images from fetch
-        const allMedia: ModelMedia[] = [
-          ...(featuredImage ? [{
-            type: "image" as const,
-            src: featuredImage,
-            alt: `${modelName || "Model"} - Featured`,
-          }] : []),
-          ...model.gallery,
-        ].filter((item): item is ModelMedia => isValidImageSrc(item.src));
+        // Set loaded counts from cache if available
+        if (hasGallery) {
+          setGalleryLoadedCount(state.galleryMedia.length);
+        }
+        if (hasDigitals && cachedModel.digitals) {
+          setDigitalsLoadedCount(cachedModel.digitals.length);
+        }
+        
+        // Only fetch what's missing from cache
+        const promises: Array<Promise<Response> & { type?: string }> = [];
+        
+        if (!hasGallery) {
+          const featuredPromise = fetch(`/api/models/${slug}?offset=0&limit=1&type=image`) as Promise<Response> & { type?: string };
+          featuredPromise.type = "featured";
+          promises.push(featuredPromise);
+          
+          const galleryPromise = fetch(`/api/models/${slug}?offset=0&limit=10&type=image`) as Promise<Response> & { type?: string };
+          galleryPromise.type = "gallery";
+          promises.push(galleryPromise);
+        }
+        
+        if (!hasDigitals) {
+          const firstDigitalPromise = fetch(`/api/models/${slug}?offset=0&limit=1&type=digital`) as Promise<Response> & { type?: string };
+          firstDigitalPromise.type = "firstDigital";
+          promises.push(firstDigitalPromise);
+        
+          const digitalsPromise = fetch(`/api/models/${slug}?offset=0&limit=10&type=digital`) as Promise<Response> & { type?: string };
+          digitalsPromise.type = "digitals";
+          promises.push(digitalsPromise);
+        }
+        
+        // If we have everything in cache, update media and return
+        if (promises.length === 0) {
+          // Update media based on current imageType using cached data
+          if (isDigital && state.digitalsMedia.length > 0) {
+            setMedia(state.digitalsMedia);
+            setLoadedCount(state.digitalsMedia.length);
+          } else if (!isDigital) {
+            const featuredMediaForDisplay: ModelMedia | null = featuredImage && isValidImageSrc(featuredImage)
+              ? { type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }
+              : null;
+            
+            const galleryWithoutFeatured = state.galleryMedia.length > 0 && featuredMediaForDisplay && state.galleryMedia[0]?.src === featuredMediaForDisplay.src
+              ? state.galleryMedia.slice(1)
+              : state.galleryMedia;
+            
+            const allMedia: ModelMedia[] = [
+              ...(featuredMediaForDisplay ? [featuredMediaForDisplay] : []),
+              ...galleryWithoutFeatured,
+            ];
         
         if (allMedia.length > 0) {
-          // Update media - stay on featured image (index 0) until user navigates
           setMedia(allMedia);
-          setLoadedCount(model.gallery.length);
+              setLoadedCount(galleryWithoutFeatured.length);
+            }
+          }
+          return;
         }
+
+        // Process requests as they resolve
+        promises.forEach((promise) => {
+          if (promise.type === "featured" || promise.type === "gallery") {
+            promise
+              .then(async (response) => {
+                if (!response.ok) return;
+                const modelData = await response.json();
+                
+                if (promise.type === "featured") {
+                  // Process featured image
+                  if (modelData.gallery && modelData.gallery.length > 0) {
+                    const featured = modelData.gallery[0];
+                    if (isValidImageSrc(featured.src)) {
+                      state.featuredMedia = {
+                        type: "image" as const,
+                        src: featured.src,
+                        alt: `${modelName || "Model"} - Featured`,
+                      };
+                    }
+                  }
+                  state.featuredModel = modelData;
+                  
+                  // Update media immediately with featured image if in gallery mode
+                  if (!isDigital && state.featuredMedia) {
+                    const featuredMediaForDisplay: ModelMedia = featuredImage && isValidImageSrc(featuredImage)
+                      ? { type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }
+                      : state.featuredMedia;
+                    
+                    setMedia([featuredMediaForDisplay]);
+                  }
+                } else if (promise.type === "gallery") {
+                  // Process gallery images
+                  state.galleryModel = modelData;
+                  state.galleryMedia = (modelData.gallery || [])
+                    .filter((item: ModelMedia): item is ModelMedia => isValidImageSrc(item.src));
+                  setGalleryLoadedCount(state.galleryMedia.length);
+                  
+                  // Update media with gallery if in gallery mode
+                  if (!isDigital) {
+                    const featuredMediaForDisplay: ModelMedia | null = featuredImage && isValidImageSrc(featuredImage)
+                      ? { type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }
+                      : state.featuredMedia;
+                    
+                    const galleryWithoutFeatured = state.galleryMedia.length > 0 && featuredMediaForDisplay && state.galleryMedia[0]?.src === featuredMediaForDisplay.src
+                      ? state.galleryMedia.slice(1)
+                      : state.galleryMedia;
+                    
+                    const allMedia: ModelMedia[] = [
+                      ...(featuredMediaForDisplay ? [featuredMediaForDisplay] : []),
+                      ...galleryWithoutFeatured,
+                    ];
+                    
+                    if (allMedia.length > 0) {
+                      setMedia(allMedia);
+                      setLoadedCount(galleryWithoutFeatured.length);
+                    }
+                  }
+                }
+                
+                // Update context
+                const cachedModel = getFullModel(slug);
+                const baseModel = cachedModel || state.galleryModel || state.featuredModel;
+                if (baseModel) {
+                  setFullModel({
+                    ...baseModel,
+                    slug: slug,
+                    gallery: state.galleryMedia,
+                    digitals: state.digitalsMedia,
+                  });
+                }
+              })
+              .catch((error) => {
+                console.error(`Error fetching ${promise.type}:`, error);
+              });
+          } else if (promise.type === "firstDigital" || promise.type === "digitals") {
+            promise
+              .then(async (response) => {
+                if (!response.ok) return;
+                const modelData = await response.json();
+                
+                if (promise.type === "digitals") {
+                  // Process digitals
+                  state.digitalsModel = modelData;
+                  state.digitalsMedia = (modelData.digitals || [])
+                    .filter((item: ModelMedia): item is ModelMedia => isValidImageSrc(item.src));
+                  setDigitalsLoadedCount(state.digitalsMedia.length);
+                  
+                  // Update context with digitals
+                  const cachedModel = getFullModel(slug);
+                  const baseModel = cachedModel || state.galleryModel || state.digitalsModel || state.featuredModel;
+                  if (baseModel) {
+                    setFullModel({
+                      ...baseModel,
+                      slug: slug,
+                      gallery: state.galleryMedia,
+                      digitals: state.digitalsMedia,
+                    });
+                    
+                    // Trigger effect update when digitals are added
+                    if (state.digitalsMedia.length > 0) {
+                      setDigitalsUpdateTrigger(prev => prev + 1);
+                    }
+                    
+                    // Force update media if in digital mode
+                    if (currentImageTypeRef.current === "digital" && state.digitalsMedia.length > 0) {
+                      setMedia(state.digitalsMedia);
+                      setLoadedCount(state.digitalsMedia.length);
+                    }
+                  }
+                }
+              })
+              .catch((error) => {
+                console.error(`Error fetching ${promise.type}:`, error);
+              });
+          }
+        });
+        
+        // Wait for all requests to complete
+        await Promise.allSettled(promises);
       } catch (error) {
         console.error("Error fetching model images:", error);
         hasInitializedRef.current = false; // Allow retry on error
@@ -145,18 +362,82 @@ export default function ImageCarousel({
     };
 
     fetchModelImages();
-  }, [slug, featuredImage, modelName]);
+  }, [slug, featuredImage, modelName, setFullModel, getFullModel]);
+
+  // Switch media when imageType changes OR after initial data load
+  useEffect(() => {
+    if (!slug) return;
+    
+    // Update currentImageTypeRef when imageType changes
+    if (currentImageTypeRef.current !== imageType) {
+      currentImageTypeRef.current = imageType;
+      setCurrentIndex(0); // Reset to first image when switching tabs
+    }
+    
+    // Get cached model from context
+    const cachedModel = getFullModel(slug);
+    
+    if (isDigital) {
+      // Switch to digitals
+      if (cachedModel?.digitals && cachedModel.digitals.length > 0) {
+        const digitals = cachedModel.digitals.filter((item): item is ModelMedia => isValidImageSrc(item.src));
+        if (digitals.length > 0) {
+          setMedia(digitals);
+          setLoadedCount(digitals.length);
+        } else {
+          // No valid digitals, show empty
+          setMedia([]);
+          setLoadedCount(0);
+        }
+      } else {
+        // No digitals in cache yet
+        setMedia([]);
+        // Don't set loadedCount to 0 if we're still loading (hasInitializedRef might be false)
+        if (hasInitializedRef.current) {
+          setLoadedCount(0);
+        }
+      }
+    } else {
+      // Switch to gallery (featured + gallery)
+      // Always use featuredImage prop as the first image to ensure consistency
+      const featuredMedia: ModelMedia | null = featuredImage && isValidImageSrc(featuredImage)
+        ? { type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }
+        : null;
+      
+      const gallery = (cachedModel?.gallery || []).filter((item): item is ModelMedia => isValidImageSrc(item.src));
+      
+      // Remove featured image from gallery array if it's the same as featuredImage prop
+      const galleryWithoutFeatured = gallery.length > 0 && featuredMedia && gallery[0]?.src === featuredMedia.src
+        ? gallery.slice(1)
+        : gallery;
+      
+      const allMedia: ModelMedia[] = [
+        ...(featuredMedia ? [featuredMedia] : []),
+        ...galleryWithoutFeatured,
+      ];
+      
+      if (allMedia.length > 0) {
+        setMedia(allMedia);
+        setLoadedCount(galleryWithoutFeatured.length);
+      } else if (hasInitializedRef.current && featuredMedia) {
+        // If no gallery yet but we have featured, show just featured
+        setMedia([featuredMedia]);
+        setLoadedCount(0);
+      }
+    }
+  }, [imageType, slug, featuredImage, modelName, isDigital, getFullModel, fullModels, digitalsUpdateTrigger]);
 
   // Load more when approaching end
   useEffect(() => {
     if (!slug || isLoadingMore || hasReachedEnd) return;
-    if (currentIndex >= 8 && loadedCount > 0 && currentIndex >= loadedCount - 2) {
-      const nextOffset = loadedCount;
+    const currentLoadedCount = isDigital ? digitalsLoadedCount : galleryLoadedCount;
+    if (currentIndex >= 8 && currentLoadedCount > 0 && currentIndex >= currentLoadedCount - 2) {
+      const nextOffset = currentLoadedCount;
       if (lastLoadedOffset === null || nextOffset > lastLoadedOffset) {
         loadMoreImages(nextOffset, 10);
       }
     }
-  }, [currentIndex, loadedCount, slug, isLoadingMore, loadMoreImages, hasReachedEnd, lastLoadedOffset]);
+  }, [currentIndex, galleryLoadedCount, digitalsLoadedCount, slug, isLoadingMore, loadMoreImages, hasReachedEnd, lastLoadedOffset, isDigital]);
 
   // Prefetch next image
   useEffect(() => {
@@ -193,32 +474,46 @@ export default function ImageCarousel({
   if (media.length === 0) return null;
 
   // Calculate valid index
-  // If currentIndex is 0, show featured image
-  // If currentIndex > 0, show gallery image (but ensure it's valid)
-  const validIndex = currentIndex === 0 
+  // For gallery: If currentIndex is 0, show featured image
+  // For digitals: Start from index 0 (no featured image)
+  const validIndex = isDigital
+    ? Math.max(0, Math.min(currentIndex, media.length - 1))
+    : currentIndex === 0 
     ? 0 
     : Math.max(1, Math.min(currentIndex, media.length - 1));
   const currentMedia = media[validIndex];
-  const featuredMedia = media[0];
+  const featuredMedia = !isDigital ? media[0] : null;
 
   const goToPrevious = () => {
     setCurrentIndex((prev) => {
+      if (isDigital) {
+        // For digitals, wrap around from first to last
+        return prev === 0 ? media.length - 1 : prev - 1;
+      } else {
+        // For gallery: featured image logic
       if (prev === 0) return media.length - 1; // From featured, go to last gallery image
       if (prev === 1) return 0; // From first gallery, go to featured
       return prev - 1; // Otherwise go to previous gallery image
+      }
     });
   };
 
   const goToNext = () => {
     setCurrentIndex((prev) => {
+      if (isDigital) {
+        // For digitals, wrap around from last to first
+        return prev >= media.length - 1 ? 0 : prev + 1;
+      } else {
+        // For gallery: featured image logic
       if (prev === 0) return 1; // From featured, go to first gallery image
       if (prev >= media.length - 1) return 0; // From last gallery, go to featured
       return prev + 1; // Otherwise go to next gallery image
+      }
     });
   };
 
   const goToSlide = (index: number) => {
-    if (index === 0) return;
+    if (!isDigital && index === 0) return; // Don't allow clicking featured image in gallery mode
     setCurrentIndex(index);
   };
 
@@ -239,9 +534,9 @@ export default function ImageCarousel({
           className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:rounded-none rounded-lg cursor-pointer"
           onClick={openFullscreen}
         >
-          {/* Featured image - visible when currentIndex is 0, or as background when showing gallery */}
+          {/* Featured image - visible when currentIndex is 0 (gallery mode only), or digitals/gallery images */}
           <AnimatePresence mode="wait">
-            {currentIndex === 0 && featuredMedia?.type === "image" ? (
+            {!isDigital && currentIndex === 0 && featuredMedia?.type === "image" ? (
               <motion.div
                 key="featured-image"
                 initial={{ opacity: 0 }}
@@ -259,7 +554,7 @@ export default function ImageCarousel({
                   loading="eager"
                 />
               </motion.div>
-            ) : currentIndex > 0 && currentMedia?.type === "image" ? (
+            ) : (isDigital || currentIndex > 0) && currentMedia?.type === "image" ? (
               <motion.div
                 key={`image-${validIndex}`}
                 initial={{ opacity: 0, x: 100 }}
@@ -276,7 +571,7 @@ export default function ImageCarousel({
                   loading="lazy"
                 />
               </motion.div>
-            ) : currentIndex > 0 && currentMedia ? (
+            ) : (isDigital || currentIndex > 0) && currentMedia ? (
               <motion.div
                 key={`video-${validIndex}`}
                 initial={{ opacity: 0, x: 100 }}

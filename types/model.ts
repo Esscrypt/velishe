@@ -23,6 +23,7 @@ export interface Model {
   instagram?: string;
   featuredImage: string;
   gallery: ModelMedia[];
+  digitals?: ModelMedia[];
   video?: string;
 }
 

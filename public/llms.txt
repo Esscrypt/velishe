@@ -47,3 +47,7 @@ The site structure follows a clear hierarchy:
 - The site uses static generation for optimal performance
 - All model pages are dynamically generated from data files
 
+
+
+
+

@@ -6,6 +6,7 @@ import GoogleTagManager from "@/components/GoogleTagManager";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import Cookiebot from "@/components/Cookiebot";
 import PageViewTracker from "@/components/PageViewTracker";
+import StructuredData from "@/components/StructuredData";
 import { ModelsProvider } from "@/contexts/ModelsContext";
 
 const inter = Inter({
@@ -112,6 +113,7 @@ export default function RootLayout({
         className="antialiased bg-white text-gray-900"
         suppressHydrationWarning
       >
+        <StructuredData />
         <Cookiebot cbid={cookiebotId} />
         {gtmId && <GoogleTagManager gtmId={gtmId} />}
         {gaId && <GoogleAnalytics gaId={gaId} />}

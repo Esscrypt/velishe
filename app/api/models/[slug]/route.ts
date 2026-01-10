@@ -22,13 +22,15 @@ export async function GET(
       );
     }
 
-    // Parse query parameters for pagination (optional - if not provided, fetch all images)
+    // Parse query parameters for pagination and type (optional - if not provided, fetch all images)
     const url = new URL(request.url);
     const limitParam = url.searchParams.get('limit');
     const offsetParam = url.searchParams.get('offset');
+    const typeParam = url.searchParams.get('type') as "image" | "digital" | null;
     
     const imageLimit = limitParam ? Number.parseInt(limitParam, 10) : undefined;
     const imageOffset = offsetParam ? Number.parseInt(offsetParam, 10) : undefined;
+    const imageType = typeParam === "digital" ? "digital" : typeParam === "image" ? "image" : undefined;
     
     // Validate pagination parameters
     if (limitParam && (Number.isNaN(imageLimit) || imageLimit! < 0)) {
@@ -47,7 +49,7 @@ export async function GET(
     
     // Fetch model with all images (no pagination) unless pagination params are explicitly provided
     // The model page always fetches all images in one query
-    const model = await fetchModelBySlugFromDb(cleanSlug, imageLimit, imageOffset);
+    const model = await fetchModelBySlugFromDb(cleanSlug, imageLimit, imageOffset, imageType);
     
     if (!model) {
       console.log(`Model not found for slug: ${cleanSlug}`);
