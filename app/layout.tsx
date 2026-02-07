@@ -108,8 +108,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "G-PQJ4JZ1BC7";
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || "G-PQJ4JZ1BC7";
   const cookiebotId = process.env.NEXT_PUBLIC_COOKIEBOT_ID || "0a3be31f-8747-4f7b-8b6a-256aed707f7a";
 
   return (
