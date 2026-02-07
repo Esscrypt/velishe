@@ -41,13 +41,221 @@ The site structure follows a clear hierarchy:
 2. Each model has a dedicated profile page
 3. Additional pages for contact, terms, privacy, and model applications
 
+## Model Statistics
+
+The following is a complete list of all models and their statistics:
+
+### Raya (raya)
+- **Height**: 179 cm
+- **Bust**: 86 cm
+- **Waist**: 65 cm
+- **Hips**: 95 cm
+- **Shoe Size**: 40
+- **Hair Color**: Brown
+- **Eye Color**: Green
+- **Instagram**: https://instagram.com/rayadesislavova
+
+### Christiana Velichkova (christiana)
+- **Height**: 176 cm
+- **Bust**: 85 cm
+- **Waist**: 59 cm
+- **Hips**: 88 cm
+- **Shoe Size**: 38
+- **Hair Color**: Ginger
+- **Eye Color**: Blue
+- **Instagram**: https://www.instagram.com/christiana.velichkova/
+
+### Kaloyan (kaloyan)
+- **Height**: 185 cm
+- **Bust**: 95 cm
+- **Waist**: 78 cm
+- **Hips**: 96 cm
+- **Shoe Size**: 44
+- **Hair Color**: Light Brown
+- **Eye Color**: Hazel
+- **Instagram**: https://www.instagram.com/kaloyan_mitov/
+
+### AINURA (ainura)
+- **Height**: 177
+- **Bust**: 85
+- **Waist**: N/A
+- **Hips**: 90
+- **Shoe Size**: N/A
+- **Hair Color**: Black
+- **Eye Color**: Black
+
+### Simona (simona)
+- **Height**: 171 cm
+- **Bust**: 87 cm
+- **Waist**: 62 cm
+- **Hips**: 89 cm
+- **Shoe Size**: 39
+- **Hair Color**: Blonde
+- **Eye Color**: Blue
+- **Instagram**: https://instagram.com/simonaharalanovaa
+
+### MON (mon)
+- **Height**: 174cm
+- **Bust**: 86cm
+- **Waist**: 62cm
+- **Hips**: 90cm
+- **Shoe Size**: 38
+- **Hair Color**: Brown
+- **Eye Color**: Green
+- **Instagram**: https://www.instagram.com/simonaimea/
+
+### KSENIA (ksenia)
+- **Height**: 181cm
+- **Bust**: 87cm
+- **Waist**: 61cm
+- **Hips**: 91cm
+- **Shoe Size**: 41
+- **Hair Color**: Blonde
+- **Eye Color**: Blue
+- **Instagram**: https://www.instagram.com/ksenia__lev?igsh=MWJ6YmFwc2FwZGlrNA==
+
+### Darina (darina)
+- **Height**: 176 cm
+- **Bust**: 83 cm
+- **Waist**: 65 cm
+- **Hips**: 91 cm
+- **Shoe Size**: 40
+- **Hair Color**: Brown
+- **Eye Color**: Blue
+- **Instagram**: https://instagram.com/darinaharalanova
+
+### Frank (frank)
+- **Height**: 190 cm
+- **Bust**: 103 cm
+- **Waist**: 102 cm
+- **Hips**: 98 cm
+- **Shoe Size**: 45
+- **Hair Color**: DarkBrown
+- **Eye Color**: Black
+- **Instagram**: https://instagram.com/fr.aank_aj
+
+### HAINAN (hainan)
+- **Height**: 174cm
+- **Bust**: 73cm
+- **Waist**: 59cm
+- **Hips**: 84cm
+- **Shoe Size**: 39
+- **Hair Color**: Black
+- **Eye Color**: Black
+- **Instagram**: https://www.instagram.com/hainanlu/
+
+### SPAS (spas)
+- **Height**: 185cm
+- **Bust**: 97cm
+- **Waist**: 71cm
+- **Hips**: 90cm
+- **Shoe Size**: 44
+- **Hair Color**: Brown
+- **Eye Color**: Blue
+- **Instagram**: https://www.instagram.com/spaskoooo/
+
+### Stan (stan)
+- **Height**: 188 cm
+- **Bust**: 93 cm
+- **Waist**: 73 cm
+- **Hips**: 93cm
+- **Shoe Size**: 44.5
+- **Hair Color**: Hazel
+- **Eye Color**: Blue
+- **Instagram**: https://instagram.com/stan_mladenov
+
+### Radi (radi)
+- **Height**: 190
+- **Bust**: 110
+- **Waist**: 93
+- **Hips**: 107
+- **Shoe Size**: 44
+- **Hair Color**: Brown
+- **Eye Color**: Green
+- **Instagram**: https://www.instagram.com/radevrk/
+
+### Arnau (arnau)
+- **Height**: 187 cm
+- **Bust**: 99 cm
+- **Waist**: 76 cm
+- **Hips**: 93 cm
+- **Shoe Size**: 45
+- **Hair Color**: Brown
+- **Eye Color**: Hazel
+- **Instagram**: https://instagram.com/arnauvisa
+
+### NIYA (kseniya)
+- **Height**: 178 cm
+- **Bust**: 84 cm
+- **Waist**: 61 cm
+- **Hips**: 93 cm
+- **Shoe Size**: 40
+- **Hair Color**: Dark Blonde
+- **Eye Color**: Brown
+- **Instagram**: https://instagram.com/faleevaxenia
+
+### DJIBRIL (djibril)
+- **Height**: 185cm
+- **Bust**: 87cm
+- **Waist**: 73cm
+- **Hips**: 91cm
+- **Shoe Size**: 43
+- **Hair Color**: Black
+- **Eye Color**: Black
+- **Instagram**: https://www.instagram.com/it_s_nseng_djibril/
+
+### VICTORIA (victoria)
+- **Height**: 174cm
+- **Bust**: 81cm
+- **Waist**: 60cm
+- **Hips**: 90cm
+- **Shoe Size**: 39
+- **Hair Color**: Dark Brown
+- **Eye Color**: Brown
+- **Instagram**: https://www.instagram.com/vicinowa/
+
+### ALEXANDRA (alexandra)
+- **Height**: 175cm
+- **Bust**: 80cm
+- **Waist**: 61cm
+- **Hips**: 92cm
+- **Shoe Size**: 38
+- **Hair Color**: Dark Blonde
+- **Eye Color**: Blue
+- **Instagram**: https://www.instagram.com/allerroo/
+
+### Anna (anna)
+- **Height**: 168 cm
+- **Bust**: 86 cm
+- **Waist**: 61 cm
+- **Hips**: 93 cm
+- **Shoe Size**: 38
+- **Hair Color**: Light Brown
+- **Eye Color**: Hazel
+- **Instagram**: https://instagram.com/annabodakova71
+
+### LOZANA (lozana)
+- **Height**: 175cm
+- **Bust**: 86cm
+- **Waist**: 62cm
+- **Hips**: 88cm
+- **Shoe Size**: 37
+- **Hair Color**: Brown
+- **Eye Color**: Green
+- **Instagram**: https://www.instagram.com/lausannetm/
+
+### Gabriela (gabriela)
+- **Height**: 184 cm
+- **Bust**: 84 cm
+- **Waist**: 64 cm
+- **Hips**: 97cm
+- **Shoe Size**: 41
+- **Hair Color**: Black
+- **Eye Color**: Hazel
+- **Instagram**: https://instagram.com/gabriella.spasova
+
 ## Notes for LLMs
 - Model data is stored in JSON format
 - Images are optimized and served from `/public/models/[model-slug]/`
 - The site uses static generation for optimal performance
 - All model pages are dynamically generated from data files
-
-
-
-
-

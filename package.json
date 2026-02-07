@@ -11,6 +11,7 @@
     "optimize-images": "bun run scripts/optimize-images.ts",
     "populate-db": "bun run scripts/populate-db.ts",
     "clear-db": "bun run scripts/clear-db.ts",
+    "add-type-column": "bun run scripts/add-type-column.ts",
     "db:generate": "drizzle-kit generate --config ./drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config ./drizzle.config.ts",
     "drizzle-studio": "bun drizzle-kit studio"

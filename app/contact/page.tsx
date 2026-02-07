@@ -1,5 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Instagram } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Get in touch with Velishe Model Management in Sofia, Bulgaria. Book talent, casting inquiries, and general contact.",
+  openGraph: {
+    title: "Contact | Velishe Model Management",
+    description:
+      "Get in touch with Velishe Model Management. Book talent and casting inquiries.",
+  },
+};
 
 export default function ContactPage() {
   return (

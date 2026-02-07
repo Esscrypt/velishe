@@ -20,7 +20,8 @@ export const metadata: Metadata = {
     default: "Velishe Model Management",
     template: "%s | Velishe Model Management",
   },
-  description: "Boutique model agency",
+  description:
+    "Velishe Model Management is a boutique model agency in Sofia, Bulgaria. We represent fashion and commercial models. View portfolios and book talent.",
   keywords: [
     "modeling agency",
     "Sofia",
@@ -29,7 +30,9 @@ export const metadata: Metadata = {
     "model portfolio",
     "model management",
     "Velishe",
+    "VÈLISHE",
     "professional models",
+    "boutique agency",
   ],
   authors: [{ name: "Velishe Model Management" }],
   creator: "Velishe Model Management",
@@ -63,7 +66,8 @@ export const metadata: Metadata = {
     url: process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com",
     siteName: "Velishe Model Management",
     title: "Velishe Model Management",
-    description: "Boutique model agency",
+    description:
+      "Boutique model agency in Sofia, Bulgaria. Fashion and commercial models. View portfolios and book talent.",
     images: [
       {
         url: "/logo/image3.webp",
@@ -76,7 +80,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Velishe Model Management",
-    description: "Boutique model agency",
+    description:
+      "Boutique model agency in Sofia, Bulgaria. Fashion and commercial models. View portfolios and book talent.",
     images: ["/logo/image3.webp"],
     creator: "@velishe.mgmt",
   },

@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { getModelBySlug } from "@/lib/models";
+import BreadcrumbListScript from "@/components/BreadcrumbListScript";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${model.name} | Velishe Model Management`;
   const description = `Professional model ${model.name} portfolio. ${model.stats.height} height, ${model.stats.hairColor} hair, ${model.stats.eyeColor} eyes. View portfolio and contact information.`;
-  const url = `${baseUrl}/models/${slug}`;
+  const url = `${baseUrl}/models/${slug}/`;
   const imageUrl = model.featuredImage 
     ? `${baseUrl}${model.featuredImage}`
     : `${baseUrl}/logo/image3.webp`;
@@ -52,11 +53,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ModelLayout({
+export default async function ModelLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ slug: string }>;
 }) {
-  return <>{children}</>;
+  const { slug } = await params;
+  const model = getModelBySlug(slug);
+
+  return (
+    <>
+      {model && (
+        <BreadcrumbListScript slug={slug} modelName={model.name} />
+      )}
+      {children}
+    </>
+  );
 }
 

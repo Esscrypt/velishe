@@ -7,43 +7,43 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticPages = [
     {
-      url: baseUrl,
+      url: `${baseUrl}/`,
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/models`,
+      url: `${baseUrl}/models/`,
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/contact`,
+      url: `${baseUrl}/contact/`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/become-a-model`,
+      url: `${baseUrl}/become-a-model/`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/search`,
+      url: `${baseUrl}/search/`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/privacy`,
+      url: `${baseUrl}/privacy/`,
       lastModified: new Date(),
       changeFrequency: "yearly" as const,
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/terms`,
+      url: `${baseUrl}/terms/`,
       lastModified: new Date(),
       changeFrequency: "yearly" as const,
       priority: 0.3,
@@ -51,7 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const modelPages = models.map((model) => ({
-    url: `${baseUrl}/models/${model.slug}`,
+    url: `${baseUrl}/models/${model.slug}/`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.8,
