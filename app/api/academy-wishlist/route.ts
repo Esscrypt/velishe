@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, schema } from "@/lib/db/index";
+import { eq, or } from "drizzle-orm";
 
 function validateEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -48,6 +49,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Database is not configured" },
         { status: 500 },
+      );
+    }
+
+    const existing = await db
+      .select({ id: schema.academyWishlistEntries.id })
+      .from(schema.academyWishlistEntries)
+      .where(
+        or(
+          eq(schema.academyWishlistEntries.email, email),
+          eq(schema.academyWishlistEntries.phoneNumber, phoneNumber),
+        ),
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      return NextResponse.json(
+        { error: "This email or phone number is already on the waitlist." },
+        { status: 409 },
       );
     }
 

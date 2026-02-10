@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const SESSION_STORAGE_KEY = "academy_waitlist_submitted";
 
 interface WaitlistFormState {
   email: string;
@@ -38,6 +40,13 @@ export default function AcademyPage() {
     message: string;
   }>({ type: null, message: "" });
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [hasSubmittedThisSession, setHasSubmittedThisSession] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem(SESSION_STORAGE_KEY) === "true") {
+      setHasSubmittedThisSession(true);
+    }
+  }, []);
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -126,6 +135,10 @@ export default function AcademyPage() {
       });
       setErrors({});
       setIsFormVisible(false);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, "true");
+      }
+      setHasSubmittedThisSession(true);
     } catch (error) {
       console.error("[AcademyPage] Failed to submit wishlist form", error);
       setSubmitStatus({
@@ -194,13 +207,19 @@ export default function AcademyPage() {
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => setIsFormVisible(true)}
-            className="w-full md:w-auto px-8 py-3 bg-black text-white rounded-lg transition-colors font-medium hover:bg-gray-800"
-          >
-            JOIN THE WAITLIST
-          </button>
+          {hasSubmittedThisSession ? (
+            <p className="text-lg font-medium text-gray-700">
+              You&apos;re on the waitlist. We&apos;ll be in touch when the next Academy program opens.
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsFormVisible(true)}
+              className="w-full md:w-auto px-8 py-3 bg-black text-white rounded-lg transition-colors font-medium hover:bg-gray-800"
+            >
+              JOIN THE WAITLIST
+            </button>
+          )}
         </div>
       </div>
 
