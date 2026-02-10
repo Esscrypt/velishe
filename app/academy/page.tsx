@@ -152,21 +152,21 @@ export default function AcademyPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-12 items-start">
         {/* 1. Header - first on mobile (centered), top-left on desktop */}
         <div className="order-1 md:col-start-1 md:row-start-1">
           <h1 className="text-6xl font-bold text-gray-900 mb-8 text-center md:text-left">Academy</h1>
         </div>
 
         {/* 2. First line - mobile only: above image. Desktop: shown inside text block below */}
-        <div className="order-2 md:hidden">
-          <p className="text-2xl text-gray-700 mb-3 text-center">
+        <div className="order-2 md:hidden -mb-1">
+          <p className="text-2xl text-gray-700 mb-0 text-center">
             Immerse yourself in the VÈLISHE world and the modeling industry.
           </p>
         </div>
 
         {/* 3. Image - third on mobile (after first line), right column on desktop */}
-        <div className="order-3 md:col-start-2 md:row-start-1 md:row-span-2">
+        <div className="order-3 md:col-start-2 md:row-start-1 md:row-span-2 -my-1 md:my-0">
           <div className="relative w-full overflow-hidden flex items-center justify-center min-h-[28rem] sm:min-h-[32rem]">
             <img
               src="/academy-certificate.png"
@@ -178,8 +178,8 @@ export default function AcademyPage() {
         </div>
 
         {/* 4. Rest of text + CTA - fourth on mobile, full text block on desktop (left column) */}
-        <div className="order-4 md:col-start-1 md:row-start-2">
-          <div className="mb-10 md:mt-0">
+        <div className="order-4 md:col-start-1 md:row-start-2 -mt-1 md:mt-0">
+          <div className="mb-10 md:mt-0 pt-0">
             <p className="hidden md:block text-2xl text-gray-700 mb-4">
               Immerse yourself in the VÈLISHE world and the modeling industry.
             </p>
