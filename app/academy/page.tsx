@@ -186,11 +186,8 @@ export default function AcademyPage() {
             <p className="text-xl text-gray-700 md:mb-3">
               VÈLISHE Academy is our learning path for aspiring and signed talents who want to understand how the industry really works.
             </p>
-            <p className="mt-5 text-lg text-gray-600">
-              The current intake is closed. Registration for the next Academy program opens in April 2026.
-            </p>
             <p className="mt-2 text-base text-gray-500">
-              Existing VÈLISHE talents can access their Academy path via the internal portal.
+              Apply for priority access - Join the Waitlist for the Next Intake.
             </p>
           </div>
 
