@@ -42,6 +42,9 @@ export default function Header() {
               <Link href="/contact" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 CONTACT
               </Link>
+              <Link href="/academy" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                ACADEMY
+              </Link>
             </nav>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 hidden md:flex">
@@ -131,6 +134,13 @@ export default function Header() {
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
               CONTACT
+            </Link>
+            <Link
+              href="/academy"
+              onClick={closeMenu}
+              className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
+            >
+              ACADEMY
             </Link>
           </nav>
           <div className="p-4 border-t border-gray-200 space-y-3">

@@ -1,1 +1,0 @@
-ALTER TABLE "images" ADD COLUMN "type" text DEFAULT 'image' NOT NULL;
