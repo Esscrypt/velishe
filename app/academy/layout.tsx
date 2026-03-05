@@ -19,5 +19,35 @@ export default function AcademyLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+
+  const courseSchema = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: "VÈLISHE Model Academy",
+    description:
+      "A structured training programme for aspiring and signed models covering composites, casting preparation, professional conduct on set, industry etiquette, and building a sustainable modeling career.",
+    provider: {
+      "@type": "Organization",
+      "@id": `${baseUrl}/#organization`,
+      name: "Velishe Model Management",
+    },
+    url: `${baseUrl}/academy/`,
+    availableLanguage: ["English", "Bulgarian"],
+    hasCourseInstance: {
+      "@type": "CourseInstance",
+      courseMode: "Blended",
+    },
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
+      {children}
+    </>
+  );
 }

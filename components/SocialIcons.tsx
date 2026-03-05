@@ -1,5 +1,3 @@
-"use client";
-
 import { Instagram } from "lucide-react";
 
 interface SocialIconsProps {

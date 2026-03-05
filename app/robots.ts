@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
 
   return {
     rules: [
@@ -10,8 +11,27 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/api/", "/_next/"],
       },
+      {
+        userAgent: "CCBot",
+        disallow: "/",
+      },
+      {
+        userAgent: "Bytespider",
+        disallow: "/",
+      },
+      {
+        userAgent: "cohere-ai",
+        disallow: "/",
+      },
+      {
+        userAgent: "GPTBot",
+        disallow: "/",
+      },
+      {
+        userAgent: "Google-Extended",
+        disallow: "/",
+      },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
-
