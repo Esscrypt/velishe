@@ -23,7 +23,7 @@ try {
   await db.delete(schema.models);
   console.log("  ✓ Deleted all models");
 
-  console.log("\n✅ Database cleared successfully!");
+  console.log("\n Database cleared successfully!");
   console.log("   All models and images have been removed.");
 } catch (error) {
   console.error("❌ Error clearing database:", error);

@@ -15,11 +15,11 @@ export default function GoogleAnalytics({
     <>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
       />
       <Script
         id="google-analytics"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -32,4 +32,3 @@ export default function GoogleAnalytics({
     </>
   );
 }
-

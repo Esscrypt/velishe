@@ -145,13 +145,13 @@ const nextConfig: NextConfig = {
 
 #### Pricing
 - **Free Tier (Hobby Plan)**: 
-  - ✅ Unlimited personal projects
-  - ✅ 100GB bandwidth/month
-  - ✅ Serverless functions (API routes)
-  - ✅ Automatic HTTPS
-  - ✅ Custom domains
-  - ✅ Preview deployments
-  - ✅ Analytics (limited)
+  -  Unlimited personal projects
+  -  100GB bandwidth/month
+  -  Serverless functions (API routes)
+  -  Automatic HTTPS
+  -  Custom domains
+  -  Preview deployments
+  -  Analytics (limited)
   - Perfect for most portfolios and small projects!
 
 - **Pro Plan** ($20/month): 
@@ -205,10 +205,10 @@ const nextConfig: NextConfig = {
 
 #### Important Notes for Your Project
 
-- ✅ **API Routes Work**: Since we removed `output: "export"`, your `/api/contact` route will work as a serverless function
-- ✅ **No Build Changes Needed**: Vercel auto-detects Next.js and uses the correct build settings
-- ✅ **Environment Variables**: Make sure to add all SMTP credentials in Vercel dashboard
-- ✅ **Automatic Deployments**: Every push to `main` branch triggers a new deployment
+-  **API Routes Work**: Since we removed `output: "export"`, your `/api/contact` route will work as a serverless function
+-  **No Build Changes Needed**: Vercel auto-detects Next.js and uses the correct build settings
+-  **Environment Variables**: Make sure to add all SMTP credentials in Vercel dashboard
+-  **Automatic Deployments**: Every push to `main` branch triggers a new deployment
 
 ### Netlify
 

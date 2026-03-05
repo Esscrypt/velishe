@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "Become a Model",
   description:
     "Join Velishe Model Management. Apply to become a model with our boutique agency in Sofia, Bulgaria. Open casting and application form.",
+  alternates: {
+    canonical: "https://www.velishemodelmanagement.com/become-a-model/",
+  },
   openGraph: {
     title: "Become a Model | Velishe Model Management",
     description: "Apply to join our roster. Open casting and model application.",

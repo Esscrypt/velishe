@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com"),
   alternates: {
-    canonical: "/",
+    canonical: "https://www.velishemodelmanagement.com/",
   },
   icons: {
     icon: [
@@ -132,7 +132,7 @@ export default function RootLayout({
         <footer className="bg-gray-900 text-white py-4">
           <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
             <p className="text-center text-sm">
-              © 2025 Escrypt Ltd.
+              © 2025 Velishe Model Management Ltd.
             </p>
           </div>
         </footer>

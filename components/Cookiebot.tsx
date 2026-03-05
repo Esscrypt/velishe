@@ -16,7 +16,7 @@ export default function Cookiebot({
       id="Cookiebot"
       src="https://consent.cookiebot.com/uc.js"
       data-cbid={cbid}
-      strategy="beforeInteractive"
+      strategy="afterInteractive"
     />
   );
 }

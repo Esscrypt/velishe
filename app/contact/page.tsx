@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Contact",
   description:
     "Get in touch with Velishe Model Management in Sofia, Bulgaria. Book talent, casting inquiries, and general contact.",
+  alternates: {
+    canonical: "https://www.velishemodelmanagement.com/contact/",
+  },
   openGraph: {
     title: "Contact | Velishe Model Management",
     description:
@@ -13,9 +16,39 @@ export const metadata: Metadata = {
   },
 };
 
+const contactPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Contact Velishe Model Management",
+  url: "https://www.velishemodelmanagement.com/contact/",
+  description:
+    "Get in touch with Velishe Model Management in Sofia, Bulgaria. Book talent, casting inquiries, and general contact.",
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://www.velishemodelmanagement.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Contact",
+        item: "https://www.velishemodelmanagement.com/contact/",
+      },
+    ],
+  },
+};
+
 export default function ContactPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageSchema) }}
+      />
       <h1 className="text-4xl font-bold text-gray-900 mb-8">Contact</h1>
 
       <div className="prose prose-lg max-w-none mb-12">

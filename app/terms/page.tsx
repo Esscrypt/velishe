@@ -4,15 +4,14 @@ export const metadata: Metadata = {
   title: "Terms and Conditions",
   description:
     "Terms and Conditions for using the Velishe Model Management website and services.",
+  alternates: {
+    canonical: "https://www.velishemodelmanagement.com/terms/",
+  },
   robots: { index: true, follow: true },
 };
 
 export default function TermsPage() {
-  const lastUpdated = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const lastUpdated = "February 10, 2026";
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

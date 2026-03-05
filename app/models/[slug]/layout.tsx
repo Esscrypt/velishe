@@ -1,6 +1,10 @@
 import { Metadata } from "next";
-import { getModelBySlug } from "@/lib/models";
+import { getModelBySlug, getAllModelSlugs } from "@/lib/models";
 import BreadcrumbListScript from "@/components/BreadcrumbListScript";
+
+export function generateStaticParams() {
+  return getAllModelSlugs().map((slug) => ({ slug }));
+}
 
 type Props = {
   params: Promise<{ slug: string }>;

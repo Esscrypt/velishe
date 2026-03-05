@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp, serial, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, serial, unique, boolean } from "drizzle-orm/pg-core";
 
 export const models = pgTable("models", {
   id: serial("id").primaryKey(),
@@ -32,6 +32,8 @@ export const academyWishlistEntries = pgTable("academy_wishlist_entries", {
   id: serial("id").primaryKey(),
   email: text("email").notNull(),
   phoneNumber: text("phone_number").notNull(),
+  emailSent: boolean("email_sent").notNull().default(false),
+  confirmed: boolean("confirmed").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

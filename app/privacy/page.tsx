@@ -4,15 +4,14 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "Privacy Policy for Velishe Model Management. How we collect, use, and protect your personal data.",
+  alternates: {
+    canonical: "https://www.velishemodelmanagement.com/privacy/",
+  },
   robots: { index: true, follow: true },
 };
 
 export default function PrivacyPage() {
-  const lastUpdated = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const lastUpdated = "February 10, 2026";
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

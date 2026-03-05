@@ -81,7 +81,7 @@ try {
       }
     }
   } else {
-    console.log("✅ All models already exist in database.");
+    console.log(" All models already exist in database.");
   }
 
   // Update images for all models (both new and existing) from filesystem
@@ -239,7 +239,7 @@ try {
 
   // Verify the insertions
   const finalCount = await db.select().from(schema.models);
-  console.log(`\n✅ Database population complete!`);
+  console.log(`\n Database population complete!`);
   console.log(`📊 Total models in database: ${finalCount.length}`);
 } catch (error) {
   console.error("❌ Error populating database:", error);

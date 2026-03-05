@@ -1,6 +1,8 @@
 import { MetadataRoute } from "next";
 import { getAllModelsSync } from "@/lib/models";
 
+const SITE_UPDATED = new Date("2026-02-10");
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
   const models = getAllModelsSync();
@@ -8,55 +10,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     {
       url: `${baseUrl}/`,
-      lastModified: new Date(),
-      changeFrequency: "daily" as const,
-      priority: 1.0,
+      lastModified: SITE_UPDATED,
     },
     {
       url: `${baseUrl}/models/`,
-      lastModified: new Date(),
-      changeFrequency: "daily" as const,
-      priority: 0.9,
+      lastModified: SITE_UPDATED,
+    },
+    {
+      url: `${baseUrl}/models/female/`,
+      lastModified: SITE_UPDATED,
+    },
+    {
+      url: `${baseUrl}/models/male/`,
+      lastModified: SITE_UPDATED,
     },
     {
       url: `${baseUrl}/contact/`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
+      lastModified: SITE_UPDATED,
     },
     {
       url: `${baseUrl}/become-a-model/`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
+      lastModified: SITE_UPDATED,
     },
     {
-      url: `${baseUrl}/search/`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
+      url: `${baseUrl}/academy/`,
+      lastModified: SITE_UPDATED,
     },
     {
       url: `${baseUrl}/privacy/`,
-      lastModified: new Date(),
-      changeFrequency: "yearly" as const,
-      priority: 0.3,
+      lastModified: SITE_UPDATED,
     },
     {
       url: `${baseUrl}/terms/`,
-      lastModified: new Date(),
-      changeFrequency: "yearly" as const,
-      priority: 0.3,
+      lastModified: SITE_UPDATED,
     },
   ];
 
   const modelPages = models.map((model) => ({
     url: `${baseUrl}/models/${model.slug}/`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
+    lastModified: SITE_UPDATED,
   }));
 
   return [...staticPages, ...modelPages];
 }
-
