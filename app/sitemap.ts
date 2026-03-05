@@ -17,14 +17,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: SITE_UPDATED,
     },
     {
-      url: `${baseUrl}/models/female/`,
-      lastModified: SITE_UPDATED,
-    },
-    {
-      url: `${baseUrl}/models/male/`,
-      lastModified: SITE_UPDATED,
-    },
-    {
       url: `${baseUrl}/contact/`,
       lastModified: SITE_UPDATED,
     },

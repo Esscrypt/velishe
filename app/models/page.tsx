@@ -1,53 +1,52 @@
-"use client";
-
-import { useEffect } from "react";
-import ModelGrid from "@/components/ModelGrid";
-import { useModels } from "@/contexts/ModelsContext";
+import ModelsClient from "@/components/ModelsClient";
 import { getAllModelsSync } from "@/lib/models";
 
-interface ModelsPageProps {
-  initialModels?: any[];
-}
+export default function ModelsPage() {
+  const models = getAllModelsSync();
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
 
-export default function ModelsPage({ initialModels }: ModelsPageProps = {}) {
-  const { models, isLoading, fetchModels, setModels } = useModels();
-
-  useEffect(() => {
-    // Priority order: context cache > props > API > JSON fallback
-    
-    // 1. If models are already in context, use them
-    if (models.length > 0) {
-      return;
-    }
-
-    // 2. If models were passed as props, use them and set in context
-    if (initialModels && initialModels.length > 0) {
-      setModels(initialModels);
-      return;
-    }
-
-    // 3. Fetch from API (will be cached in context)
-    fetchModels().catch(() => {
-      // Fallback to JSON on error
-      const jsonModels = getAllModelsSync();
-      setModels(jsonModels);
-    });
-  }, [models.length, initialModels, fetchModels, setModels]);
-
-  if (isLoading && models.length === 0) {
-    return (
-      <div className="py-12">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-gray-500">Loading models...</div>
-        </div>
-      </div>
-    );
-  }
+  const collectionPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Models | Velishe Model Management",
+    url: `${baseUrl}/models/`,
+    description:
+      "Browse the roster of fashion and commercial models represented by Velishe Model Management in Sofia, Bulgaria.",
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: `${baseUrl}/`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Models",
+          item: `${baseUrl}/models/`,
+        },
+      ],
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: models.map((model, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: model.name,
+        url: `${baseUrl}/models/${model.slug}/`,
+      })),
+    },
+  };
 
   return (
-    <div className="py-12">
-      <ModelGrid models={models} />
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema) }}
+      />
+      <ModelsClient />
+    </>
   );
 }
-

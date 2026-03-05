@@ -66,9 +66,36 @@ export default async function ModelLayout({
 }) {
   const { slug } = await params;
   const model = getModelBySlug(slug);
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+
+  const personSchema = model
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "@id": `${baseUrl}/models/${slug}/#person`,
+        name: model.name,
+        url: `${baseUrl}/models/${slug}/`,
+        jobTitle: "Model",
+        worksFor: {
+          "@type": "Organization",
+          "@id": `${baseUrl}/#organization`,
+          name: "Velishe Model Management",
+        },
+        ...(model.instagram && { sameAs: [model.instagram] }),
+        ...(model.stats?.height && { height: model.stats.height }),
+        ...(model.stats?.hairColor && { hairColor: model.stats.hairColor }),
+        ...(model.stats?.eyeColor && { eyeColor: model.stats.eyeColor }),
+      }
+    : null;
 
   return (
     <>
+      {personSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
+      )}
       {model && (
         <BreadcrumbListScript slug={slug} modelName={model.name} />
       )}
