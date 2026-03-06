@@ -136,7 +136,7 @@ export default function RootLayout({
             {children}
           </main>
         </ModelsProvider>
-        <footer className="bg-gray-900 text-white py-4">
+        <footer className="bg-white text-gray-900 border-t border-gray-200 py-4">
           <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-md mx-auto mb-3">
               <div
@@ -157,7 +157,7 @@ export default function RootLayout({
                 </a>
               </div>
             </div>
-            <p className="text-center text-sm">
+            <p className="text-center text-sm text-gray-500">
               © 2025 Velishe Model Management Ltd.
             </p>
           </div>
