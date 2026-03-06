@@ -114,6 +114,13 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
+      <head>
+        <script
+          type="text/javascript"
+          src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+          async
+        />
+      </head>
       <body
         className="antialiased bg-white text-gray-900"
         suppressHydrationWarning
@@ -131,6 +138,25 @@ export default function RootLayout({
         </ModelsProvider>
         <footer className="bg-gray-900 text-white py-4">
           <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md mx-auto mb-3">
+              <div
+                className="trustpilot-widget"
+                data-locale="en-US"
+                data-template-id="56278e9abfbbba0bdcd568bc"
+                data-businessunit-id="69a89c0462fd1e62e9e08eab"
+                data-style-height="52px"
+                data-style-width="100%"
+                data-token="2029db83-629c-44d8-a8dd-beaf514874b0"
+              >
+                <a
+                  href="https://www.trustpilot.com/review/velishemodelmanagement.com"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Trustpilot
+                </a>
+              </div>
+            </div>
             <p className="text-center text-sm">
               © 2025 Velishe Model Management Ltd.
             </p>
