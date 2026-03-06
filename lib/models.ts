@@ -1,5 +1,5 @@
 import { Model } from "@/types/model";
-import { fetchAllModelMetadataFromDb } from "@/lib/db";
+import { fetchAllModelMetadataFromDb, fetchModelBySlugFromDb } from "@/lib/db";
 
 export async function getAllModels(): Promise<Model[]> {
   const models = await fetchAllModelMetadataFromDb();
@@ -7,8 +7,8 @@ export async function getAllModels(): Promise<Model[]> {
 }
 
 export async function getModelBySlug(slug: string): Promise<Model | undefined> {
-  const models = await getAllModels();
-  return models.find((model) => model.slug === slug);
+  const model = await fetchModelBySlugFromDb(slug);
+  return model ?? undefined;
 }
 
 export async function getAllModelSlugs(): Promise<string[]> {
