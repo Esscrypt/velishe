@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getAllModelsSync } from "@/lib/models";
+import { getAllModels } from "@/lib/models";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
 
-function buildLlmsTxt(): string {
-  const models = getAllModelsSync();
+async function buildLlmsTxt(): Promise<string> {
+  const models = await getAllModels();
 
   const staticSections = `# Velishe Model Management
 > Boutique modeling agency in Sofia, Bulgaria representing fashion and commercial talent.
@@ -101,8 +101,8 @@ The following is a complete list of all represented models and their statistics:
   return staticSections + modelEntries + notes;
 }
 
-export function GET() {
-  const body = buildLlmsTxt();
+export async function GET() {
+  const body = await buildLlmsTxt();
   return new NextResponse(body, {
     status: 200,
     headers: {

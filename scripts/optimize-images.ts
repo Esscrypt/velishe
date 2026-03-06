@@ -61,7 +61,7 @@ async function optimizeImage(inputPath: string, outputPath: string, isLogo: bool
     fit: "inside",
     withoutEnlargement: true,
   };
-  
+
   if (targetWidth) resizeOptions.width = targetWidth;
   if (targetHeight) resizeOptions.height = targetHeight;
 
@@ -99,7 +99,7 @@ async function processDirectory(dir: string, baseDir: string = dir) {
     } else if (entry.isFile()) {
       const ext = extname(entry.name).toLowerCase();
       const isLogo = dir.toLowerCase().includes("logo");
-      
+
       if (ext === ".jpg" || ext === ".jpeg" || ext === ".png") {
         try {
           // Create WebP version
@@ -112,7 +112,7 @@ async function processDirectory(dir: string, baseDir: string = dir) {
           console.log(
             `  Size: ${(stats.originalSize / 1024).toFixed(2)}KB → ${(stats.optimizedSize / 1024).toFixed(2)}KB (${stats.savings.toFixed(1)}% smaller)`
           );
-          
+
           // Force garbage collection hint every 10 images to prevent memory buildup
           if (processedImages.length % 10 === 0) {
             // Small delay to allow GC to run
@@ -178,4 +178,3 @@ main().catch((error) => {
   console.error("Error:", error);
   process.exit(1);
 });
-

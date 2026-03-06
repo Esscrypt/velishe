@@ -2,8 +2,9 @@ import { Metadata } from "next";
 import { getModelBySlug, getAllModelSlugs } from "@/lib/models";
 import BreadcrumbListScript from "@/components/BreadcrumbListScript";
 
-export function generateStaticParams() {
-  return getAllModelSlugs().map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  const slugs = await getAllModelSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 type Props = {
@@ -12,7 +13,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const model = getModelBySlug(slug);
+  const model = await getModelBySlug(slug);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
 
   if (!model) {
@@ -65,7 +66,7 @@ export default async function ModelLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const model = getModelBySlug(slug);
+  const model = await getModelBySlug(slug);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
 
   const personSchema = model

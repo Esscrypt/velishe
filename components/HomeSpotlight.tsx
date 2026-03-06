@@ -5,7 +5,6 @@ import Spotlight from "@/components/Spotlight";
 import PreloadThumbnails from "@/components/PreloadThumbnails";
 import MobileRedirect from "@/components/MobileRedirect";
 import { useModels } from "@/contexts/ModelsContext";
-import { getAllModelsSync } from "@/lib/models";
 import { Model } from "@/types/model";
 
 interface HomeSpotlightProps {
@@ -25,10 +24,7 @@ export default function HomeSpotlight({ initialModels }: HomeSpotlightProps = {}
       return;
     }
 
-    fetchModels().catch(() => {
-      const jsonModels = getAllModelsSync();
-      setModels(jsonModels);
-    });
+    fetchModels();
   }, [models.length, initialModels, fetchModels, setModels]);
 
   if (isLoading && models.length === 0) {

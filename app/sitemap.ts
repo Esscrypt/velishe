@@ -1,11 +1,11 @@
 import { MetadataRoute } from "next";
-import { getAllModelsSync } from "@/lib/models";
+import { getAllModels } from "@/lib/models";
 
 const SITE_UPDATED = new Date("2026-02-10");
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
-  const models = getAllModelsSync();
+  const models = await getAllModels();
 
   const staticPages = [
     {

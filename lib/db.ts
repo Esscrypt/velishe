@@ -3,22 +3,63 @@ import { Model, ModelMedia } from "@/types/model";
 import { eq, asc, and } from "drizzle-orm";
 
 /**
+ * Fetch model metadata only (no images) — lightweight query for SSG/metadata callers.
+ * Returns null if database is not available or query fails.
+ */
+export async function fetchAllModelMetadataFromDb(): Promise<Model[] | null> {
+  const db = getDb();
+  if (!db) {
+    return null;
+  }
+
+  try {
+    const rows = await db
+      .select({
+        modelId: schema.models.id,
+        slug: schema.models.slug,
+        name: schema.models.name,
+        height: schema.models.height,
+        bust: schema.models.bust,
+        waist: schema.models.waist,
+        hips: schema.models.hips,
+        shoeSize: schema.models.shoeSize,
+        hairColor: schema.models.hairColor,
+        eyeColor: schema.models.eyeColor,
+        instagram: schema.models.instagram,
+        displayOrder: schema.models.displayOrder,
+      })
+      .from(schema.models)
+      .orderBy(asc(schema.models.displayOrder));
+
+    return rows.map((row) => ({
+      id: String(row.modelId),
+      slug: row.slug || "",
+      name: row.name || "",
+      stats: {
+        height: row.height || "",
+        bust: row.bust || "",
+        waist: row.waist || "",
+        hips: row.hips || "",
+        shoeSize: row.shoeSize || "",
+        hairColor: row.hairColor || "",
+        eyeColor: row.eyeColor || "",
+      },
+      instagram: row.instagram || undefined,
+      featuredImage: "",
+      gallery: [],
+    }));
+  } catch (error) {
+    console.error("[fetchAllModelMetadataFromDb] Failed:", error);
+    return null;
+  }
+}
+
+/**
  * Fetch all models from database with only featured images (no gallery)
  * Returns null if database is not available or query fails
- * Skips database connection during build time (static generation)
  * Used for list views where gallery is not needed
  */
 export async function fetchModelsListFromDb(): Promise<Model[] | null> {
-  // Skip database during build time to avoid connection attempts
-  // Only check for actual build phases, not runtime on Vercel
-  const isBuildTime = 
-    process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NEXT_PHASE === 'phase-development-build';
-  
-  if (isBuildTime) {
-    return null;
-  }
-  
   const db = getDb();
   if (!db) {
     console.warn("[fetchModelsListFromDb] Database connection not available, returning null");
@@ -94,18 +135,7 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
     console.log(`[fetchModelsListFromDb] Successfully fetched ${models.length} models from database`);
     return models;
   } catch (error) {
-    // Log errors (except during build)
-    const isBuildTime = 
-      process.env.NEXT_PHASE === 'phase-production-build' ||
-      process.env.NEXT_PHASE === 'phase-development-build';
-    
-    if (!isBuildTime) {
-      console.error("[fetchModelsListFromDb] Failed to fetch models from database:", error);
-      if (error instanceof Error) {
-        console.error("[fetchModelsListFromDb] Error message:", error.message);
-        console.error("[fetchModelsListFromDb] Error code:", (error as any).code);
-      }
-    }
+    console.error("[fetchModelsListFromDb] Failed to fetch models from database:", error);
     return null;
   }
 }
@@ -117,16 +147,6 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
  * @deprecated Use fetchModelsListFromDb for list views (no gallery) or fetchModelBySlugFromDb for single model (with gallery)
  */
 export async function fetchModelsFromDb(): Promise<Model[] | null> {
-  // Skip database during build time to avoid connection attempts
-  // Only check for actual build phases, not runtime on Vercel
-  const isBuildTime = 
-    process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NEXT_PHASE === 'phase-development-build';
-  
-  if (isBuildTime) {
-    return null;
-  }
-  
   const db = getDb();
   if (!db) {
     return null;
@@ -193,7 +213,7 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
           model.gallery.push({
             type: "image",
             src: imageSrc,
-            alt: "",
+            alt: `${model.name} - Portfolio photo`,
           });
         }
       }
@@ -221,18 +241,7 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
     console.log(`[fetchModelsFromDb] Successfully fetched ${models.length} models from database`);
     return models;
   } catch (error) {
-    // Log errors (except during build)
-    const isBuildTime = 
-      process.env.NEXT_PHASE === 'phase-production-build' ||
-      process.env.NEXT_PHASE === 'phase-development-build';
-    
-    if (!isBuildTime) {
-      console.error("[fetchModelsFromDb] Failed to fetch models from database:", error);
-      if (error instanceof Error) {
-        console.error("[fetchModelsFromDb] Error message:", error.message);
-        console.error("[fetchModelsFromDb] Error code:", (error as any).code);
-      }
-    }
+    console.error("[fetchModelsFromDb] Failed to fetch models from database:", error);
     return null;
   }
 }
@@ -251,16 +260,6 @@ export async function fetchModelBySlugFromDb(
   imageOffset?: number,
   imageType?: "image" | "digital"
 ): Promise<Model | null> {
-  // Skip database during build time to avoid connection attempts
-  // Only check for actual build phases, not runtime on Vercel
-  const isBuildTime = 
-    process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NEXT_PHASE === 'phase-development-build';
-  
-  if (isBuildTime) {
-    return null;
-  }
-  
   const db = getDb();
   if (!db) {
     return null;
@@ -331,7 +330,7 @@ export async function fetchModelBySlugFromDb(
         const mediaItem: ModelMedia = {
           type: "image",
           src: imageSrc,
-          alt: "",
+          alt: `${modelData.name} - Portfolio photo`,
         };
         
         // Image with order 0 and type 'image' is the featured image
@@ -369,14 +368,7 @@ export async function fetchModelBySlugFromDb(
 
     return result;
   } catch (error) {
-    // Log errors (except during build)
-    const isBuildTime = 
-      process.env.NEXT_PHASE === 'phase-production-build' ||
-      process.env.NEXT_PHASE === 'phase-development-build';
-    
-    if (!isBuildTime) {
-      console.error(`Failed to fetch model ${slug} from database:`, error);
-    }
+    console.error(`Failed to fetch model ${slug} from database:`, error);
     return null;
   }
 }

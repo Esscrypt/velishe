@@ -1,10 +1,10 @@
 import Link from "next/link";
 import HomeSpotlight from "@/components/HomeSpotlight";
 import WebSiteSchema from "@/components/WebSiteSchema";
-import { getAllModelsSync } from "@/lib/models";
+import { getAllModels } from "@/lib/models";
 
-export default function Home() {
-  const modelCount = getAllModelsSync().length;
+export default async function Home() {
+  const modelCount = (await getAllModels()).length;
 
   const faqSchema = {
     "@context": "https://schema.org",

@@ -12,7 +12,7 @@ type Props = {
 
 export default async function ModelPage({ params }: Props) {
   const { slug } = await params;
-  const model = getModelBySlug(slug);
+  const model = await getModelBySlug(slug);
 
   if (!model) {
     notFound();

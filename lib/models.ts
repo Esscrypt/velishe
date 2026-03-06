@@ -1,28 +1,17 @@
 import { Model } from "@/types/model";
-import modelsData from "@/data/models.json";
+import { fetchAllModelMetadataFromDb } from "@/lib/db";
 
-// Synchronous functions for client-side and static generation
-
-/**
- * Synchronous version for static generation (uses JSON only)
- * Use this for generateStaticParams
- */
-export function getAllModelsSync(): Model[] {
-  const models = [...modelsData] as Model[];
-  // Sort models by id (numeric)
-  return models.sort((a, b) => {
-    const idA = Number.parseInt(a.id || "0", 10);
-    const idB = Number.parseInt(b.id || "0", 10);
-    return idA - idB;
-  });
+export async function getAllModels(): Promise<Model[]> {
+  const models = await fetchAllModelMetadataFromDb();
+  return models ?? [];
 }
 
-export function getModelBySlug(slug: string): Model | undefined {
-  return getAllModelsSync().find((model) => model.slug === slug);
+export async function getModelBySlug(slug: string): Promise<Model | undefined> {
+  const models = await getAllModels();
+  return models.find((model) => model.slug === slug);
 }
 
-
-export function getAllModelSlugs(): string[] {
-  return getAllModelsSync().map((model) => model.slug);
+export async function getAllModelSlugs(): Promise<string[]> {
+  const models = await getAllModels();
+  return models.map((model) => model.slug);
 }
-

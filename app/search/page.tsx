@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { getAllModelsSync } from "@/lib/models";
 import { Model } from "@/types/model";
 
 export default function SearchPage() {
@@ -12,8 +11,10 @@ export default function SearchPage() {
   const [allModels, setAllModels] = useState<Model[]>([]);
 
   useEffect(() => {
-    // Use sync version for client component
-    setAllModels(getAllModelsSync());
+    fetch("/api/models")
+      .then((res) => res.json())
+      .then((data) => setAllModels(data))
+      .catch(() => setAllModels([]));
   }, []);
 
   const filteredModels = useMemo(() => {
@@ -80,7 +81,7 @@ export default function SearchPage() {
             </div>
           ) : (
             <p className="text-gray-600 text-center py-12">
-              No models found matching "{searchQuery}"
+              No models found matching &quot;{searchQuery}&quot;
             </p>
           )}
         </div>
@@ -94,4 +95,3 @@ export default function SearchPage() {
     </div>
   );
 }
-

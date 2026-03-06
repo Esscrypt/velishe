@@ -62,8 +62,8 @@ export default function OptimizedImage({
     : {};
 
   // Determine loading strategy
-  const loadingStrategy = loading !== undefined 
-    ? loading 
+  const loadingStrategy = loading !== undefined
+    ? loading
     : (priority ? "eager" : "lazy");
 
   return (
@@ -87,4 +87,3 @@ export default function OptimizedImage({
     </div>
   );
 }
-

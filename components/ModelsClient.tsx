@@ -3,21 +3,17 @@
 import { useEffect } from "react";
 import ModelGrid from "@/components/ModelGrid";
 import { useModels } from "@/contexts/ModelsContext";
-import { getAllModelsSync } from "@/lib/models";
 
 export default function ModelsClient() {
-  const { models, isLoading, fetchModels, setModels } = useModels();
+  const { models, isLoading, fetchModels } = useModels();
 
   useEffect(() => {
     if (models.length > 0) {
       return;
     }
 
-    fetchModels().catch(() => {
-      const jsonModels = getAllModelsSync();
-      setModels(jsonModels);
-    });
-  }, [models.length, fetchModels, setModels]);
+    fetchModels();
+  }, [models.length, fetchModels]);
 
   if (isLoading && models.length === 0) {
     return (

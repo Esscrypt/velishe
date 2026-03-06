@@ -1,8 +1,8 @@
 import ModelsClient from "@/components/ModelsClient";
-import { getAllModelsSync } from "@/lib/models";
+import { getAllModels } from "@/lib/models";
 
-export default function ModelsPage() {
-  const models = getAllModelsSync();
+export default async function ModelsPage() {
+  const models = await getAllModels();
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
 
   const collectionPageSchema = {
