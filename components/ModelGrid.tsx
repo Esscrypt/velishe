@@ -19,6 +19,8 @@ export default function ModelGrid({ models }: ModelGridProps) {
             featuredImage={model.featuredImage}
             stats={model.stats}
             index={index}
+            booked={model.booked}
+            targetLocation={model.targetLocation}
           />
         ))}
       </div>

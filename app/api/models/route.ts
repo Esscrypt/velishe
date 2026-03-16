@@ -17,6 +17,8 @@ export async function GET() {
       name: model.name,
       stats: model.stats,
       instagram: model.instagram,
+      booked: model.booked ?? false,
+      targetLocation: model.targetLocation,
       featuredImage: model.featuredImage,
       // Explicitly exclude gallery from response
     }));

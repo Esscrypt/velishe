@@ -26,6 +26,8 @@ export async function fetchAllModelMetadataFromDb(): Promise<Model[] | null> {
         hairColor: schema.models.hairColor,
         eyeColor: schema.models.eyeColor,
         instagram: schema.models.instagram,
+        booked: schema.models.booked,
+        targetLocation: schema.models.targetLocation,
         displayOrder: schema.models.displayOrder,
       })
       .from(schema.models)
@@ -45,6 +47,8 @@ export async function fetchAllModelMetadataFromDb(): Promise<Model[] | null> {
         eyeColor: row.eyeColor || "",
       },
       instagram: row.instagram || undefined,
+      booked: row.booked ?? false,
+      targetLocation: row.targetLocation || undefined,
       featuredImage: "",
       gallery: [],
     }));
@@ -83,6 +87,8 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         hairColor: schema.models.hairColor,
         eyeColor: schema.models.eyeColor,
         instagram: schema.models.instagram,
+        booked: schema.models.booked,
+        targetLocation: schema.models.targetLocation,
         displayOrder: schema.models.displayOrder,
         imageId: schema.images.id,
         imageData: schema.images.data,
@@ -97,22 +103,22 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         )
       )
       .orderBy(asc(schema.models.displayOrder));
-    
+
     // Build models array - each row is already a model with its featured image
     const models: Model[] = [];
     const processedIds = new Set<number>();
-    
+
     for (const row of rows) {
       if (processedIds.has(row.modelId)) {
         continue;
       }
-      
+
       processedIds.add(row.modelId);
-      
-      const featuredImage = (row.imageId && row.imageData && row.imageOrder === 0) 
-        ? row.imageData 
+
+      const featuredImage = (row.imageId && row.imageData && row.imageOrder === 0)
+        ? row.imageData
         : "";
-      
+
       models.push({
         id: String(row.modelId),
         slug: row.slug || "",
@@ -127,6 +133,8 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
           eyeColor: row.eyeColor || "",
         },
         instagram: row.instagram || undefined,
+        booked: row.booked ?? false,
+        targetLocation: row.targetLocation || undefined,
         featuredImage,
         gallery: [], // Empty gallery for list view
       });
@@ -167,6 +175,8 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
         hairColor: schema.models.hairColor,
         eyeColor: schema.models.eyeColor,
         instagram: schema.models.instagram,
+        booked: schema.models.booked,
+        targetLocation: schema.models.targetLocation,
         displayOrder: schema.models.displayOrder,
         imageId: schema.images.id,
         imageData: schema.images.data,
@@ -175,14 +185,14 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
       .from(schema.models)
       .leftJoin(schema.images, eq(schema.models.id, schema.images.modelId))
       .orderBy(asc(schema.models.displayOrder), asc(schema.images.order));
-    
+
     // Group by model and collect images
     const modelsMap = new Map<number, Model>();
-    
+
     for (const row of rows) {
       if (!modelsMap.has(row.modelId)) {
         modelsMap.set(row.modelId, {
-          id: String(row.modelId), // Convert to string for Model type
+          id: String(row.modelId),
           slug: row.slug || "",
           name: row.name || "",
           stats: {
@@ -195,7 +205,9 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
             eyeColor: row.eyeColor || "",
           },
           instagram: row.instagram || undefined,
-          featuredImage: "", // Will be set from order 0 image
+          booked: row.booked ?? false,
+          targetLocation: row.targetLocation || undefined,
+          featuredImage: "",
           gallery: [],
         });
       }
@@ -280,6 +292,8 @@ export async function fetchModelBySlugFromDb(
         hairColor: schema.models.hairColor,
         eyeColor: schema.models.eyeColor,
         instagram: schema.models.instagram,
+        booked: schema.models.booked,
+        targetLocation: schema.models.targetLocation,
       })
       .from(schema.models)
       .where(eq(schema.models.slug, slug))
@@ -361,6 +375,8 @@ export async function fetchModelBySlugFromDb(
         eyeColor: modelData.eyeColor || "",
       },
       instagram: modelData.instagram || undefined,
+      booked: modelData.booked ?? false,
+      targetLocation: modelData.targetLocation || undefined,
       featuredImage,
       gallery,
       digitals: digitals.length > 0 ? digitals : undefined,

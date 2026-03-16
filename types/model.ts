@@ -21,6 +21,8 @@ export interface Model {
   name: string;
   stats: ModelStats;
   instagram?: string;
+  booked?: boolean;
+  targetLocation?: string;
   featuredImage: string;
   gallery: ModelMedia[];
   digitals?: ModelMedia[];

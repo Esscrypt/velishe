@@ -12,6 +12,8 @@ interface ModelCardProps {
   readonly featuredImage: string;
   readonly stats: ModelStats;
   readonly index: number;
+  readonly booked?: boolean;
+  readonly targetLocation?: string;
 }
 
 export default function ModelCard({
@@ -20,6 +22,8 @@ export default function ModelCard({
   featuredImage,
   stats,
   index,
+  booked,
+  targetLocation,
 }: ModelCardProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -52,6 +56,14 @@ export default function ModelCard({
     >
       <Link href={`/models/${slug}/`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:rounded-none rounded-lg">
+          {/* Booked badge */}
+          {booked && (
+            <div className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-900">
+                Booked{targetLocation ? ` \u2014 ${targetLocation}` : ""}
+              </span>
+            </div>
+          )}
           {/* Featured image with blur on hover */}
           <div className="w-full h-full group-hover:blur-sm transition-all duration-300">
             <OptimizedImage
