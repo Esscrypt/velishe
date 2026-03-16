@@ -56,12 +56,25 @@ export default function ModelCard({
     >
       <Link href={`/models/${slug}/`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:rounded-none rounded-lg">
-          {/* Booked badge */}
+          {/* Booked status bar */}
           {booked && (
-            <div className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-900">
-                Booked{targetLocation ? ` \u2014 ${targetLocation}` : ""}
-              </span>
+            <div className="absolute top-0 inset-x-0 z-10">
+              <div className="bg-gray-950/80 backdrop-blur-md px-4 py-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+                  </span>
+                  <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-white">
+                    Booked
+                  </span>
+                </div>
+                {targetLocation && (
+                  <span className="text-[11px] uppercase tracking-[0.15em] text-white/50">
+                    {targetLocation}
+                  </span>
+                )}
+              </div>
             </div>
           )}
           {/* Featured image with blur on hover */}

@@ -57,9 +57,23 @@ export default async function ModelPage({ params }: Props) {
 
         {/* SSR-rendered info section — visible to all crawlers */}
         <div className="order-2 lg:order-2">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             {model.name}
           </h1>
+
+          {model.booked && (
+            <div className="flex items-center gap-3 mb-8">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-gray-900" />
+              </span>
+              <span className="text-sm font-medium uppercase tracking-[0.15em] text-gray-500">
+                Currently booked{model.targetLocation ? ` \u2014 ${model.targetLocation}` : ""}
+              </span>
+            </div>
+          )}
+
+          {!model.booked && <div className="mb-4" />}
 
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
