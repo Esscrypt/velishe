@@ -56,25 +56,24 @@ export default function ModelCard({
     >
       <Link href={`/models/${slug}/`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:rounded-none rounded-lg">
-          {/* Booked status bar */}
+          {/* Booked status — sits just above the name gradient */}
           {booked && (
-            <div className="absolute top-0 inset-x-0 z-10">
-              <div className="bg-gray-950/80 backdrop-blur-md px-4 py-2.5 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
-                  </span>
-                  <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-white">
-                    Booked
-                  </span>
-                </div>
-                {targetLocation && (
-                  <span className="text-[11px] uppercase tracking-[0.15em] text-white/50">
+            <div className="absolute bottom-12 left-0 right-0 z-10 px-4 flex items-center gap-2.5 opacity-100 group-hover:opacity-0 transition-opacity duration-300">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+              </span>
+              <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-white">
+                Booked
+              </span>
+              {targetLocation && (
+                <>
+                  <span className="text-white/40">&middot;</span>
+                  <span className="text-[11px] uppercase tracking-[0.15em] text-white/70">
                     {targetLocation}
                   </span>
-                )}
-              </div>
+                </>
+              )}
             </div>
           )}
           {/* Featured image with blur on hover */}
