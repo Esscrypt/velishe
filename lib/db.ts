@@ -99,7 +99,8 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         schema.images,
         and(
           eq(schema.models.id, schema.images.modelId),
-          eq(schema.images.order, 0) // Only join featured images (order 0)
+          eq(schema.images.order, 0), // Only join featured images (order 0)
+          eq(schema.images.type, "image") // Must be type 'image', not 'digital'
         )
       )
       .orderBy(asc(schema.models.displayOrder));
