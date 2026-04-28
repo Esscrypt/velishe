@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     revalidatePath("/", "layout");
     if (slug) {
-      revalidatePath(`/models/${slug}`, "page");
+      revalidatePath(`/models/${slug}/`, "page");
     }
 
     return NextResponse.json({ revalidated: true });

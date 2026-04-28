@@ -10,6 +10,8 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+export const revalidate = 60;
+
 export default async function ModelPage({ params }: Props) {
   const { slug } = await params;
   const model = await getModelBySlug(slug);
