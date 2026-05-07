@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { getModelBySlug } from "@/lib/models";
 import SocialIcons from "@/components/SocialIcons";
 import ModelPageTracker from "@/components/ModelPageTracker";
+import DownloadPortfolioButton from "@/components/DownloadPortfolioButton";
 import ModelProfileClient from "./ModelProfileClient";
 
 type Props = {
@@ -78,9 +79,17 @@ export default async function ModelPage({ params }: Props) {
           {!model.booked && <div className="mb-4" />}
 
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Measurements
-            </h2>
+            <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Measurements
+              </h2>
+              <DownloadPortfolioButton
+                slug={slug}
+                name={model.name}
+                stats={model.stats}
+                featuredImage={model.featuredImage}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               {stats.map((stat) => (
                 <div
