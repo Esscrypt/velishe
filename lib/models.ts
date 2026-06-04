@@ -1,8 +1,17 @@
 import { Model } from "@/types/model";
-import { fetchAllModelMetadataFromDb, fetchModelBySlugFromDb } from "@/lib/db";
+import {
+  fetchAllModelMetadataFromDb,
+  fetchModelsListFromDb,
+  fetchModelBySlugFromDb,
+} from "@/lib/db";
 
 export async function getAllModels(): Promise<Model[]> {
   const models = await fetchAllModelMetadataFromDb();
+  return models ?? [];
+}
+
+export async function getModelsForListing(): Promise<Model[]> {
+  const models = await fetchModelsListFromDb();
   return models ?? [];
 }
 

@@ -1,8 +1,8 @@
 import ModelGrid from "@/components/ModelGrid";
-import { getAllModels } from "@/lib/models";
+import { getModelsForListing } from "@/lib/models";
 
 export default async function ModelsPage() {
-  const models = await getAllModels();
+  const models = await getModelsForListing();
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
 
   const collectionPageSchema = {
