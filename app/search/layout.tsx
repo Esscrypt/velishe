@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   description:
     "Search Velishe Model Management roster. Find models by name and view portfolios.",
   robots: { index: false, follow: false },
+  alternates: {
+    canonical: "https://www.velishemodelmanagement.com/search/",
+  },
 };
 
 export default function SearchLayout({

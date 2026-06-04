@@ -1,5 +1,5 @@
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
 
 interface BreadcrumbListScriptProps {
   slug: string;

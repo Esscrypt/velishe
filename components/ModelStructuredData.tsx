@@ -5,7 +5,7 @@ interface ModelStructuredDataProps {
 }
 
 export default function ModelStructuredData({ model }: ModelStructuredDataProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
   const modelUrl = `${baseUrl}/models/${model.slug}`;
   const imageUrl = model.featuredImage 
     ? `${baseUrl}${model.featuredImage}`

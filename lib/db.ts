@@ -31,6 +31,7 @@ export async function fetchAllModelMetadataFromDb(): Promise<Model[] | null> {
         displayOrder: schema.models.displayOrder,
       })
       .from(schema.models)
+      .where(eq(schema.models.published, true))
       .orderBy(asc(schema.models.displayOrder));
 
     return rows.map((row) => ({
@@ -103,6 +104,7 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
           eq(schema.images.type, "image") // Must be type 'image', not 'digital'
         )
       )
+      .where(eq(schema.models.published, true))
       .orderBy(asc(schema.models.displayOrder));
 
     // Build models array - each row is already a model with its featured image
@@ -185,6 +187,7 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
       })
       .from(schema.models)
       .leftJoin(schema.images, eq(schema.models.id, schema.images.modelId))
+      .where(eq(schema.models.published, true))
       .orderBy(asc(schema.models.displayOrder), asc(schema.images.order));
 
     // Group by model and collect images
@@ -297,7 +300,7 @@ export async function fetchModelBySlugFromDb(
         targetLocation: schema.models.targetLocation,
       })
       .from(schema.models)
-      .where(eq(schema.models.slug, slug))
+      .where(and(eq(schema.models.slug, slug), eq(schema.models.published, true)))
       .limit(1);
 
     if (modelRow.length === 0) {
