@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchModelBySlugFromDb } from "@/lib/db";
 
-// Ensure this route is dynamic and not statically generated
-export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET(
@@ -84,10 +82,17 @@ export async function GET(
 
     // Gallery images already use base64 data if available (from fetchModelBySlugFromDb)
     // This ensures consistency with populate-db and admin upload mechanisms
-    return NextResponse.json({
-      ...model,
-      featuredImage,
-    });
+    return NextResponse.json(
+      {
+        ...model,
+        featuredImage,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600",
+        },
+      }
+    );
   } catch (error) {
     console.error("[API] Error fetching model:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";

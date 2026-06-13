@@ -23,7 +23,11 @@ export async function GET() {
       // Explicitly exclude gallery from response
     }));
 
-    return NextResponse.json(modelsList);
+    return NextResponse.json(modelsList, {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600",
+      },
+    });
   } catch (error) {
     console.error("Error fetching models from API:", error);
     return NextResponse.json(

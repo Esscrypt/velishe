@@ -11,9 +11,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    revalidatePath("/", "layout");
+    revalidatePath("/");
+    revalidatePath("/models");
     if (slug) {
-      revalidatePath(`/models/${slug}/`, "page");
+      revalidatePath(`/models/${slug}`);
     }
 
     return NextResponse.json({ revalidated: true });

@@ -11,7 +11,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export const revalidate = 60;
+export const revalidate = false;
 
 export default async function ModelPage({ params }: Props) {
   const { slug } = await params;
