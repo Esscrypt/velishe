@@ -396,6 +396,92 @@ export async function fetchModelBySlugFromDb(
   }
 }
 
+export async function fetchModelsByBoard(
+  board: "mainboard" | "development",
+): Promise<Model[]> {
+  const db = getDb();
+  if (!db) {
+    return [];
+  }
+
+  try {
+    const rows = await db
+      .select({
+        modelId: schema.models.id,
+        slug: schema.models.slug,
+        name: schema.models.name,
+        height: schema.models.height,
+        bust: schema.models.bust,
+        waist: schema.models.waist,
+        hips: schema.models.hips,
+        shoeSize: schema.models.shoeSize,
+        hairColor: schema.models.hairColor,
+        eyeColor: schema.models.eyeColor,
+        instagram: schema.models.instagram,
+        booked: schema.models.booked,
+        targetLocation: schema.models.targetLocation,
+        board: schema.models.board,
+        gender: schema.models.gender,
+        imageId: schema.images.id,
+        imageData: schema.images.data,
+      })
+      .from(schema.models)
+      .leftJoin(
+        schema.images,
+        and(eq(schema.images.modelId, schema.models.id), eq(schema.images.order, 0)),
+      )
+      .where(and(eq(schema.models.published, true), eq(schema.models.board, board)))
+      .orderBy(asc(schema.models.displayOrder));
+
+    return rows.map((row) => ({
+      id: String(row.modelId),
+      slug: row.slug || "",
+      name: row.name || "",
+      stats: {
+        height: row.height || "",
+        bust: row.bust || "",
+        waist: row.waist || "",
+        hips: row.hips || "",
+        shoeSize: row.shoeSize || "",
+        hairColor: row.hairColor || "",
+        eyeColor: row.eyeColor || "",
+      },
+      instagram: row.instagram || undefined,
+      booked: row.booked ?? false,
+      targetLocation: row.targetLocation || undefined,
+      board: row.board,
+      gender: row.gender,
+      featuredImage: row.imageData || "",
+      featuredImageId: row.imageId || undefined,
+      gallery: [],
+    }));
+  } catch (error) {
+    console.error(`Failed to fetch models for board ${board}:`, error);
+    return [];
+  }
+}
+
+export async function fetchEnabledBoards(): Promise<{ id: string; label: string }[]> {
+  const db = getDb();
+  if (!db) {
+    return [
+      { id: "mainboard", label: "Mainboard" },
+      { id: "development", label: "Development" },
+    ];
+  }
+
+  try {
+    return await db
+      .select({ id: schema.boards.id, label: schema.boards.label })
+      .from(schema.boards)
+      .where(eq(schema.boards.enabled, true))
+      .orderBy(asc(schema.boards.displayOrder));
+  } catch (error) {
+    console.error("Failed to fetch enabled boards:", error);
+    return [];
+  }
+}
+
 /**
  * Fetch only the featured image (order 0, type 'image') for a published model.
  * Lean query for the OG-card route — avoids loading the full gallery.

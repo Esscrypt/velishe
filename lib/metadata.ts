@@ -16,6 +16,7 @@ export type OgImage = {
   width: number;
   height: number;
   alt: string;
+  type?: string;
 };
 
 export const DEFAULT_OG_IMAGE: OgImage = {
@@ -23,6 +24,7 @@ export const DEFAULT_OG_IMAGE: OgImage = {
   width: OG_CARD_WIDTH,
   height: OG_CARD_HEIGHT,
   alt: SITE_NAME,
+  type: "image/jpeg",
 };
 
 type BuildMetadataArgs = {
@@ -65,6 +67,7 @@ export function buildPageMetadata({
       title: fullTitle,
       description,
       images: [og.url],
+      site: TWITTER_HANDLE,
       creator: TWITTER_HANDLE,
     },
   };

@@ -37,6 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         width: OG_CARD_WIDTH,
         height: OG_CARD_HEIGHT,
         alt: `${model.name} — Velishe Model Management`,
+        type: "image/jpeg",
       }
     : undefined;
 

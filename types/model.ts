@@ -25,6 +25,8 @@ export interface Model {
   targetLocation?: string;
   featuredImage: string;
   featuredImageId?: string;
+  board?: "mainboard" | "development";
+  gender?: "male" | "female";
   gallery: ModelMedia[];
   digitals?: ModelMedia[];
   video?: string;
