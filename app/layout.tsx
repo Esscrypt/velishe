@@ -8,6 +8,7 @@ import Cookiebot from "@/components/Cookiebot";
 import PageViewTracker from "@/components/PageViewTracker";
 import StructuredData from "@/components/StructuredData";
 import { ModelsProvider } from "@/contexts/ModelsContext";
+import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE, TWITTER_HANDLE } from "@/lib/metadata";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,9 +43,9 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com"),
+  metadataBase: new URL(SITE_URL),
   alternates: {
-    canonical: "https://www.velishemodelmanagement.com/",
+    canonical: `${SITE_URL}/`,
   },
   icons: {
     icon: [
@@ -63,27 +64,20 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com",
-    siteName: "Velishe Model Management",
-    title: "Velishe Model Management",
+    url: `${SITE_URL}/`,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
     description:
       "Boutique model agency in Sofia, Bulgaria. Fashion and commercial models. View portfolios and book talent.",
-    images: [
-      {
-        url: "/logo/image3.webp",
-        width: 2000,
-        height: 2000,
-        alt: "Velishe Model Management Logo",
-      },
-    ],
+    images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Velishe Model Management",
+    title: SITE_NAME,
     description:
       "Boutique model agency in Sofia, Bulgaria. Fashion and commercial models. View portfolios and book talent.",
-    images: ["/logo/image3.webp"],
-    creator: "@velishe.mgmt",
+    images: [DEFAULT_OG_IMAGE.url],
+    creator: TWITTER_HANDLE,
   },
   robots: {
     index: true,

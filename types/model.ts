@@ -24,6 +24,7 @@ export interface Model {
   booked?: boolean;
   targetLocation?: string;
   featuredImage: string;
+  featuredImageId?: string;
   gallery: ModelMedia[];
   digitals?: ModelMedia[];
   video?: string;

@@ -338,6 +338,7 @@ export async function fetchModelBySlugFromDb(
 
     // Separate images by type and handle featured image (order 0, type 'image')
     let featuredImage = "";
+    let featuredImageId: string | undefined;
     const gallery: ModelMedia[] = [];
     const digitals: ModelMedia[] = [];
 
@@ -350,10 +351,11 @@ export async function fetchModelBySlugFromDb(
           src: imageSrc,
           alt: `${modelData.name} - Portfolio photo`,
         };
-        
+
         // Image with order 0 and type 'image' is the featured image
         if (row.imageOrder === 0 && row.imageType === "image") {
           featuredImage = imageSrc;
+          featuredImageId = row.imageId!;
           return; // Don't include in gallery
         }
         
@@ -382,6 +384,7 @@ export async function fetchModelBySlugFromDb(
       booked: modelData.booked ?? false,
       targetLocation: modelData.targetLocation || undefined,
       featuredImage,
+      featuredImageId,
       gallery,
       digitals: digitals.length > 0 ? digitals : undefined,
     };
@@ -389,6 +392,40 @@ export async function fetchModelBySlugFromDb(
     return result;
   } catch (error) {
     console.error(`Failed to fetch model ${slug} from database:`, error);
+    return null;
+  }
+}
+
+/**
+ * Fetch only the featured image (order 0, type 'image') for a published model.
+ * Lean query for the OG-card route — avoids loading the full gallery.
+ */
+export async function fetchFeaturedImageBySlug(
+  slug: string,
+): Promise<{ id: string; data: string } | null> {
+  const db = getDb();
+  if (!db) {
+    return null;
+  }
+
+  try {
+    const rows = await db
+      .select({ id: schema.images.id, data: schema.images.data })
+      .from(schema.images)
+      .innerJoin(schema.models, eq(schema.images.modelId, schema.models.id))
+      .where(
+        and(
+          eq(schema.models.slug, slug),
+          eq(schema.models.published, true),
+          eq(schema.images.order, 0),
+          eq(schema.images.type, "image"),
+        ),
+      )
+      .limit(1);
+
+    return rows[0] ?? null;
+  } catch (error) {
+    console.error(`Failed to fetch featured image for ${slug}:`, error);
     return null;
   }
 }

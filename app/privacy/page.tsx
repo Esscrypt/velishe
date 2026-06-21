@@ -1,14 +1,11 @@
-import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title: "Privacy Policy",
   description:
     "Privacy Policy for Velishe Model Management. How we collect, use, and protect your personal data.",
-  alternates: {
-    canonical: "https://www.velishemodelmanagement.com/privacy/",
-  },
-  robots: { index: true, follow: true },
-};
+  path: "/privacy/",
+});
 
 export default function PrivacyPage() {
   const lastUpdated = "February 10, 2026";

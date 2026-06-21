@@ -1,20 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Instagram } from "lucide-react";
+import { buildPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title: "Contact",
   description:
     "Get in touch with Velishe Model Management in Sofia, Bulgaria. Book talent, casting inquiries, and general contact.",
-  alternates: {
-    canonical: "https://www.velishemodelmanagement.com/contact/",
-  },
-  openGraph: {
-    title: "Contact | Velishe Model Management",
-    description:
-      "Get in touch with Velishe Model Management. Book talent and casting inquiries.",
-  },
-};
+  path: "/contact/",
+});
 
 const contactPageSchema = {
   "@context": "https://schema.org",
