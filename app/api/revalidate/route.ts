@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
     }
 
     revalidatePath("/");
-    revalidatePath("/models");
     revalidatePath("/mainboard");
     revalidatePath("/development");
     if (slug) {
