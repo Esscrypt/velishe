@@ -43,7 +43,7 @@ export default function HomeSpotlight({ initialModels }: HomeSpotlightProps = {}
       <MobileRedirect />
       <PreloadThumbnails models={models} />
       <div className="w-full">
-        <Spotlight models={models} />
+        <Spotlight models={models.filter((m) => m.board === "mainboard")} />
       </div>
     </>
   );

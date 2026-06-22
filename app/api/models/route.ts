@@ -20,6 +20,7 @@ export async function GET() {
       booked: model.booked ?? false,
       targetLocation: model.targetLocation,
       featuredImage: model.featuredImage,
+      board: model.board,
       // Explicitly exclude gallery from response
     }));
 

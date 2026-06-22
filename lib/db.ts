@@ -91,6 +91,7 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         booked: schema.models.booked,
         targetLocation: schema.models.targetLocation,
         displayOrder: schema.models.displayOrder,
+        board: schema.models.board,
         imageId: schema.images.id,
         imageData: schema.images.data,
         imageOrder: schema.images.order,
@@ -138,6 +139,7 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         instagram: row.instagram || undefined,
         booked: row.booked ?? false,
         targetLocation: row.targetLocation || undefined,
+        board: row.board,
         featuredImage,
         gallery: [], // Empty gallery for list view
       });
