@@ -7,6 +7,7 @@ import { ModelMedia, Model } from "@/types/model";
 import OptimizedImage from "./OptimizedImage";
 import VideoPlayer from "./VideoPlayer";
 import { useModels } from "@/contexts/ModelsContext";
+import Tooltip from "@/components/Tooltip";
 
 interface ImageCarouselProps {
   media?: ModelMedia[];
@@ -592,44 +593,58 @@ export default function ImageCarousel({
 
           {media.length > 1 && (
             <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToPrevious();
-                }}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors z-20"
-                aria-label="Previous image"
+              <Tooltip
+                label="Previous image"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20"
               >
-                <ChevronLeft size={24} />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToNext();
-                }}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors z-20"
-                aria-label="Next image"
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToPrevious();
+                  }}
+                  className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+              </Tooltip>
+              <Tooltip
+                label="Next image"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20"
               >
-                <ChevronRight size={24} />
-              </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToNext();
+                  }}
+                  className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                  aria-label="Next image"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </Tooltip>
 
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
                 {media.slice(1).map((_, index) => {
                   const galleryIndex = index + 1;
                   return (
-                    <button
+                    <Tooltip
                       key={galleryIndex}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        goToSlide(galleryIndex);
-                      }}
-                      className={`h-2 rounded-full transition-all ${
-                        galleryIndex === validIndex
-                          ? "w-8 bg-white"
-                          : "w-2 bg-white/50 hover:bg-white/75"
-                      }`}
-                      aria-label={`Go to slide ${galleryIndex + 1}`}
-                    />
+                      label={`Go to slide ${galleryIndex + 1}`}
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          goToSlide(galleryIndex);
+                        }}
+                        className={`h-2 rounded-full transition-all ${
+                          galleryIndex === validIndex
+                            ? "w-8 bg-white"
+                            : "w-2 bg-white/50 hover:bg-white/75"
+                        }`}
+                        aria-label={`Go to slide ${galleryIndex + 1}`}
+                      />
+                    </Tooltip>
                   );
                 })}
               </div>
@@ -648,13 +663,18 @@ export default function ImageCarousel({
             className="fixed inset-0 z-50 bg-black flex items-center justify-center"
             onClick={closeFullscreen}
           >
-            <button
-              onClick={closeFullscreen}
-              className="absolute top-4 right-4 z-[60] bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors"
-              aria-label="Close fullscreen"
+            <Tooltip
+              label="Close fullscreen"
+              className="absolute top-4 right-4 z-[60]"
             >
-              <X size={24} />
-            </button>
+              <button
+                onClick={closeFullscreen}
+                className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors"
+                aria-label="Close fullscreen"
+              >
+                <X size={24} />
+              </button>
+            </Tooltip>
 
             <div
               className="relative w-full h-full flex items-center justify-center p-4"
@@ -699,44 +719,58 @@ export default function ImageCarousel({
 
               {media.length > 1 && (
                 <>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      goToPrevious();
-                    }}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors z-10"
-                    aria-label="Previous image"
+                  <Tooltip
+                    label="Previous image"
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10"
                   >
-                    <ChevronLeft size={32} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      goToNext();
-                    }}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors z-10"
-                    aria-label="Next image"
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToPrevious();
+                      }}
+                      className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft size={32} />
+                    </button>
+                  </Tooltip>
+                  <Tooltip
+                    label="Next image"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10"
                   >
-                    <ChevronRight size={32} />
-                  </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToNext();
+                      }}
+                      className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors"
+                      aria-label="Next image"
+                    >
+                      <ChevronRight size={32} />
+                    </button>
+                  </Tooltip>
 
                   <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
                     {media.slice(1).map((_, index) => {
                       const galleryIndex = index + 1;
                       return (
-                        <button
+                        <Tooltip
                           key={galleryIndex}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            goToSlide(galleryIndex);
-                          }}
-                          className={`h-2 rounded-full transition-all ${
-                            galleryIndex === validIndex
-                              ? "w-8 bg-white"
-                              : "w-2 bg-white/50 hover:bg-white/75"
-                          }`}
-                          aria-label={`Go to slide ${galleryIndex + 1}`}
-                        />
+                          label={`Go to slide ${galleryIndex + 1}`}
+                        >
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              goToSlide(galleryIndex);
+                            }}
+                            className={`h-2 rounded-full transition-all ${
+                              galleryIndex === validIndex
+                                ? "w-8 bg-white"
+                                : "w-2 bg-white/50 hover:bg-white/75"
+                            }`}
+                            aria-label={`Go to slide ${galleryIndex + 1}`}
+                          />
+                        </Tooltip>
                       );
                     })}
                   </div>

@@ -3,18 +3,21 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { SearchResultSkeleton } from "@/components/Skeleton";
 import { Model } from "@/types/model";
 
 export default function SearchPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [allModels, setAllModels] = useState<Model[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(true);
 
   useEffect(() => {
     fetch("/api/models")
       .then((res) => res.json())
       .then((data) => setAllModels(data))
-      .catch(() => setAllModels([]));
+      .catch(() => setAllModels([]))
+      .finally(() => setIsLoadingModels(false));
   }, []);
 
   const filteredModels = useMemo(() => {
@@ -58,7 +61,9 @@ export default function SearchPage() {
 
       {searchQuery.trim() && (
         <div>
-          {filteredModels.length > 0 ? (
+          {isLoadingModels ? (
+            <SearchResultSkeleton />
+          ) : filteredModels.length > 0 ? (
             <div className="space-y-2">
               <p className="text-sm text-gray-600 mb-4">
                 Found {filteredModels.length} model{filteredModels.length !== 1 ? "s" : ""}

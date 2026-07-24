@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Spotlight from "@/components/Spotlight";
 import PreloadThumbnails from "@/components/PreloadThumbnails";
 import MobileRedirect from "@/components/MobileRedirect";
+import { SpotlightSkeleton } from "@/components/Skeleton";
 import { useModels } from "@/contexts/ModelsContext";
 import { Model } from "@/types/model";
 
@@ -31,9 +32,7 @@ export default function HomeSpotlight({ initialModels }: HomeSpotlightProps = {}
     return (
       <>
         <MobileRedirect />
-        <div className="w-full flex items-center justify-center min-h-[600px]">
-          <div className="text-gray-500">Loading models...</div>
-        </div>
+        <SpotlightSkeleton />
       </>
     );
   }

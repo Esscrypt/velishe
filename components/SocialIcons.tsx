@@ -1,4 +1,7 @@
+"use client";
+
 import { Instagram } from "lucide-react";
+import Tooltip from "@/components/Tooltip";
 
 interface SocialIconsProps {
   instagram?: string;
@@ -17,15 +20,17 @@ export default function SocialIcons({
 
   return (
     <div className={`flex items-center gap-4 ${className}`}>
-      <a
-        href={instagram}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-gray-700 hover:text-black transition-colors duration-200 hover:scale-110 transform"
-        aria-label="Instagram profile"
-      >
-        <Instagram size={iconSize} />
-      </a>
+      <Tooltip label="Instagram profile">
+        <a
+          href={instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-700 hover:text-black transition-colors duration-200 hover:scale-110 transform"
+          aria-label="Instagram profile"
+        >
+          <Instagram size={iconSize} />
+        </a>
+      </Tooltip>
     </div>
   );
 }

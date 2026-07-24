@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import ModelGrid from "@/components/ModelGrid";
+import { ModelGridSkeleton } from "@/components/Skeleton";
 import { useModels } from "@/contexts/ModelsContext";
 
 export default function ModelsClient() {
@@ -18,9 +19,7 @@ export default function ModelsClient() {
   if (isLoading && models.length === 0) {
     return (
       <div className="py-12">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-gray-500">Loading models...</div>
-        </div>
+        <ModelGridSkeleton />
       </div>
     );
   }

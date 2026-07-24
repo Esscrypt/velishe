@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Skeleton } from "@/components/Skeleton";
 
 interface OptimizedImageProps {
   src: string;
@@ -59,7 +60,11 @@ export default function OptimizedImage({
         width: "100%",
         height: "100%",
       }
-    : {};
+    : {
+        position: "relative" as const,
+        width: width ? `${width}px` : undefined,
+        height: height ? `${height}px` : undefined,
+      };
 
   // Determine loading strategy
   const loadingStrategy = loading !== undefined
@@ -67,20 +72,29 @@ export default function OptimizedImage({
     : (priority ? "eager" : "lazy");
 
   return (
-    <div style={containerStyle} className={fill ? className : ""}>
+    <div style={containerStyle} className={fill ? className : "relative"}>
+      {isLoading && (
+        <Skeleton
+          className={`absolute inset-0 ${fill ? "h-full w-full" : className}`}
+        />
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
         loading={loadingStrategy}
         decoding="async"
         fetchPriority={priority ? "high" : "auto"}
+        sizes={sizes}
         onLoad={() => setIsLoading(false)}
         onError={() => {
           setHasError(true);
           setIsLoading(false);
         }}
         style={imageStyle}
-        className={fill ? "" : `${className} ${isLoading ? "blur-sm" : "blur-0"} transition-all duration-300`}
+        className={`${fill ? "relative h-full w-full" : className} ${
+          isLoading ? "opacity-0" : "opacity-100"
+        } transition-opacity duration-300`}
         width={fill ? undefined : width}
         height={fill ? undefined : height}
       />

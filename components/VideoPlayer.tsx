@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Play, Pause } from "lucide-react";
 import OptimizedImage from "./OptimizedImage";
+import Tooltip from "@/components/Tooltip";
 
 interface VideoPlayerProps {
   src: string;
@@ -70,17 +71,22 @@ export default function VideoPlayer({
       )}
 
       {showControls && (
-        <button
-          onClick={togglePlay}
-          className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors duration-200"
-          aria-label={isPlaying ? "Pause video" : "Play video"}
+        <Tooltip
+          label={isPlaying ? "Pause video" : "Play video"}
+          className="absolute inset-0 z-10"
         >
-          {isPlaying ? (
-            <Pause className="text-white" size={48} />
-          ) : (
-            <Play className="text-white" size={48} />
-          )}
-        </button>
+          <button
+            onClick={togglePlay}
+            className="w-full h-full flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors duration-200"
+            aria-label={isPlaying ? "Pause video" : "Play video"}
+          >
+            {isPlaying ? (
+              <Pause className="text-white" size={48} />
+            ) : (
+              <Play className="text-white" size={48} />
+            )}
+          </button>
+        </Tooltip>
       )}
     </div>
   );
