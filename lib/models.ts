@@ -6,8 +6,13 @@ export async function getAllModels(): Promise<Model[]> {
   return models ?? [];
 }
 
+/**
+ * Fetch model metadata + featured image only.
+ * Full galleries are loaded client-side via /api/models/[slug] to keep
+ * SSR/ISR payloads small enough to regenerate successfully for large portfolios.
+ */
 export async function getModelBySlug(slug: string): Promise<Model | undefined> {
-  const model = await fetchModelBySlugFromDb(slug);
+  const model = await fetchModelBySlugFromDb(slug, 1, 0, "image");
   return model ?? undefined;
 }
 
