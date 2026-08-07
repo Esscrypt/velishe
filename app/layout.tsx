@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -8,12 +8,18 @@ import Cookiebot from "@/components/Cookiebot";
 import PageViewTracker from "@/components/PageViewTracker";
 import StructuredData from "@/components/StructuredData";
 import { ModelsProvider } from "@/contexts/ModelsContext";
+import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE, TWITTER_HANDLE } from "@/lib/metadata";
+import { getEnabledBoards } from "@/lib/models";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
 });
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -42,9 +48,9 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com"),
+  metadataBase: new URL(SITE_URL),
   alternates: {
-    canonical: "https://www.velishemodelmanagement.com/",
+    canonical: `${SITE_URL}/`,
   },
   icons: {
     icon: [
@@ -60,30 +66,25 @@ export const metadata: Metadata = {
       { rel: "android-chrome-512x512", url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
     ],
   },
+  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com",
-    siteName: "Velishe Model Management",
-    title: "Velishe Model Management",
+    url: `${SITE_URL}/`,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
     description:
       "Boutique model agency in Sofia, Bulgaria. Fashion and commercial models. View portfolios and book talent.",
-    images: [
-      {
-        url: "/logo/image3.webp",
-        width: 2000,
-        height: 2000,
-        alt: "Velishe Model Management Logo",
-      },
-    ],
+    images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Velishe Model Management",
+    title: SITE_NAME,
     description:
       "Boutique model agency in Sofia, Bulgaria. Fashion and commercial models. View portfolios and book talent.",
-    images: ["/logo/image3.webp"],
-    creator: "@velishe.mgmt",
+    images: [DEFAULT_OG_IMAGE.url],
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
   },
   robots: {
     index: true,
@@ -103,11 +104,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const enabledBoards = await getEnabledBoards();
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   const gaId = process.env.NEXT_PUBLIC_GA_ID || "G-PQJ4JZ1BC7";
   const cookiebotId = process.env.NEXT_PUBLIC_COOKIEBOT_ID || "0a3be31f-8747-4f7b-8b6a-256aed707f7a";
@@ -131,7 +133,7 @@ export default function RootLayout({
         {gaId && <GoogleAnalytics gaId={gaId} />}
         <PageViewTracker />
         <ModelsProvider>
-          <Header />
+          <Header enabledBoards={enabledBoards} />
           <main className="min-h-screen">
             {children}
           </main>

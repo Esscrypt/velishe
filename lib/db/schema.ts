@@ -1,4 +1,7 @@
-import { pgTable, text, integer, timestamp, serial, unique, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, serial, unique, boolean, pgEnum } from "drizzle-orm/pg-core";
+
+export const boardEnum = pgEnum("board", ["mainboard", "development"]);
+export const genderEnum = pgEnum("gender", ["male", "female"]);
 
 export const models = pgTable("models", {
   id: serial("id").primaryKey(),
@@ -15,6 +18,9 @@ export const models = pgTable("models", {
   displayOrder: integer("display_order").default(0),
   booked: boolean("booked").default(false),
   targetLocation: text("target_location"),
+  published: boolean("published").notNull().default(false),
+  board: boardEnum("board").notNull().default("mainboard"),
+  gender: genderEnum("gender").notNull().default("female"),
 });
 
 export const images = pgTable("images", {
@@ -45,4 +51,11 @@ export type ImageRow = typeof images.$inferSelect;
 export type ImageInsert = typeof images.$inferInsert;
 export type AcademyWishlistEntryRow = typeof academyWishlistEntries.$inferSelect;
 export type AcademyWishlistEntryInsert = typeof academyWishlistEntries.$inferInsert;
+
+export const boards = pgTable("boards", {
+  id: text("id").primaryKey(),
+  label: text("label").notNull(),
+  enabled: boolean("enabled").notNull().default(true),
+  displayOrder: integer("display_order").notNull().default(0),
+});
 

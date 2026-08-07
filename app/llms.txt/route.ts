@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAllModels } from "@/lib/models";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
 
 async function buildLlmsTxt(): Promise<string> {
   const models = await getAllModels();

@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
 
   return {
     rules: [
@@ -25,10 +25,6 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: "GPTBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "Google-Extended",
         disallow: "/",
       },
     ],

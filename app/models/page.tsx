@@ -1,9 +1,9 @@
-import ModelsClient from "@/components/ModelsClient";
-import { getAllModels } from "@/lib/models";
+import ModelGrid from "@/components/ModelGrid";
+import { getModelsForListing } from "@/lib/models";
 
 export default async function ModelsPage() {
-  const models = await getAllModels();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+  const models = await getModelsForListing();
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
 
   const collectionPageSchema = {
     "@context": "https://schema.org",
@@ -46,7 +46,10 @@ export default async function ModelsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema) }}
       />
-      <ModelsClient />
+      <div className="py-12">
+        <h1 className="sr-only">Our Models</h1>
+        <ModelGrid models={models} />
+      </div>
     </>
   );
 }

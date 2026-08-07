@@ -6,52 +6,9 @@ import { getAllModels } from "@/lib/models";
 export default async function Home() {
   const modelCount = (await getAllModels()).length;
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: "What does Velishe Model Management do?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: `Velishe Model Management is a boutique modeling agency founded in 2025 and based in Sofia, Bulgaria. The agency represents ${modelCount} professional fashion and commercial models — both women and men — across 7 categories: fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. Velishe connects talent with leading Bulgarian and international brands, creative directors, and photographers, placing models in campaigns that make an impact. Beyond bookings, the agency guides models through the industry — helping them build professional portfolios, understand their market positioning, and navigate the demands of a modeling career with confidence and clarity.`,
-        },
-      },
-      {
-        "@type": "Question",
-        name: "What are the requirements to become a Velishe model?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Velishe Model Management accepts applications from women with a minimum height of 173 cm and men with a minimum height of 183 cm. The agency prioritises natural, unedited portfolios and values authentic character, individuality, and a sense of narrative above conventional industry trends. VÈLISHE is selective and bold — focused on timeless presence rather than fleeting aesthetics. Applicants submit natural photos with no filters, editing, or makeup, and are reviewed on a rolling basis.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "What is the VÈLISHE Model Academy?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "The VÈLISHE Academy is a structured training programme for aspiring and signed models based in Sofia, Bulgaria. The curriculum covers composites and casting preparation, professional conduct on set, industry etiquette, and building a sustainable modeling career. Enrolment operates on a cohort intake basis — applicants join a waitlist and are notified when the next programme opens.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "How do you book a model or apply to Velishe?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Clients looking to book talent for campaigns, editorials, and commercial productions can contact the Velishe team directly at models@velishemodelmanagement.com or via the contact page. Aspiring models can apply through the Become a Model page, where the team reviews all applications and responds to those that fit current development needs.",
-        },
-      },
-    ],
-  };
-
   return (
     <>
       <WebSiteSchema />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
       <HomeSpotlight />
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">

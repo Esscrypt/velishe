@@ -1,6 +1,12 @@
 import { Metadata } from "next";
 import { getModelBySlug, getAllModelSlugs } from "@/lib/models";
 import BreadcrumbListScript from "@/components/BreadcrumbListScript";
+import {
+  buildPageMetadata,
+  SITE_URL,
+  OG_CARD_WIDTH,
+  OG_CARD_HEIGHT,
+} from "@/lib/metadata";
 
 export async function generateStaticParams() {
   const slugs = await getAllModelSlugs();
@@ -14,7 +20,6 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const model = await getModelBySlug(slug);
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
 
   if (!model) {
     return {
@@ -22,40 +27,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `${model.name} | Velishe Model Management`;
   const description = `Professional model ${model.name} portfolio. ${model.stats.height} height, ${model.stats.hairColor} hair, ${model.stats.eyeColor} eyes. View portfolio and contact information.`;
-  const url = `${baseUrl}/models/${slug}/`;
-  const imageUrl = model.featuredImage 
-    ? `${baseUrl}${model.featuredImage}`
-    : `${baseUrl}/logo/image3.webp`;
 
-  return {
-    title,
+  // The OG card is served by /api/og/[slug] from the model's current featured
+  // image; ?v=<image id> changes whenever the admin swaps it, forcing a re-scrape.
+  const image = model.featuredImageId
+    ? {
+        url: `${SITE_URL}/api/og/${slug}/?v=${model.featuredImageId}`,
+        width: OG_CARD_WIDTH,
+        height: OG_CARD_HEIGHT,
+        alt: `${model.name} — Velishe Model Management`,
+        type: "image/jpeg",
+      }
+    : undefined;
+
+  return buildPageMetadata({
+    title: model.name,
     description,
-    alternates: {
-      canonical: url,
-    },
-    openGraph: {
-      type: "profile",
-      url,
-      title,
-      description,
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 1200,
-          alt: `${model.name} - Model Portfolio`,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [imageUrl],
-    },
-  };
+    path: `/models/${slug}/`,
+    type: "profile",
+    image,
+  });
 }
 
 export default async function ModelLayout({

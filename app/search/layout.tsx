@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title: "Search Models",
   description:
     "Search Velishe Model Management roster. Find models by name and view portfolios.",
-  robots: { index: false, follow: false },
-};
+  path: "/search/",
+  index: false,
+});
 
 export default function SearchLayout({
   children,

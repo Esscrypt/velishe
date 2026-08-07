@@ -1,17 +1,11 @@
-import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title: "Become a Model",
   description:
     "Join Velishe Model Management. Apply to become a model with our boutique agency in Sofia, Bulgaria. Open casting and application form.",
-  alternates: {
-    canonical: "https://www.velishemodelmanagement.com/become-a-model/",
-  },
-  openGraph: {
-    title: "Become a Model | Velishe Model Management",
-    description: "Apply to join our roster. Open casting and model application.",
-  },
-};
+  path: "/become-a-model/",
+});
 
 export default function BecomeAModelLayout({
   children,

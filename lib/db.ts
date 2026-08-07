@@ -31,6 +31,7 @@ export async function fetchAllModelMetadataFromDb(): Promise<Model[] | null> {
         displayOrder: schema.models.displayOrder,
       })
       .from(schema.models)
+      .where(eq(schema.models.published, true))
       .orderBy(asc(schema.models.displayOrder));
 
     return rows.map((row) => ({
@@ -90,6 +91,7 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         booked: schema.models.booked,
         targetLocation: schema.models.targetLocation,
         displayOrder: schema.models.displayOrder,
+        board: schema.models.board,
         imageId: schema.images.id,
         imageData: schema.images.data,
         imageOrder: schema.images.order,
@@ -103,6 +105,7 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
           eq(schema.images.type, "image") // Must be type 'image', not 'digital'
         )
       )
+      .where(eq(schema.models.published, true))
       .orderBy(asc(schema.models.displayOrder));
 
     // Build models array - each row is already a model with its featured image
@@ -136,6 +139,7 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         instagram: row.instagram || undefined,
         booked: row.booked ?? false,
         targetLocation: row.targetLocation || undefined,
+        board: row.board,
         featuredImage,
         gallery: [], // Empty gallery for list view
       });
@@ -185,6 +189,7 @@ export async function fetchModelsFromDb(): Promise<Model[] | null> {
       })
       .from(schema.models)
       .leftJoin(schema.images, eq(schema.models.id, schema.images.modelId))
+      .where(eq(schema.models.published, true))
       .orderBy(asc(schema.models.displayOrder), asc(schema.images.order));
 
     // Group by model and collect images
@@ -297,7 +302,7 @@ export async function fetchModelBySlugFromDb(
         targetLocation: schema.models.targetLocation,
       })
       .from(schema.models)
-      .where(eq(schema.models.slug, slug))
+      .where(and(eq(schema.models.slug, slug), eq(schema.models.published, true)))
       .limit(1);
 
     if (modelRow.length === 0) {
@@ -335,6 +340,7 @@ export async function fetchModelBySlugFromDb(
 
     // Separate images by type and handle featured image (order 0, type 'image')
     let featuredImage = "";
+    let featuredImageId: string | undefined;
     const gallery: ModelMedia[] = [];
     const digitals: ModelMedia[] = [];
 
@@ -347,10 +353,11 @@ export async function fetchModelBySlugFromDb(
           src: imageSrc,
           alt: `${modelData.name} - Portfolio photo`,
         };
-        
+
         // Image with order 0 and type 'image' is the featured image
         if (row.imageOrder === 0 && row.imageType === "image") {
           featuredImage = imageSrc;
+          featuredImageId = row.imageId!;
           return; // Don't include in gallery
         }
         
@@ -379,6 +386,7 @@ export async function fetchModelBySlugFromDb(
       booked: modelData.booked ?? false,
       targetLocation: modelData.targetLocation || undefined,
       featuredImage,
+      featuredImageId,
       gallery,
       digitals: digitals.length > 0 ? digitals : undefined,
     };
@@ -386,6 +394,126 @@ export async function fetchModelBySlugFromDb(
     return result;
   } catch (error) {
     console.error(`Failed to fetch model ${slug} from database:`, error);
+    return null;
+  }
+}
+
+export async function fetchModelsByBoard(
+  board: "mainboard" | "development",
+): Promise<Model[]> {
+  const db = getDb();
+  if (!db) {
+    return [];
+  }
+
+  try {
+    const rows = await db
+      .select({
+        modelId: schema.models.id,
+        slug: schema.models.slug,
+        name: schema.models.name,
+        height: schema.models.height,
+        bust: schema.models.bust,
+        waist: schema.models.waist,
+        hips: schema.models.hips,
+        shoeSize: schema.models.shoeSize,
+        hairColor: schema.models.hairColor,
+        eyeColor: schema.models.eyeColor,
+        instagram: schema.models.instagram,
+        booked: schema.models.booked,
+        targetLocation: schema.models.targetLocation,
+        board: schema.models.board,
+        gender: schema.models.gender,
+        imageId: schema.images.id,
+        imageData: schema.images.data,
+      })
+      .from(schema.models)
+      .leftJoin(
+        schema.images,
+        and(eq(schema.images.modelId, schema.models.id), eq(schema.images.order, 0)),
+      )
+      .where(and(eq(schema.models.published, true), eq(schema.models.board, board)))
+      .orderBy(asc(schema.models.displayOrder));
+
+    return rows.map((row) => ({
+      id: String(row.modelId),
+      slug: row.slug || "",
+      name: row.name || "",
+      stats: {
+        height: row.height || "",
+        bust: row.bust || "",
+        waist: row.waist || "",
+        hips: row.hips || "",
+        shoeSize: row.shoeSize || "",
+        hairColor: row.hairColor || "",
+        eyeColor: row.eyeColor || "",
+      },
+      instagram: row.instagram || undefined,
+      booked: row.booked ?? false,
+      targetLocation: row.targetLocation || undefined,
+      board: row.board,
+      gender: row.gender,
+      featuredImage: row.imageData || "",
+      featuredImageId: row.imageId || undefined,
+      gallery: [],
+    }));
+  } catch (error) {
+    console.error(`Failed to fetch models for board ${board}:`, error);
+    return [];
+  }
+}
+
+export async function fetchEnabledBoards(): Promise<{ id: string; label: string }[]> {
+  const db = getDb();
+  if (!db) {
+    return [
+      { id: "mainboard", label: "Mainboard" },
+      { id: "development", label: "Development" },
+    ];
+  }
+
+  try {
+    return await db
+      .select({ id: schema.boards.id, label: schema.boards.label })
+      .from(schema.boards)
+      .where(eq(schema.boards.enabled, true))
+      .orderBy(asc(schema.boards.displayOrder));
+  } catch (error) {
+    console.error("Failed to fetch enabled boards:", error);
+    return [];
+  }
+}
+
+/**
+ * Fetch only the featured image (order 0, type 'image') for a published model.
+ * Lean query for the OG-card route — avoids loading the full gallery.
+ */
+export async function fetchFeaturedImageBySlug(
+  slug: string,
+): Promise<{ id: string; data: string } | null> {
+  const db = getDb();
+  if (!db) {
+    return null;
+  }
+
+  try {
+    const rows = await db
+      .select({ id: schema.images.id, data: schema.images.data })
+      .from(schema.images)
+      .innerJoin(schema.models, eq(schema.images.modelId, schema.models.id))
+      .where(
+        and(
+          eq(schema.models.slug, slug),
+          eq(schema.models.published, true),
+          eq(schema.images.order, 0),
+          eq(schema.images.type, "image"),
+        ),
+      )
+      .limit(1);
+
+    return rows[0] ?? null;
+  } catch (error) {
+    console.error(`Failed to fetch featured image for ${slug}:`, error);
     return null;
   }
 }

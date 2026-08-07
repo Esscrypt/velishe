@@ -5,7 +5,12 @@ import Link from "next/link";
 import { Instagram, Menu, X } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
 
-export default function Header() {
+interface Board {
+  id: string;
+  label: string;
+}
+
+export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -31,9 +36,11 @@ export default function Header() {
               />
             </Link>
             <nav className="hidden md:flex items-center gap-10">
-              <Link href="/models" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                MODELS
-              </Link>
+              {enabledBoards.map((b) => (
+                <Link key={b.id} href={`/${b.id}`} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                  {b.label.toUpperCase()}
+                </Link>
+              ))}
               <Link href="/search" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 SEARCH
               </Link>
@@ -116,13 +123,16 @@ export default function Header() {
             </Tooltip>
           </div>
           <nav className="flex flex-col flex-1 p-4 space-y-4">
-            <Link
-              href="/models"
-              onClick={closeMenu}
-              className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
-            >
-              MODELS
-            </Link>
+            {enabledBoards.map((b) => (
+              <Link
+                key={b.id}
+                href={`/${b.id}`}
+                onClick={closeMenu}
+                className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
+              >
+                {b.label.toUpperCase()}
+              </Link>
+            ))}
             <Link
               href="/search"
               onClick={closeMenu}
