@@ -11,11 +11,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Site uses trailingSlash: true — paths must include the trailing slash
+    // so they match the canonical cached routes.
     revalidatePath("/");
-    revalidatePath("/mainboard");
-    revalidatePath("/development");
+    revalidatePath("/models/");
+    revalidatePath("/mainboard/");
+    revalidatePath("/development/");
     if (slug) {
-      revalidatePath(`/models/${slug}`);
+      revalidatePath(`/models/${slug}/`, "layout");
     }
 
     return NextResponse.json({ revalidated: true });

@@ -11,7 +11,10 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export const revalidate = false;
+// Stats, Instagram, and booking status change from the admin at any time;
+// revalidatePath does not reliably refresh these nested static routes, so
+// render per-request to always reflect the current DB.
+export const dynamic = "force-dynamic";
 
 export default async function ModelPage({ params }: Props) {
   const { slug } = await params;

@@ -8,6 +8,9 @@ import {
   OG_CARD_HEIGHT,
 } from "@/lib/metadata";
 
+// Keep metadata / JSON-LD in sync with admin edits (same as the page).
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   const slugs = await getAllModelSlugs();
   return slugs.map((slug) => ({ slug }));
