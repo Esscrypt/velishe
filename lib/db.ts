@@ -1,6 +1,7 @@
 import { getDb, schema } from "./db/index";
 import { Model, ModelMedia } from "@/types/model";
 import { eq, asc, and } from "drizzle-orm";
+import { publicImageUrl } from "./image-url";
 
 /**
  * Fetch model metadata only (no images) — lightweight query for SSG/metadata callers.
@@ -93,7 +94,6 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         displayOrder: schema.models.displayOrder,
         board: schema.models.board,
         imageId: schema.images.id,
-        imageData: schema.images.data,
         imageOrder: schema.images.order,
       })
       .from(schema.models)
@@ -119,9 +119,10 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
 
       processedIds.add(row.modelId);
 
-      const featuredImage = (row.imageId && row.imageData && row.imageOrder === 0)
-        ? row.imageData
-        : "";
+      const featuredImage =
+        row.imageId && row.imageOrder === 0
+          ? publicImageUrl(row.imageId)
+          : "";
 
       models.push({
         id: String(row.modelId),
@@ -141,6 +142,7 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
         targetLocation: row.targetLocation || undefined,
         board: row.board,
         featuredImage,
+        featuredImageId: row.imageId || undefined,
         gallery: [], // Empty gallery for list view
       });
     }
@@ -347,7 +349,7 @@ export async function fetchModelBySlugFromDb(
     imageRows
       .filter((row) => row.imageId !== null && row.imageData !== null)
       .forEach((row) => {
-        const imageSrc = row.imageData!;
+        const imageSrc = publicImageUrl(row.imageId!);
         const mediaItem: ModelMedia = {
           type: "image",
           src: imageSrc,
@@ -425,7 +427,6 @@ export async function fetchModelsByBoard(
         board: schema.models.board,
         gender: schema.models.gender,
         imageId: schema.images.id,
-        imageData: schema.images.data,
       })
       .from(schema.models)
       .leftJoin(
@@ -453,7 +454,7 @@ export async function fetchModelsByBoard(
       targetLocation: row.targetLocation || undefined,
       board: row.board,
       gender: row.gender,
-      featuredImage: row.imageData || "",
+      featuredImage: row.imageId ? publicImageUrl(row.imageId) : "",
       featuredImageId: row.imageId || undefined,
       gallery: [],
     }));
