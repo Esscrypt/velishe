@@ -8,9 +8,18 @@ import {
   uniqueBookedLocations,
 } from "@/lib/model-bio";
 import {
+  languageAlternates,
   ORGANIZATION_EMAIL,
   ORGANIZATION_PHONE_DISPLAY,
+  SITE_URL,
 } from "@/lib/metadata";
+
+export const metadata = {
+  alternates: {
+    canonical: `${SITE_URL}/`,
+    languages: languageAlternates(),
+  },
+};
 
 const WORK_CATEGORIES = [
   "fashion editorial",

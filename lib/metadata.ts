@@ -26,10 +26,21 @@ export const WIKIDATA_URL = "https://www.wikidata.org/wiki/Q141222478";
 
 export const FOUNDER = {
   name: "Christiana Velichkova",
+  nameZh: "克里斯蒂安娜·韦利奇科娃",
   slug: "christiana",
   jobTitle: "Founder & CEO",
   linkedin: "https://www.linkedin.com/in/christiana-velichkova-4943351b2",
 } as const;
+
+export const ZH_PATH = "/zh/";
+
+export function languageAlternates(): Record<string, string> {
+  return {
+    en: `${SITE_URL}/`,
+    "zh-CN": `${SITE_URL}${ZH_PATH}`,
+    "x-default": `${SITE_URL}/`,
+  };
+}
 
 export const ORGANIZATION_SAME_AS = [
   INSTAGRAM_URL,
@@ -66,6 +77,8 @@ type BuildMetadataArgs = {
   type?: "website" | "profile" | "article";
   index?: boolean;
   modifiedTime?: Date;
+  locale?: string;
+  languages?: Record<string, string>;
 };
 
 export function buildPageMetadata({
@@ -76,6 +89,8 @@ export function buildPageMetadata({
   type = "website",
   index = true,
   modifiedTime,
+  locale = "en_US",
+  languages,
 }: BuildMetadataArgs): Metadata {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
   const url = `${SITE_URL}${path}`;
@@ -85,12 +100,15 @@ export function buildPageMetadata({
   return {
     ...(title ? { title } : {}),
     description,
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      ...(languages ? { languages } : {}),
+    },
     ...(index ? {} : { robots: { index: false, follow: false } }),
     ...(modified ? { other: { "article:modified_time": modified } } : {}),
     openGraph: {
       type,
-      locale: "en_US",
+      locale,
       url,
       siteName: SITE_NAME,
       title: fullTitle,

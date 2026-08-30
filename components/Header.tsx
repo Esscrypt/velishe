@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Instagram, Linkedin, Menu, X } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
 import {
@@ -9,6 +10,7 @@ import {
   LINKEDIN_COMPANY_URL,
   WHATSAPP_URL,
 } from "@/lib/metadata";
+import { nextHeaderScrollState } from "@/lib/header-scroll";
 
 interface Board {
   id: string;
@@ -17,6 +19,10 @@ interface Board {
 
 export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  const scrollStateRef = useRef({ hidden: false, lastY: 0 });
+  const pathname = usePathname();
+  const isZh = pathname === "/zh" || pathname === "/zh/";
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -26,9 +32,34 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
     setIsMenuOpen(false);
   };
 
+  useEffect(() => {
+    scrollStateRef.current.lastY = Math.max(0, window.scrollY);
+
+    const onScroll = () => {
+      const next = nextHeaderScrollState(
+        scrollStateRef.current,
+        window.scrollY,
+        { menuOpen: isMenuOpen },
+      );
+      const hiddenChanged = next.hidden !== scrollStateRef.current.hidden;
+      scrollStateRef.current = next;
+      if (hiddenChanged) {
+        setIsHeaderHidden(next.hidden);
+      }
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isMenuOpen]);
+
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+      <header
+        className={`sticky top-0 z-50 bg-white border-b border-gray-200 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+          isHeaderHidden ? "-translate-y-full md:translate-y-0" : "translate-y-0"
+        }`}
+      >
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-40 md:h-48">
             <Link href="/" className="flex items-center" onClick={closeMenu}>
@@ -61,6 +92,13 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               </Link>
               <Link href="/academy" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 ACADEMY
+              </Link>
+              <Link
+                href={isZh ? "/" : "/zh/"}
+                className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide"
+                hrefLang={isZh ? "en" : "zh-CN"}
+              >
+                {isZh ? "EN" : "中文"}
               </Link>
             </nav>
             <div className="flex items-center gap-4">
@@ -180,6 +218,14 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
               ACADEMY
+            </Link>
+            <Link
+              href={isZh ? "/" : "/zh/"}
+              onClick={closeMenu}
+              hrefLang={isZh ? "en" : "zh-CN"}
+              className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide py-2"
+            >
+              {isZh ? "EN" : "中文"}
             </Link>
           </nav>
           <div className="p-4 border-t border-gray-200 space-y-3">

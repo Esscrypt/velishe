@@ -4,6 +4,7 @@ export default function WebSiteSchema() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
     name: SITE_NAME,
     url: `${SITE_URL}/`,
     potentialAction: {

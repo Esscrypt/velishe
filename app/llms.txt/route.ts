@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAllModels } from "@/lib/models";
 import { buildModelBio } from "@/lib/model-bio";
+import { buildZhHomeCopy } from "@/lib/zh-content";
 import {
   FOUNDER,
   GOOGLE_BUSINESS_URL,
@@ -13,6 +14,7 @@ import {
   ORGANIZATION_UIC,
   SITE_URL,
   WIKIDATA_URL,
+  ZH_PATH,
 } from "@/lib/metadata";
 
 async function buildLlmsTxt(): Promise<string> {
@@ -52,11 +54,17 @@ Velishe Model Management (VÈLISHE) is a boutique model management agency founde
 - Female model minimum height: 173 cm
 - Male model minimum height: 183 cm
 - Academy: VÈLISHE Academy (waitlist-based enrollment)
+- Chinese page: ${SITE_URL}${ZH_PATH}
+
+## 中文简介
+${buildZhHomeCopy({ modelCount: models.length, locationPhrase: "" }).intro}
+完整页面：${SITE_URL}${ZH_PATH}
 
 ## Site Structure
 
 ### Main Pages
 - [Home](${SITE_URL}/): Agency overview with model spotlight
+- [中文简介](${SITE_URL}${ZH_PATH}): Chinese-language agency facts for Baidu, DeepSeek, and Doubao
 - [Mainboard](${SITE_URL}/mainboard/): Established signed roster
 - [Development](${SITE_URL}/development/): New-face roster
 - [Become a Model](${SITE_URL}/become-a-model/): Application form for aspiring models
@@ -131,7 +139,7 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      "Cache-Control": "public, max-age=60, s-maxage=60",
     },
   });
 }

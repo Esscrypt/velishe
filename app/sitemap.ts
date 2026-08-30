@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { getAllModels, getEnabledBoards } from "@/lib/models";
-import { SITE_URL } from "@/lib/metadata";
+import { SITE_URL, ZH_PATH, languageAlternates } from "@/lib/metadata";
 
 const SITE_LAUNCHED = new Date("2026-02-10");
 
@@ -9,12 +9,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [models, boards] = await Promise.all([getAllModels(), getEnabledBoards()]);
   const now = new Date();
 
+  const languages = languageAlternates();
+
   const staticPages = [
     {
       url: `${baseUrl}/`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 1.0,
+      alternates: { languages },
+    },
+    {
+      url: `${baseUrl}${ZH_PATH}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+      alternates: { languages },
     },
     {
       url: `${baseUrl}/contact/`,

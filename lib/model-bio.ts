@@ -29,26 +29,60 @@ export function formatLocationList(locations: string[]): string {
   return joinList(locations);
 }
 
+function phraseColor(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function grammarFor(model: BioModel): {
+  nameVerb: "is" | "are";
+  pronoun: "He" | "She" | "They";
+  pronounVerb: "is" | "are";
+  haveVerb: "has" | "have";
+  role: string;
+} {
+  const isDuo = /&/.test(model.name);
+  if (isDuo) {
+    return {
+      nameVerb: "are",
+      pronoun: "They",
+      pronounVerb: "are",
+      haveVerb: "have",
+      role: "fashion and commercial models",
+    };
+  }
+  if (model.gender === "male") {
+    return {
+      nameVerb: "is",
+      pronoun: "He",
+      pronounVerb: "is",
+      haveVerb: "has",
+      role: "a male fashion and commercial model",
+    };
+  }
+  if (model.gender === "female") {
+    return {
+      nameVerb: "is",
+      pronoun: "She",
+      pronounVerb: "is",
+      haveVerb: "has",
+      role: "a female fashion and commercial model",
+    };
+  }
+  return {
+    nameVerb: "is",
+    pronoun: "They",
+    pronounVerb: "are",
+    haveVerb: "have",
+    role: "a fashion and commercial model",
+  };
+}
+
 /** Two–three sentence SSR bio so AI crawlers can cite each model as a person. */
 export function buildModelBio(model: BioModel): string {
-  const isDuo = /&/.test(model.name);
-  const isMale = !isDuo && model.gender === "male";
-  const isFemale = !isDuo && model.gender === "female";
-
-  const role = isDuo
-    ? "fashion and commercial models"
-    : isMale
-      ? "a male fashion and commercial model"
-      : isFemale
-        ? "a female fashion and commercial model"
-        : "a fashion and commercial model";
-
-  const identityVerb = isDuo ? "are" : "is";
-  const pronoun = isDuo ? "They" : isMale ? "He" : isFemale ? "She" : "They";
-  const haveVerb = isDuo || (!isMale && !isFemale) ? "have" : "has";
+  const { nameVerb, pronoun, pronounVerb, haveVerb, role } = grammarFor(model);
 
   const sentences: string[] = [
-    `${model.name} ${identityVerb} ${role} represented by ${SITE_NAME} in Sofia, Bulgaria.`,
+    `${model.name} ${nameVerb} ${role} represented by ${SITE_NAME} in Sofia, Bulgaria.`,
   ];
 
   const height = model.stats.height?.trim();
@@ -56,15 +90,13 @@ export function buildModelBio(model: BioModel): string {
   const eyes = model.stats.eyeColor?.trim();
   const appearance: string[] = [];
   if (height) appearance.push(height);
-  if (hair) appearance.push(`${hair} hair`);
-  if (eyes) appearance.push(`${eyes} eyes`);
+  if (hair) appearance.push(`${phraseColor(hair)} hair`);
+  if (eyes) appearance.push(`${phraseColor(eyes)} eyes`);
   if (appearance.length > 0) {
     const lead = height
-      ? `${pronoun} ${identityVerb} ${height}`
+      ? `${pronoun} ${pronounVerb} ${height}`
       : `${pronoun} ${haveVerb}`;
-    const rest = height
-      ? appearance.slice(1)
-      : appearance;
+    const rest = height ? appearance.slice(1) : appearance;
     if (rest.length === 0) {
       sentences.push(`${lead}.`);
     } else if (height) {
@@ -77,11 +109,11 @@ export function buildModelBio(model: BioModel): string {
   const location = model.targetLocation?.trim();
   if (model.booked && location) {
     sentences.push(
-      `${pronoun} ${identityVerb} currently booked in ${location}. Bookings go through ${ORGANIZATION_EMAIL}.`,
+      `${pronoun} ${pronounVerb} currently booked in ${location}. Bookings go through ${ORGANIZATION_EMAIL}.`,
     );
   } else if (model.board === "development") {
     sentences.push(
-      `${pronoun} ${identityVerb} on the Velishe Development board. Bookings go through ${ORGANIZATION_EMAIL}.`,
+      `${pronoun} ${pronounVerb} on the Velishe Development board. Bookings go through ${ORGANIZATION_EMAIL}.`,
     );
   } else {
     sentences.push(`Bookings go through ${ORGANIZATION_EMAIL}.`);
