@@ -10,6 +10,7 @@ export const metadata = buildPageMetadata({
   title: BOARD_CONFIG.mainboard.title,
   description: BOARD_CONFIG.mainboard.description,
   path: "/mainboard/",
+  modifiedTime: new Date(),
 });
 
 export default function MainboardPage() {

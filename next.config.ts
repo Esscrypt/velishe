@@ -22,7 +22,14 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 86400,
+    localPatterns: [
+      {
+        pathname: "/api/images/**",
+        search: "",
+      },
+    ],
   },
   trailingSlash: true,
   experimental: {

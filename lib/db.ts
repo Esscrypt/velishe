@@ -30,6 +30,8 @@ export async function fetchAllModelMetadataFromDb(): Promise<Model[] | null> {
         booked: schema.models.booked,
         targetLocation: schema.models.targetLocation,
         displayOrder: schema.models.displayOrder,
+        board: schema.models.board,
+        gender: schema.models.gender,
       })
       .from(schema.models)
       .where(eq(schema.models.published, true))
@@ -51,6 +53,8 @@ export async function fetchAllModelMetadataFromDb(): Promise<Model[] | null> {
       instagram: row.instagram || undefined,
       booked: row.booked ?? false,
       targetLocation: row.targetLocation || undefined,
+      board: row.board,
+      gender: row.gender,
       featuredImage: "",
       gallery: [],
     }));
@@ -302,6 +306,8 @@ export async function fetchModelBySlugFromDb(
         instagram: schema.models.instagram,
         booked: schema.models.booked,
         targetLocation: schema.models.targetLocation,
+        board: schema.models.board,
+        gender: schema.models.gender,
       })
       .from(schema.models)
       .where(and(eq(schema.models.slug, slug), eq(schema.models.published, true)))
@@ -387,6 +393,8 @@ export async function fetchModelBySlugFromDb(
       instagram: modelData.instagram || undefined,
       booked: modelData.booked ?? false,
       targetLocation: modelData.targetLocation || undefined,
+      board: modelData.board,
+      gender: modelData.gender,
       featuredImage,
       featuredImageId,
       gallery,

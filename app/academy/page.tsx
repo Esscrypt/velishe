@@ -220,6 +220,53 @@ export default function AcademyPage() {
         </div>
       </div>
 
+      <section className="max-w-3xl mt-16 space-y-6 text-gray-700">
+        <h2 className="text-2xl font-semibold text-gray-900">
+          What is the VÈLISHE Model Academy?
+        </h2>
+        <p className="text-lg leading-relaxed">
+          The VÈLISHE Academy is a structured training programme in Sofia for
+          aspiring and signed models who want to understand how the modeling
+          industry really works. It is run by Velishe Model Management, a
+          boutique agency founded in 2025, and it is separate from the signed
+          Mainboard and Development rosters. Enrolment is by intake. Join the
+          waitlist to be notified when the next programme opens. The Academy is
+          taught in English and Bulgarian and is designed for people who want
+          professional composites, casting preparation, and a sustainable
+          approach to a modeling career — not a one-off photoshoot.
+        </p>
+
+        <h2 className="text-2xl font-semibold text-gray-900">
+          What the Academy covers
+        </h2>
+        <p>
+          The programme covers five areas that match how bookings actually
+          happen in Sofia and on international jobs:
+        </p>
+        <ol className="list-decimal list-inside space-y-2">
+          <li>
+            Composites and casting preparation — how to present measurements,
+            digitals, and a book that clients can use.
+          </li>
+          <li>
+            Professional conduct on set — timing, direction, and working with
+            photographers, stylists, and clients.
+          </li>
+          <li>
+            Industry etiquette — agency communication, usage, and how bookings
+            are confirmed.
+          </li>
+          <li>
+            Portfolio building — what to shoot, what to leave out, and how a
+            board evolves over a season.
+          </li>
+          <li>
+            Building a sustainable career — markets, travel, and long-term
+            representation with Velishe.
+          </li>
+        </ol>
+      </section>
+
       {isFormVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">

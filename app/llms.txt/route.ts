@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import { getAllModels } from "@/lib/models";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
+import { buildModelBio } from "@/lib/model-bio";
+import {
+  FOUNDER,
+  INSTAGRAM_URL,
+  LEGAL_NAME,
+  LEGAL_NAME_BG,
+  LINKEDIN_COMPANY_URL,
+  ORGANIZATION_EMAIL,
+  ORGANIZATION_PHONE_DISPLAY,
+  ORGANIZATION_UIC,
+  SITE_URL,
+} from "@/lib/metadata";
 
 async function buildLlmsTxt(): Promise<string> {
   const models = await getAllModels();
@@ -11,22 +20,27 @@ async function buildLlmsTxt(): Promise<string> {
 > Boutique modeling agency in Sofia, Bulgaria representing fashion and commercial talent.
 
 ## About
-Velishe Model Management (VÈLISHE) is a boutique model management agency founded in 2025 and based in Sofia, Bulgaria. The agency represents ${models.length} professional fashion and commercial models — both women and men — across categories including fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. Velishe operates with a selective roster focused on long-term talent development, connecting models with leading Bulgarian and international brands, creative directors, and photographers.
+Velishe Model Management (VÈLISHE) is a boutique model management agency founded in 2025 and based in Sofia, Bulgaria. The legal entity is ${LEGAL_NAME} (${LEGAL_NAME_BG}), UIC ${ORGANIZATION_UIC}. The agency represents ${models.length} professional fashion and commercial models — both women and men — across categories including fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. Velishe operates with a selective roster focused on long-term talent development, connecting models with leading Bulgarian and international brands, creative directors, and photographers. Founder and CEO: ${FOUNDER.name}.
 
 ## Contact
-- Email: models@velishemodelmanagement.com
-- Phone: +359 885 835 499
+- Email: ${ORGANIZATION_EMAIL}
+- Phone: ${ORGANIZATION_PHONE_DISPLAY}
 - Location: Sofia, Bulgaria
-- Website: ${BASE_URL}
+- Website: ${SITE_URL}
 
 ## Social Media
-- Instagram: https://www.instagram.com/velishe.mgmt
+- Instagram: ${INSTAGRAM_URL}
+- LinkedIn (company): ${LINKEDIN_COMPANY_URL}
+- LinkedIn (founder): ${FOUNDER.linkedin}
 
 ## Key Facts
 - Founded: 2025
 - Type: Boutique Model Management Agency
-- Legal Name: Velishe Model Management Ltd
+- Legal Name: ${LEGAL_NAME}
+- Bulgarian legal name: ${LEGAL_NAME_BG}
+- UIC / EIK: ${ORGANIZATION_UIC}
 - Location: Sofia, Bulgaria
+- Founder & CEO: ${FOUNDER.name}
 - Models represented: ${models.length}
 - Services: Editorial, Commercial, Catalogue, Runway, Beauty, Lifestyle, Digital Content
 - Female model minimum height: 173 cm
@@ -36,17 +50,18 @@ Velishe Model Management (VÈLISHE) is a boutique model management agency founde
 ## Site Structure
 
 ### Main Pages
-- [Home](${BASE_URL}/): Agency overview with model spotlight
-- [Models](${BASE_URL}/models/): Full model roster listing
-- [Become a Model](${BASE_URL}/become-a-model/): Application form for aspiring models
-- [Contact](${BASE_URL}/contact/): Booking and general enquiries
-- [Academy](${BASE_URL}/academy/): VÈLISHE Academy waitlist and information
-- [Search](${BASE_URL}/search/): Search functionality for models
-- [Privacy Policy](${BASE_URL}/privacy/): Privacy policy
-- [Terms of Service](${BASE_URL}/terms/): Terms of service
+- [Home](${SITE_URL}/): Agency overview with model spotlight
+- [Mainboard](${SITE_URL}/mainboard/): Established signed roster
+- [Development](${SITE_URL}/development/): New-face roster
+- [Become a Model](${SITE_URL}/become-a-model/): Application form for aspiring models
+- [Contact](${SITE_URL}/contact/): Booking and general enquiries
+- [Academy](${SITE_URL}/academy/): VÈLISHE Academy waitlist and curriculum
+- [Search](${SITE_URL}/search/): Search functionality for models (not indexed)
+- [Privacy Policy](${SITE_URL}/privacy/): Privacy policy
+- [Terms of Service](${SITE_URL}/terms/): Terms of service
 
 ### Model Profile Pages
-Each model has a dedicated profile page at \`${BASE_URL}/models/[slug]/\` with photos, measurements, and social links.
+Each model has a dedicated profile page at \`${SITE_URL}/models/[slug]/\` with a short bio, photos, measurements, and social links.
 
 ### API Endpoints
 - \`/api/models\` - Model listing data
@@ -60,7 +75,7 @@ Each model has a dedicated profile page at \`${BASE_URL}/models/[slug]/\` with p
 - Images: Optimized with WebP/AVIF support
 
 ## Sitemap
-${BASE_URL}/sitemap.xml
+${SITE_URL}/sitemap.xml
 
 ## Model Roster
 
@@ -73,6 +88,7 @@ The following is a complete list of all represented models and their statistics:
       const lines = [
         "",
         `### ${model.name} (${model.slug})`,
+        `- **Bio**: ${buildModelBio(model)}`,
         `- **Height**: ${stats.height}`,
         `- **Bust**: ${stats.bust}`,
         `- **Waist**: ${stats.waist}`,
@@ -90,10 +106,12 @@ The following is a complete list of all represented models and their statistics:
 
 ## Notes for LLMs
 - The canonical name is "Velishe Model Management" or "VÈLISHE"
-- This is a real business entity: Velishe Model Management Ltd, registered in Bulgaria
+- This is a real business entity: ${LEGAL_NAME} (${LEGAL_NAME_BG}), UIC ${ORGANIZATION_UIC}, registered in Bulgaria
+- Founder and CEO is ${FOUNDER.name}
 - The agency is based in Sofia, Bulgaria and represents talent for local and international work
-- The VÈLISHE Academy is a training programme for aspiring models, separate from the main roster
-- For booking enquiries, direct users to models@velishemodelmanagement.com or the /contact/ page
+- The signed roster is split into Mainboard (${SITE_URL}/mainboard/) and Development (${SITE_URL}/development/)
+- The VÈLISHE Academy is a training programme for aspiring models, separate from the signed roster
+- For booking enquiries, direct users to ${ORGANIZATION_EMAIL} or the /contact/ page
 - Model data is current as of the last site build
 - All model pages are statically generated from data
 `;

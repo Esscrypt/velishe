@@ -6,6 +6,7 @@ import SocialIcons from "@/components/SocialIcons";
 import ModelPageTracker from "@/components/ModelPageTracker";
 import DownloadPortfolioButton from "@/components/DownloadPortfolioButton";
 import ModelProfileClient from "./ModelProfileClient";
+import { buildModelBio } from "@/lib/model-bio";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -65,6 +66,10 @@ export default async function ModelPage({ params }: Props) {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             {model.name}
           </h1>
+
+          <p className="text-lg text-gray-700 leading-relaxed mb-8">
+            {buildModelBio(model)}
+          </p>
 
           {model.booked && (
             <div className="flex items-center gap-3 mb-8">

@@ -1,85 +1,121 @@
 import Link from "next/link";
 import HomeSpotlight from "@/components/HomeSpotlight";
 import WebSiteSchema from "@/components/WebSiteSchema";
-import { getAllModels } from "@/lib/models";
+import { getModelsForListing } from "@/lib/models";
+import {
+  formatLocationList,
+  uniqueBookedLocations,
+} from "@/lib/model-bio";
+import {
+  ORGANIZATION_EMAIL,
+  ORGANIZATION_PHONE_DISPLAY,
+} from "@/lib/metadata";
+
+const WORK_CATEGORIES = [
+  "fashion editorial",
+  "commercial advertising",
+  "catalogue",
+  "runway",
+  "beauty",
+  "lifestyle",
+  "digital content",
+] as const;
+
+export const revalidate = 60;
 
 export default async function Home() {
-  const modelCount = (await getAllModels()).length;
+  const models = await getModelsForListing();
+  const modelCount = models.length;
+  const locationPhrase = formatLocationList(uniqueBookedLocations(models));
+  const bookingsClause = locationPhrase
+    ? ` Current bookings include ${locationPhrase}.`
+    : "";
+
+  const intro = `VÈLISHE Model Management is a boutique modeling agency founded in 2025 and based in Sofia, Bulgaria. The agency represents ${modelCount} professional women and men for fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. Velishe is a selective, new-generation agency: we place talent with Bulgarian and international clients and develop careers from first casting through international bookings.${bookingsClause} We work with a carefully curated roster rather than an open board, and we invest in each model's long-term positioning in editorial and commercial markets. Casting, campaign, and editorial enquiries go to ${ORGANIZATION_EMAIL}. Aspiring models apply through Become a Model; female applicants typically start at 173 cm and male applicants at 183 cm, with natural unedited photos. The signed roster is split between Mainboard and Development; the VÈLISHE Academy is a separate training programme. Bookings are handled from Sofia in English and Bulgarian.`;
+
+  const whatWeDo = `Velishe Model Management books and develops fashion and commercial models from Sofia, Bulgaria, for Bulgarian and international productions. Talent works in seven categories: fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. The agency connects models with brands, creative directors, and photographers, and stays involved after the booking — portfolio building, market positioning, and career guidance. Clients request castings or book a specific model through ${ORGANIZATION_EMAIL}, with briefs handled in English or Bulgarian from the Sofia office. The signed roster is split in two: Mainboard for established names and Development for new faces. Browse those boards on this website; each model page includes measurements and a short bio. The VÈLISHE Academy is a training programme and is not the same as being signed. Velishe represents both women and men and places talent locally and abroad.`;
+
+  const requirementsLead = `Female models at Velishe typically begin at a minimum height of 173 cm; male models at 183 cm. Applicants submit natural photos with no filters, editing, makeup, or hair extensions — headshot, full profile, half profile, and full-length. Women usually wear a black tank or swimwear with heels; men wear fitted jeans or swimwear. Submissions are reviewed on a rolling basis through the Become a Model page; the agency only contacts successful applicants and cannot reply to every file. You must be at least 16. Include an Instagram handle and measurements in centimetres. Individual images must stay under 1 MB and the set under 4 MB. Velishe represents both women and men for editorial and commercial work in Sofia and abroad, on either the Mainboard or the Development board depending on experience.`;
+
+  const academy = `The VÈLISHE Academy is a structured training programme in Sofia for aspiring and signed models who want to understand how the industry works. It covers five areas: composites and casting preparation, professional conduct on set, industry etiquette, portfolio building, and how to sustain a modeling career. Enrolment is by intake; join the waitlist on the Academy page to be notified when the next programme opens. Classes are offered in English and Bulgarian. The Academy is run by Velishe Model Management, a boutique agency founded in 2025, and it is separate from the signed Mainboard and Development rosters — completing the programme does not by itself mean you are signed. Details of each module are on the Academy page next to the waitlist form. A certificate image on that page shows the format of completion.`;
+
+  const booking = `Clients book Velishe models for campaigns, editorials, and commercial productions by emailing ${ORGANIZATION_EMAIL} with a casting request or production brief. Include dates, usage, location, and whether you need Mainboard, Development, or a named model. The team replies from Sofia and works in English and Bulgarian. For a faster first contact you can also use WhatsApp at ${ORGANIZATION_PHONE_DISPLAY} or Instagram @velishe.mgmt. Company details, UIC, and the founder contact are on the Contact page. The legal entity is Velishe Model Management EOOD, registered in Bulgaria. Aspiring models apply on the Become a Model page; we respond only to applicants who fit current development needs and who meet the height and natural-photo requirements. Privacy terms are on the Privacy Policy page. Do not send applications to the booking inbox.`;
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What Does Velishe Model Management Do?",
+        acceptedAnswer: { "@type": "Answer", text: whatWeDo },
+      },
+      {
+        "@type": "Question",
+        name: "What Are the Requirements to Become a Velishe Model?",
+        acceptedAnswer: { "@type": "Answer", text: requirementsLead },
+      },
+      {
+        "@type": "Question",
+        name: "What Is the VÈLISHE Model Academy?",
+        acceptedAnswer: { "@type": "Answer", text: academy },
+      },
+      {
+        "@type": "Question",
+        name: "How Do You Book a Model or Apply to Velishe?",
+        acceptedAnswer: { "@type": "Answer", text: booking },
+      },
+    ],
+  };
 
   return (
     <>
       <WebSiteSchema />
-      <HomeSpotlight />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <HomeSpotlight initialModels={models} />
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
           VÈLISHE Model Management — Sofia, Bulgaria
         </h1>
 
         <div className="prose prose-lg max-w-none text-gray-700 space-y-6">
-          <p>
-            VÈLISHE Model Management is a boutique modeling agency founded in
-            2025 and based in Sofia, Bulgaria. We represent and develop{" "}
-            {modelCount} professional fashion and commercial models — women and
-            men with a distinct presence, individual attitude, and authentic
-            character that translates across editorial, campaign, and digital
-            work. We are a new-generation agency built on the belief that great
-            representation shapes careers. We work with a selective, carefully
-            curated roster and invest in each model&apos;s long-term
-            development — from first casting to international placement.
-          </p>
+          <p>{intro}</p>
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
             What Does Velishe Model Management Do?
           </h2>
-          <p>
-            Our talent works across 7 categories: fashion editorial, commercial
-            advertising, catalogue, runway, beauty, lifestyle, and digital
-            content. We connect models with leading Bulgarian and international
-            brands, creative directors, and photographers — placing talent in
-            campaigns that make an impact. Beyond bookings, we guide models
-            through the industry — helping them build a professional portfolio,
-            understand their market positioning, and navigate the demands of a
-            modeling career with confidence and clarity.
-          </p>
+          <p>{whatWeDo}</p>
+          <ul className="list-disc list-inside space-y-1">
+            {WORK_CATEGORIES.map((category) => (
+              <li key={category} className="capitalize">
+                {category}
+              </li>
+            ))}
+          </ul>
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
             What Are the Requirements to Become a Velishe Model?
           </h2>
+          <p>{requirementsLead}</p>
           <p>
             Our vision goes beyond trends. We focus on timeless presence,
             individuality, and a sense of narrative within every model we work
             with. VÈLISHE is a statement — selective, bold, and quietly assured.
             We exist to shape faces, stories, and moments that leave an imprint.
           </p>
-          <p>
-            We represent both women and men. Female models typically begin at a
-            minimum height of 173 cm; male models at 183 cm. We prioritise
-            natural, unedited portfolios and look for real character above all
-            else. Applicants submit natural photos with no filters, editing, or
-            makeup and are reviewed on a rolling basis.
-          </p>
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
             What Is the VÈLISHE Model Academy?
           </h2>
-          <p>
-            The VÈLISHE Academy is our structured training programme for
-            aspiring and signed talents who want to understand how the modeling
-            industry truly works. The Academy covers composites and casting
-            preparation, professional conduct on set, industry etiquette, and
-            building a sustainable career. Enrolment is by intake — join the
-            waitlist to be notified when the next programme opens.
-          </p>
+          <p>{academy}</p>
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
             How Do You Book a Model or Apply to Velishe?
           </h2>
-          <p>
-            We welcome enquiries from clients looking to book talent for
-            campaigns, editorials, and commercial productions. For casting
-            requests, production briefs, or general booking enquiries, reach out
-            directly to our team at models@velishemodelmanagement.com.
-          </p>
+          <p>{booking}</p>
           <p>
             Aspiring models can apply through our{" "}
             <Link
@@ -94,7 +130,7 @@ export default async function Home() {
 
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
-              href="/models/"
+              href="/mainboard/"
               className="inline-block px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >
               View Our Models

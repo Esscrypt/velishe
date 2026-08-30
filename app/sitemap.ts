@@ -1,10 +1,11 @@
 import { MetadataRoute } from "next";
 import { getAllModels, getEnabledBoards } from "@/lib/models";
+import { SITE_URL } from "@/lib/metadata";
 
 const SITE_LAUNCHED = new Date("2026-02-10");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
+  const baseUrl = SITE_URL;
   const [models, boards] = await Promise.all([getAllModels(), getEnabledBoards()]);
   const now = new Date();
 

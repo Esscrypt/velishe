@@ -8,6 +8,7 @@ import OptimizedImage from "./OptimizedImage";
 import VideoPlayer from "./VideoPlayer";
 import { useModels } from "@/contexts/ModelsContext";
 import Tooltip from "@/components/Tooltip";
+import { PROFILE_IMAGE_SIZES } from "@/lib/lcp";
 
 interface ImageCarouselProps {
   media?: ModelMedia[];
@@ -538,23 +539,18 @@ export default function ImageCarousel({
           {/* Featured image - visible when currentIndex is 0 (gallery mode only), or digitals/gallery images */}
           <AnimatePresence mode="wait">
             {!isDigital && currentIndex === 0 && featuredMedia?.type === "image" ? (
-              <motion.div
+              <div
                 key="featured-image"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
                 className="absolute inset-0 w-full h-full"
               >
                 <OptimizedImage
                   src={featuredMedia.src}
                   alt={featuredMedia.alt}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes={PROFILE_IMAGE_SIZES}
                   priority
-                  loading="eager"
                 />
-              </motion.div>
+              </div>
             ) : (isDigital || currentIndex > 0) && currentMedia?.type === "image" ? (
               <motion.div
                 key={`image-${validIndex}`}
@@ -568,7 +564,7 @@ export default function ImageCarousel({
                   src={currentMedia.src}
                   alt={currentMedia.alt}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes={PROFILE_IMAGE_SIZES}
                   loading="lazy"
                 />
               </motion.div>

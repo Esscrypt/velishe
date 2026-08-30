@@ -1,20 +1,37 @@
-export default function StructuredData() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
+import {
+  FOUNDER,
+  LEGAL_NAME,
+  LEGAL_NAME_BG,
+  LINKEDIN_COMPANY_URL,
+  ORGANIZATION_EMAIL,
+  ORGANIZATION_PHONE,
+  ORGANIZATION_SAME_AS,
+  ORGANIZATION_UIC,
+  SITE_URL,
+} from "@/lib/metadata";
 
-  const localBusinessSchema = {
+export default function StructuredData() {
+  const organizationSchema = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "@id": `${baseUrl}/#organization`,
+    "@type": ["LocalBusiness", "EmploymentAgency"],
+    "@id": `${SITE_URL}/#organization`,
     name: "Velishe Model Management",
-    legalName: "Velishe Model Management Ltd",
-    url: `${baseUrl}/`,
+    alternateName: ["VÈLISHE", LEGAL_NAME_BG],
+    legalName: LEGAL_NAME,
+    identifier: {
+      "@type": "PropertyValue",
+      propertyID: "BG-EIK",
+      value: ORGANIZATION_UIC,
+    },
+    foundingDate: "2025",
+    url: `${SITE_URL}/`,
     logo: {
       "@type": "ImageObject",
-      url: `${baseUrl}/logo/logo.svg`,
+      url: `${SITE_URL}/logo/logo.svg`,
       width: 800,
       height: 320,
     },
-    image: `${baseUrl}/logo/logo.svg`,
+    image: `${SITE_URL}/logo/logo.svg`,
     description:
       "VÈLISHE Model Management is a boutique model agency based in Sofia, Bulgaria, representing fashion and commercial models.",
     address: {
@@ -22,29 +39,36 @@ export default function StructuredData() {
       addressLocality: "Sofia",
       addressCountry: "BG",
     },
-    email: "models@velishemodelmanagement.com",
-    telephone: "+359885835499",
+    email: ORGANIZATION_EMAIL,
+    telephone: ORGANIZATION_PHONE,
+    founder: {
+      "@type": "Person",
+      name: FOUNDER.name,
+      jobTitle: FOUNDER.jobTitle,
+      url: `${SITE_URL}/models/${FOUNDER.slug}/`,
+      sameAs: [FOUNDER.linkedin],
+    },
     contactPoint: [
       {
         "@type": "ContactPoint",
-        telephone: "+359885835499",
+        telephone: ORGANIZATION_PHONE,
         contactType: "customer service",
         areaServed: "BG",
         availableLanguage: ["English", "Bulgarian"],
       },
       {
         "@type": "ContactPoint",
-        email: "models@velishemodelmanagement.com",
+        email: ORGANIZATION_EMAIL,
         contactType: "booking inquiries",
       },
     ],
-    sameAs: ["https://www.instagram.com/velishe.mgmt"],
+    sameAs: [...ORGANIZATION_SAME_AS],
   };
 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
     />
   );
 }

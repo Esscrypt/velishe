@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db/index";
 import { imageDataToBuffer } from "@/lib/og-card";
+import {
+  IMAGE_CACHE_CONTROL,
+  IMAGE_CDN_CACHE_CONTROL,
+} from "@/lib/image-cache";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
 
 function contentTypeFromDataUri(data: string): string {
   const match = /^data:([^;,]+)/i.exec(data);
@@ -45,7 +49,8 @@ export async function GET(
       status: 200,
       headers: {
         "Content-Type": contentTypeFromDataUri(dataUri),
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        "Cache-Control": IMAGE_CACHE_CONTROL,
+        "CDN-Cache-Control": IMAGE_CDN_CACHE_CONTROL,
       },
     });
   } catch (error) {

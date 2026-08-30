@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Instagram, Menu, X } from "lucide-react";
+import { Instagram, Linkedin, Menu, X } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
+import {
+  INSTAGRAM_URL,
+  LINKEDIN_COMPANY_URL,
+  WHATSAPP_URL,
+} from "@/lib/metadata";
 
 interface Board {
   id: string;
@@ -27,12 +32,16 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-32 py-4">
             <Link href="/" className="flex items-center" onClick={closeMenu}>
+              {/* SVG logo — next/image does not optimize SVG */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo/logo.svg"
                 alt="Velishe Model Management"
-                className="h-40 md:h-64 w-auto"
-                width={800}
-                height={320}
+                className="h-20 md:h-24 w-auto"
+                width={96}
+                height={96}
+                fetchPriority="low"
+                decoding="async"
               />
             </Link>
             <nav className="hidden md:flex items-center gap-10">
@@ -58,7 +67,7 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               <div className="flex items-center gap-3 hidden md:flex">
                 <Tooltip label="Instagram">
                   <a
-                    href="https://instagram.com/velishe.mgmt"
+                    href={INSTAGRAM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-black hover:text-gray-600 transition-colors flex items-center"
@@ -67,9 +76,20 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
                     <Instagram size={32} />
                   </a>
                 </Tooltip>
+                <Tooltip label="LinkedIn">
+                  <a
+                    href={LINKEDIN_COMPANY_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-black hover:text-gray-600 transition-colors flex items-center"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin size={32} />
+                  </a>
+                </Tooltip>
                 <Tooltip label="WhatsApp">
                   <a
-                    href="https://wa.me/359885835499"
+                    href={WHATSAPP_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-black hover:text-gray-600 transition-colors flex items-center"
@@ -164,7 +184,7 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
           </nav>
           <div className="p-4 border-t border-gray-200 space-y-3">
             <a
-              href="https://instagram.com/velishe.mgmt"
+              href={INSTAGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-black hover:text-gray-600 transition-colors flex items-center gap-2"
@@ -174,7 +194,17 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               <span className="text-sm font-medium">Instagram</span>
             </a>
             <a
-              href="https://wa.me/359885835499"
+              href={LINKEDIN_COMPANY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-black hover:text-gray-600 transition-colors flex items-center gap-2"
+              aria-label="LinkedIn"
+            >
+              <Linkedin size={24} />
+              <span className="text-sm font-medium">LinkedIn</span>
+            </a>
+            <a
+              href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-black hover:text-gray-600 transition-colors flex items-center gap-2"

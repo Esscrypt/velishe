@@ -7,6 +7,7 @@ import {
   OG_CARD_WIDTH,
   OG_CARD_HEIGHT,
 } from "@/lib/metadata";
+import { buildModelBio } from "@/lib/model-bio";
 
 // Keep metadata / JSON-LD on the same ISR cadence as the page.
 export const revalidate = 60;
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const description = `Professional model ${model.name} portfolio. ${model.stats.height} height, ${model.stats.hairColor} hair, ${model.stats.eyeColor} eyes. View portfolio and contact information.`;
+  const description = buildModelBio(model);
 
   // The OG card is served by /api/og/[slug] from the model's current featured
   // image; ?v=<image id> changes whenever the admin swaps it, forcing a re-scrape.
@@ -50,6 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/models/${slug}/`,
     type: "profile",
     image,
+    modifiedTime: new Date(),
   });
 }
 
@@ -62,19 +64,20 @@ export default async function ModelLayout({
 }) {
   const { slug } = await params;
   const model = await getModelBySlug(slug);
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
+  const bio = model ? buildModelBio(model) : "";
 
   const personSchema = model
     ? {
         "@context": "https://schema.org",
         "@type": "Person",
-        "@id": `${baseUrl}/models/${slug}/#person`,
+        "@id": `${SITE_URL}/models/${slug}/#person`,
         name: model.name,
-        url: `${baseUrl}/models/${slug}/`,
+        url: `${SITE_URL}/models/${slug}/`,
+        description: bio,
         jobTitle: "Model",
         worksFor: {
           "@type": "Organization",
-          "@id": `${baseUrl}/#organization`,
+          "@id": `${SITE_URL}/#organization`,
           name: "Velishe Model Management",
         },
         ...(model.instagram && { sameAs: [model.instagram] }),
