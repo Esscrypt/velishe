@@ -119,9 +119,9 @@ export default async function RootLayout({
   const cookiebotId = process.env.NEXT_PUBLIC_COOKIEBOT_ID || "0a3be31f-8747-4f7b-8b6a-256aed707f7a";
 
   return (
-    <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
+    <html lang="en" className={`h-full ${inter.variable}`} data-scroll-behavior="smooth">
       <body
-        className="antialiased bg-white text-gray-900"
+        className="antialiased bg-white text-gray-900 min-h-full flex flex-col"
         suppressHydrationWarning
       >
         <Script
@@ -136,7 +136,7 @@ export default async function RootLayout({
         <PageViewTracker />
         <ModelsProvider>
           <Header enabledBoards={enabledBoards} />
-          <main className="min-h-screen">
+          <main className="flex-1">
             {children}
           </main>
         </ModelsProvider>

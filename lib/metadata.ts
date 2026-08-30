@@ -22,6 +22,7 @@ export const TRUSTPILOT_URL =
 export const WHATSAPP_URL = "https://wa.me/359885835499";
 export const GOOGLE_KNOWLEDGE_GRAPH_ID = "/g/11ynm3nt8y";
 export const GOOGLE_BUSINESS_URL = `https://www.google.com/search?kgmid=${GOOGLE_KNOWLEDGE_GRAPH_ID}`;
+export const WIKIDATA_URL = "https://www.wikidata.org/wiki/Q141222478";
 
 export const FOUNDER = {
   name: "Christiana Velichkova",
@@ -35,6 +36,7 @@ export const ORGANIZATION_SAME_AS = [
   LINKEDIN_COMPANY_URL,
   TRUSTPILOT_URL,
   GOOGLE_BUSINESS_URL,
+  WIKIDATA_URL,
 ] as const;
 
 export const OG_CARD_WIDTH = 1200;

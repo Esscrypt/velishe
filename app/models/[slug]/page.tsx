@@ -67,10 +67,6 @@ export default async function ModelPage({ params }: Props) {
             {model.name}
           </h1>
 
-          <p className="text-lg text-gray-700 leading-relaxed mb-8">
-            {buildModelBio(model)}
-          </p>
-
           {model.booked && (
             <div className="flex items-center gap-3 mb-8">
               <span className="relative flex h-2 w-2">
@@ -112,12 +108,27 @@ export default async function ModelPage({ params }: Props) {
             </div>
           </div>
 
-          <div>
+          <div className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Connect
             </h2>
             <SocialIcons instagram={model.instagram} iconSize={28} />
           </div>
+
+          <details className="group border-t border-gray-200 pt-6">
+            <summary className="cursor-pointer list-none text-sm font-medium uppercase tracking-[0.2em] text-gray-900 flex items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+              About {model.name}
+              <span className="text-gray-400 text-base font-normal group-open:hidden">
+                +
+              </span>
+              <span className="text-gray-400 text-base font-normal hidden group-open:inline">
+                –
+              </span>
+            </summary>
+            <p className="mt-4 text-gray-700 leading-relaxed">
+              {buildModelBio(model)}
+            </p>
+          </details>
         </div>
       </div>
     </div>
