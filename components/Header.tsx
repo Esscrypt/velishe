@@ -30,16 +30,16 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
     <>
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-32 py-4">
+          <div className="flex justify-between items-center h-40 md:h-48">
             <Link href="/" className="flex items-center" onClick={closeMenu}>
               {/* SVG logo — next/image does not optimize SVG */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo/logo.svg"
                 alt="Velishe Model Management"
-                className="h-20 md:h-24 w-auto"
-                width={96}
-                height={96}
+                className="h-36 md:h-44 w-auto"
+                width={800}
+                height={320}
                 fetchPriority="low"
                 decoding="async"
               />

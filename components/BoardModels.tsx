@@ -29,7 +29,7 @@ export default function BoardModels({ models }: { models: Model[] }) {
 
   return (
     <>
-      <div className="flex justify-center gap-3 py-6">
+      <div className="flex justify-center gap-3 pt-6 pb-4">
         {(["male", "female"] as const).map((g) => (
           <button
             key={g}

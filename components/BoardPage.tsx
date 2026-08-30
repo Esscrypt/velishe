@@ -71,14 +71,7 @@ export default async function BoardPage({ board }: { board: BoardId }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-2">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
-          {cfg.title}
-        </h1>
-        <p className="text-base md:text-lg text-gray-600 max-w-2xl">
-          {cfg.description}
-        </p>
-      </section>
+      <h1 className="sr-only">{cfg.title}</h1>
       <BoardModels models={models} />
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <details className="group border-t border-gray-200 pt-6">

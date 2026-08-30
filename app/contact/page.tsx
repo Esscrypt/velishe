@@ -157,7 +157,7 @@ export default function ContactPage() {
                   rel="noopener noreferrer"
                   className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  Google
+                  Google Business
                 </a>
                 <a
                   href={WHATSAPP_URL}
