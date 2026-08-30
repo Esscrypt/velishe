@@ -759,7 +759,13 @@ export default function BecomeAModelPage() {
           </div>
         ) : null}
 
-        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+          noValidate
+          toolname="applyToBecomeAModel"
+          tooldescription="Submit an application to join Velishe Model Management as a model. Applicants must be at least 16. Female height is typically 173 cm or above; male 183 cm or above. Natural unedited photos are required. The agency only contacts successful applicants."
+        >
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -776,6 +782,7 @@ export default function BecomeAModelPage() {
                     onChange={handleInputChange}
                     className="mr-2"
                     required
+                    toolparamdescription="Applicant gender: woman or man"
                   />
                   Woman
                 </label>
@@ -788,6 +795,7 @@ export default function BecomeAModelPage() {
                     onChange={handleInputChange}
                     className="mr-2"
                     required
+                    toolparamdescription="Applicant gender: woman or man"
                   />
                   Man
                 </label>
@@ -1021,6 +1029,7 @@ export default function BecomeAModelPage() {
                 onChange={handleInputChange}
                 placeholder="e.g., 173cm"
                 required
+                toolparamdescription="Height in centimeters, for example 173cm. Female applicants are typically 173 cm or above; male 183 cm or above."
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.height
                     ? "border-red-500 focus:ring-red-500"
@@ -1046,6 +1055,7 @@ export default function BecomeAModelPage() {
                 onChange={handleInputChange}
                 placeholder="e.g., 80-90"
                 required
+                toolparamdescription="Bust measurement in centimeters"
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.bust
                     ? "border-red-500 focus:ring-red-500"
@@ -1068,6 +1078,7 @@ export default function BecomeAModelPage() {
                 onChange={handleInputChange}
                 placeholder="e.g., 60-70"
                 required
+                toolparamdescription="Waist measurement in centimeters"
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.waist
                     ? "border-red-500 focus:ring-red-500"
@@ -1090,6 +1101,7 @@ export default function BecomeAModelPage() {
                 onChange={handleInputChange}
                 placeholder="e.g., 90-100"
                 required
+                toolparamdescription="Hip measurement in centimeters"
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.hips
                     ? "border-red-500 focus:ring-red-500"
@@ -1112,6 +1124,7 @@ export default function BecomeAModelPage() {
                 onChange={handleInputChange}
                 placeholder="e.g., 40 or 41"
                 required
+                toolparamdescription="European shoe size, for example 40 or 41"
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.shoeSize
                     ? "border-red-500 focus:ring-red-500"
@@ -1178,6 +1191,7 @@ export default function BecomeAModelPage() {
               onChange={handleInputChange}
               placeholder="username or @username"
               required
+              toolparamdescription="Instagram username, with or without @"
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                 errors.instagram
                   ? "border-red-500 focus:ring-red-500"
@@ -1268,6 +1282,7 @@ export default function BecomeAModelPage() {
                 name="headshot"
                 onChange={handleFileChange}
                 accept="image/*"
+                toolparamdescription="Natural unedited headshot photo, under 1MB. Total of all photos must be under 4MB."
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.headshot
                     ? "border-red-500 focus:ring-red-500"
@@ -1287,6 +1302,7 @@ export default function BecomeAModelPage() {
                 name="fullProfile"
                 onChange={handleFileChange}
                 accept="image/*"
+                toolparamdescription="Natural unedited full-profile photo, under 1MB. Total of all photos must be under 4MB."
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.fullProfile
                     ? "border-red-500 focus:ring-red-500"
@@ -1306,6 +1322,7 @@ export default function BecomeAModelPage() {
                 name="halfProfile"
                 onChange={handleFileChange}
                 accept="image/*"
+                toolparamdescription="Natural unedited half-profile photo, under 1MB. Total of all photos must be under 4MB."
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.halfProfile
                     ? "border-red-500 focus:ring-red-500"
@@ -1325,6 +1342,7 @@ export default function BecomeAModelPage() {
                 name="fullLengthProfile"
                 onChange={handleFileChange}
                 accept="image/*"
+                toolparamdescription="Natural unedited full-length photo, under 1MB. Total of all photos must be under 4MB."
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.fullLengthProfile
                     ? "border-red-500 focus:ring-red-500"

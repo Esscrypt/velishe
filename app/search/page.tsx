@@ -47,17 +47,29 @@ export default function SearchPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-4xl font-bold text-gray-900 mb-8">Search Models</h1>
 
-      <div className="relative mb-8">
+      <form
+        className="relative mb-8"
+        toolname="searchModels"
+        tooldescription="Find a Velishe signed model by name and list matching profiles on this page."
+        toolautosubmit=""
+        onSubmit={(event) => {
+          event.preventDefault();
+          const formData = new FormData(event.currentTarget);
+          setSearchQuery(String(formData.get("query") ?? ""));
+        }}
+      >
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
         <input
-          type="text"
+          type="search"
+          name="query"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search by name..."
           className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-lg"
           autoFocus
+          toolparamdescription="Model name or slug to search"
         />
-      </div>
+      </form>
 
       {searchQuery.trim() && (
         <div>

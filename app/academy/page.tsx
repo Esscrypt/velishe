@@ -285,7 +285,13 @@ export default function AcademyPage() {
               Share your contact details and we will notify you when the next Academy intake opens.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6"
+              noValidate
+              toolname="joinAcademyWaitlist"
+              tooldescription="Join the VÈLISHE Academy waitlist in Sofia to be notified when the next model-training intake opens. Completing the Academy does not mean you are signed."
+            >
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -297,6 +303,7 @@ export default function AcademyPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
+                    toolparamdescription="Email address for Academy intake notifications"
                     className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                       errors.email
                         ? "border-red-500 focus:ring-red-500"
@@ -318,6 +325,7 @@ export default function AcademyPage() {
                     value={formData.phoneNumber}
                     onChange={handleInputChange}
                     required
+                    toolparamdescription="Phone number including country code"
                     className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                       errors.phoneNumber
                         ? "border-red-500 focus:ring-red-500"
