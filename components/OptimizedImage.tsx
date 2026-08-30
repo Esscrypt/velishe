@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Skeleton } from "@/components/Skeleton";
-import { GRID_IMAGE_SIZES } from "@/lib/lcp";
+import { GRID_IMAGE_SIZES, LCP_IMAGE_QUALITY } from "@/lib/lcp";
 
 interface OptimizedImageProps {
   src: string;
@@ -16,6 +16,7 @@ interface OptimizedImageProps {
   sizes?: string;
   loading?: "lazy" | "eager";
   objectFit?: "contain" | "cover" | "fill" | "none" | "scale-down";
+  quality?: number;
 }
 
 function isOptimizableSrc(src: string): boolean {
@@ -33,6 +34,7 @@ export default function OptimizedImage({
   sizes = GRID_IMAGE_SIZES,
   loading,
   objectFit = "cover",
+  quality,
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(!priority);
   const [hasError, setHasError] = useState(false);
@@ -60,6 +62,7 @@ export default function OptimizedImage({
 
   const imageStyle = { objectFit };
 
+  const imageQuality = quality ?? (priority ? LCP_IMAGE_QUALITY : 75);
   const handleLoad = () => setIsLoading(false);
   const handleError = () => {
     setHasError(true);
@@ -77,6 +80,7 @@ export default function OptimizedImage({
         fetchPriority={priority ? "high" : "auto"}
         loading={priority ? undefined : loading ?? "lazy"}
         decoding={priority ? "sync" : "async"}
+        quality={imageQuality}
         className={imageClassName}
         style={imageStyle}
         onLoad={handleLoad}
@@ -93,6 +97,7 @@ export default function OptimizedImage({
         fetchPriority={priority ? "high" : "auto"}
         loading={priority ? undefined : loading ?? "lazy"}
         decoding={priority ? "sync" : "async"}
+        quality={imageQuality}
         className={imageClassName}
         style={imageStyle}
         onLoad={handleLoad}

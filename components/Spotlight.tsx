@@ -8,6 +8,7 @@ import {
   getInitialSpotlightModels,
   getSpotlightSet,
   isLcpImageIndex,
+  spotlightVisibilityClass,
 } from "@/lib/lcp";
 
 interface SpotlightProps {
@@ -68,6 +69,7 @@ export default function Spotlight({ models }: SpotlightProps) {
             {displayed.map((model, index) => (
               <motion.div
                 key={`${model.id}-${cycleKey}`}
+                className={spotlightVisibilityClass(index)}
                 initial={hasCycled ? { opacity: 0, y: 30, scale: 0.95 } : false}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={

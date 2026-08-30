@@ -20,6 +20,8 @@ export const LINKEDIN_COMPANY_URL =
 export const TRUSTPILOT_URL =
   "https://www.trustpilot.com/review/velishemodelmanagement.com";
 export const WHATSAPP_URL = "https://wa.me/359885835499";
+export const GOOGLE_KNOWLEDGE_GRAPH_ID = "/g/11ynm3nt8y";
+export const GOOGLE_BUSINESS_URL = `https://www.google.com/search?kgmid=${GOOGLE_KNOWLEDGE_GRAPH_ID}`;
 
 export const FOUNDER = {
   name: "Christiana Velichkova",
@@ -32,6 +34,7 @@ export const ORGANIZATION_SAME_AS = [
   INSTAGRAM_URL,
   LINKEDIN_COMPANY_URL,
   TRUSTPILOT_URL,
+  GOOGLE_BUSINESS_URL,
 ] as const;
 
 export const OG_CARD_WIDTH = 1200;

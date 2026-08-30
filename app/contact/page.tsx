@@ -3,6 +3,7 @@ import { Instagram, Linkedin } from "lucide-react";
 import {
   buildPageMetadata,
   FOUNDER,
+  GOOGLE_BUSINESS_URL,
   INSTAGRAM_URL,
   LEGAL_NAME,
   LEGAL_NAME_BG,
@@ -149,6 +150,14 @@ export default function ContactPage() {
                 >
                   <Linkedin size={20} />
                   LinkedIn
+                </a>
+                <a
+                  href={GOOGLE_BUSINESS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
+                >
+                  Google
                 </a>
                 <a
                   href={WHATSAPP_URL}

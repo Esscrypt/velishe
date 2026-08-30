@@ -3,6 +3,7 @@ import { getAllModels } from "@/lib/models";
 import { buildModelBio } from "@/lib/model-bio";
 import {
   FOUNDER,
+  GOOGLE_BUSINESS_URL,
   INSTAGRAM_URL,
   LEGAL_NAME,
   LEGAL_NAME_BG,
@@ -32,6 +33,7 @@ Velishe Model Management (VÈLISHE) is a boutique model management agency founde
 - Instagram: ${INSTAGRAM_URL}
 - LinkedIn (company): ${LINKEDIN_COMPANY_URL}
 - LinkedIn (founder): ${FOUNDER.linkedin}
+- Google Business: ${GOOGLE_BUSINESS_URL}
 
 ## Key Facts
 - Founded: 2025
@@ -39,6 +41,7 @@ Velishe Model Management (VÈLISHE) is a boutique model management agency founde
 - Legal Name: ${LEGAL_NAME}
 - Bulgarian legal name: ${LEGAL_NAME_BG}
 - UIC / EIK: ${ORGANIZATION_UIC}
+- Google Knowledge Graph: ${GOOGLE_BUSINESS_URL}
 - Location: Sofia, Bulgaria
 - Founder & CEO: ${FOUNDER.name}
 - Models represented: ${models.length}

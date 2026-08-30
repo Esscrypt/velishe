@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import HomeSpotlight from "@/components/HomeSpotlight";
 import WebSiteSchema from "@/components/WebSiteSchema";
 import { getModelsForListing } from "@/lib/models";
@@ -20,6 +21,31 @@ const WORK_CATEGORIES = [
   "lifestyle",
   "digital content",
 ] as const;
+
+function HomeFaqItem({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <details className="group border-t border-gray-200 py-5">
+      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+        <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
+          {title}
+        </h2>
+        <span className="shrink-0 text-gray-400 text-lg group-open:hidden">
+          +
+        </span>
+        <span className="shrink-0 text-gray-400 text-lg hidden group-open:inline">
+          –
+        </span>
+      </summary>
+      <div className="mt-4 space-y-4 leading-relaxed">{children}</div>
+    </details>
+  );
+}
 
 export const revalidate = 60;
 
@@ -77,58 +103,60 @@ export default async function Home() {
       />
       <HomeSpotlight initialModels={models} />
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">
           VÈLISHE Model Management — Sofia, Bulgaria
         </h1>
+        <p className="text-lg text-gray-600 mb-10 max-w-2xl">
+          Boutique modeling agency in Sofia. {modelCount} signed women and men
+          on Mainboard and Development.
+        </p>
 
-        <div className="prose prose-lg max-w-none text-gray-700 space-y-6">
-          <p>{intro}</p>
+        <div className="text-gray-700">
+          <HomeFaqItem title="About VÈLISHE">
+            <p>{intro}</p>
+          </HomeFaqItem>
 
-          <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
-            What Does Velishe Model Management Do?
-          </h2>
-          <p>{whatWeDo}</p>
-          <ul className="list-disc list-inside space-y-1">
-            {WORK_CATEGORIES.map((category) => (
-              <li key={category} className="capitalize">
-                {category}
-              </li>
-            ))}
-          </ul>
+          <HomeFaqItem title="What Does Velishe Model Management Do?">
+            <p>{whatWeDo}</p>
+            <ul className="list-disc list-inside space-y-1">
+              {WORK_CATEGORIES.map((category) => (
+                <li key={category} className="capitalize">
+                  {category}
+                </li>
+              ))}
+            </ul>
+          </HomeFaqItem>
 
-          <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
-            What Are the Requirements to Become a Velishe Model?
-          </h2>
-          <p>{requirementsLead}</p>
-          <p>
-            Our vision goes beyond trends. We focus on timeless presence,
-            individuality, and a sense of narrative within every model we work
-            with. VÈLISHE is a statement — selective, bold, and quietly assured.
-            We exist to shape faces, stories, and moments that leave an imprint.
-          </p>
+          <HomeFaqItem title="What Are the Requirements to Become a Velishe Model?">
+            <p>{requirementsLead}</p>
+            <p>
+              Our vision goes beyond trends. We focus on timeless presence,
+              individuality, and a sense of narrative within every model we work
+              with. VÈLISHE is a statement — selective, bold, and quietly assured.
+              We exist to shape faces, stories, and moments that leave an imprint.
+            </p>
+          </HomeFaqItem>
 
-          <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
-            What Is the VÈLISHE Model Academy?
-          </h2>
-          <p>{academy}</p>
+          <HomeFaqItem title="What Is the VÈLISHE Model Academy?">
+            <p>{academy}</p>
+          </HomeFaqItem>
 
-          <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
-            How Do You Book a Model or Apply to Velishe?
-          </h2>
-          <p>{booking}</p>
-          <p>
-            Aspiring models can apply through our{" "}
-            <Link
-              href="/become-a-model/"
-              className="text-gray-900 underline hover:text-gray-600 transition-colors"
-            >
-              Become a Model
-            </Link>{" "}
-            page. We review all applications and respond to those that fit our
-            current development needs.
-          </p>
+          <HomeFaqItem title="How Do You Book a Model or Apply to Velishe?">
+            <p>{booking}</p>
+            <p>
+              Aspiring models can apply through our{" "}
+              <Link
+                href="/become-a-model/"
+                className="text-gray-900 underline hover:text-gray-600 transition-colors"
+              >
+                Become a Model
+              </Link>{" "}
+              page. We review all applications and respond to those that fit our
+              current development needs.
+            </p>
+          </HomeFaqItem>
 
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/mainboard/"
               className="inline-block px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"

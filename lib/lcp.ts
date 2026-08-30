@@ -1,12 +1,26 @@
 export const SPOTLIGHT_CARDS_PER_SET = 3;
 
 export const GRID_IMAGE_SIZES =
-  "(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw";
+  "(max-width: 768px) 92vw, (max-width: 1024px) 46vw, 30vw";
 
 export const PROFILE_IMAGE_SIZES = "(max-width: 1024px) 100vw, 50vw";
 
+export const LCP_IMAGE_QUALITY = 70;
+
+export const ROSTER_ANCHOR_ID = "roster";
+
 export function isLcpImageIndex(index: number): boolean {
   return index === 0;
+}
+
+export function spotlightVisibilityClass(index: number): string {
+  if (index <= 0) {
+    return "";
+  }
+  if (index === 1) {
+    return "hidden md:block";
+  }
+  return "hidden lg:block";
 }
 
 export function shuffleModels<T>(models: readonly T[], seed: number): T[] {

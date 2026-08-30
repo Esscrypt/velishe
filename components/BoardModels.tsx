@@ -1,18 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Model } from "@/types/model";
 import ModelGrid from "./ModelGrid";
+import { ROSTER_ANCHOR_ID } from "@/lib/lcp";
 
 type GenderFilter = "all" | "male" | "female";
 
 export default function BoardModels({ models }: { models: Model[] }) {
   const [filter, setFilter] = useState<GenderFilter>("all");
+  const hasInteracted = useRef(false);
   const visible =
     filter === "all" ? models : models.filter((m) => m.gender === filter);
 
-  const toggle = (g: "male" | "female") =>
+  const toggle = (g: "male" | "female") => {
+    hasInteracted.current = true;
     setFilter((cur) => (cur === g ? "all" : g));
+  };
+
+  useEffect(() => {
+    if (!hasInteracted.current) {
+      return;
+    }
+    document
+      .getElementById(ROSTER_ANCHOR_ID)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [filter]);
 
   return (
     <>

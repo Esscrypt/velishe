@@ -1,5 +1,6 @@
 import {
   FOUNDER,
+  GOOGLE_BUSINESS_URL,
   LEGAL_NAME,
   LEGAL_NAME_BG,
   LINKEDIN_COMPANY_URL,
@@ -25,6 +26,7 @@ export default function StructuredData() {
     },
     foundingDate: "2025",
     url: `${SITE_URL}/`,
+    hasMap: GOOGLE_BUSINESS_URL,
     logo: {
       "@type": "ImageObject",
       url: `${SITE_URL}/logo/logo.svg`,
