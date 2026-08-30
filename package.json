@@ -17,6 +17,7 @@
     "drizzle-studio": "bun drizzle-kit studio"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "drizzle-orm": "0.41.0",
     "framer-motion": "12.23.24",
     "jspdf": "^4.2.1",

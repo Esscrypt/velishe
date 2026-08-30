@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/Header";
 import GoogleTagManager from "@/components/GoogleTagManager";
@@ -133,6 +134,7 @@ export default async function RootLayout({
         <Cookiebot cbid={cookiebotId} />
         {gtmId && <GoogleTagManager gtmId={gtmId} />}
         {gaId && <GoogleAnalytics gaId={gaId} />}
+        <Analytics />
         <PageViewTracker />
         <ModelsProvider>
           <Header enabledBoards={enabledBoards} />
