@@ -13,3 +13,11 @@ export const metadata = buildPageMetadata({
   languages: languageAlternates(),
   modifiedTime: new Date(),
 });
+
+export default function ZhLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
+}
