@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BlogCredits from "@/components/BlogCredits";
-import BlogCopyLink from "@/components/BlogCopyLink";
 import BlogPostModelCta from "@/components/BlogPostModelCta";
 import BlogRelatedPosts from "@/components/BlogRelatedPosts";
+import BlogShareBar from "@/components/BlogShareBar";
 import BlogSubscribeForm from "@/components/BlogSubscribeForm";
 import BlogVideoEmbed from "@/components/BlogVideoEmbed";
 import {
@@ -13,7 +13,7 @@ import {
   getPublishedPostsByModelId,
 } from "@/lib/blog";
 import { plainTextFromMarkdown, markdownToSafeHtml } from "@/lib/blog-markdown";
-import { formatBlogDate, toIsoDateString } from "@/lib/format-date";
+import { coerceDate, formatBlogDate, toIsoDateString } from "@/lib/format-date";
 import { publicBlogImageUrl } from "@/lib/image-url";
 import { JOURNAL_TITLE } from "@/lib/blog-journal";
 import {
@@ -100,6 +100,8 @@ export async function generateMetadata({ params }: PageProps) {
     type: "article",
     image,
     index: true,
+    publishedTime: coerceDate(post.publishedAt) ?? undefined,
+    modifiedTime: coerceDate(post.updatedAt) ?? undefined,
   });
 }
 
@@ -133,6 +135,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         dateModified: toIsoDateString(post.updatedAt),
         author: { "@type": "Organization", name: SITE_NAME },
         publisher: { "@type": "Organization", name: SITE_NAME },
+        url: `${SITE_URL}/blog/${post.slug}/`,
         mainEntityOfPage: `${SITE_URL}/blog/${post.slug}/`,
         image: jsonLdImage,
       },
@@ -197,9 +200,12 @@ export default async function BlogPostPage({ params }: PageProps) {
           })}
         </p>
       ) : null}
-      <p className="mb-8">
-        <BlogCopyLink url={`${SITE_URL}/blog/${post.slug}/`} />
-      </p>
+      <div className="mb-8">
+        <BlogShareBar
+          url={`${SITE_URL}/blog/${post.slug}/`}
+          title={post.title}
+        />
+      </div>
 
       {post.cover ? (
         <div className="mb-8 w-full overflow-hidden bg-gray-100">

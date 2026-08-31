@@ -96,6 +96,7 @@ type BuildMetadataArgs = {
   image?: OgImage;
   type?: "website" | "profile" | "article";
   index?: boolean;
+  publishedTime?: Date;
   modifiedTime?: Date;
   locale?: string;
   languages?: Record<string, string>;
@@ -108,6 +109,7 @@ export function buildPageMetadata({
   image,
   type = "website",
   index = true,
+  publishedTime,
   modifiedTime,
   locale = "en_US",
   languages,
@@ -116,7 +118,12 @@ export function buildPageMetadata({
   const url = `${SITE_URL}${path}`;
   const og = image ?? DEFAULT_OG_IMAGE;
   const trimmedDescription = trimMetaDescription(description);
+  const published = publishedTime?.toISOString();
   const modified = modifiedTime?.toISOString();
+
+  const articleOther: Record<string, string> = {};
+  if (published) articleOther["article:published_time"] = published;
+  if (modified) articleOther["article:modified_time"] = modified;
 
   return {
     ...(title ? { title } : {}),
@@ -128,7 +135,7 @@ export function buildPageMetadata({
     robots: index
       ? { index: true, follow: true }
       : { index: false, follow: false },
-    ...(modified ? { other: { "article:modified_time": modified } } : {}),
+    ...(Object.keys(articleOther).length > 0 ? { other: articleOther } : {}),
     openGraph: {
       type,
       locale,
@@ -137,6 +144,7 @@ export function buildPageMetadata({
       title: fullTitle,
       description: trimmedDescription,
       images: [og],
+      ...(published ? { publishedTime: published } : {}),
       ...(modified ? { modifiedTime: modified } : {}),
     },
     twitter: {
