@@ -10,6 +10,7 @@ export const metadata = buildPageMetadata({
   title: BOARD_CONFIG.development.title,
   description: BOARD_CONFIG.development.description,
   path: "/development/",
+  modifiedTime: new Date(),
 });
 
 export default function DevelopmentPage() {

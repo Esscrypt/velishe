@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import OptimizedImage from "./OptimizedImage";
+import { GRID_IMAGE_SIZES, isLcpImageIndex } from "@/lib/lcp";
 import { ModelStats } from "@/types/model";
 
 interface ModelCardProps {
@@ -14,6 +14,7 @@ interface ModelCardProps {
   readonly index: number;
   readonly booked?: boolean;
   readonly targetLocation?: string;
+  readonly priority?: boolean;
 }
 
 export default function ModelCard({
@@ -24,12 +25,9 @@ export default function ModelCard({
   index,
   booked,
   targetLocation,
+  priority,
 }: ModelCardProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const isPriority = priority ?? isLcpImageIndex(index);
 
   const statsList = [
     { label: "Height", value: stats.height },
@@ -41,22 +39,10 @@ export default function ModelCard({
     ...(stats.eyeColor ? [{ label: "Eyes", value: stats.eyeColor }] : []),
   ];
 
-  // Priority loading for above-the-fold images (first 3-4)
-  const isPriority = index < 4;
-
   return (
-    <motion.div
-      {...(mounted ? {
-        initial: { opacity: 0, y: 20 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.5, delay: index * 0.1 },
-        whileHover: { scale: 1.02 }
-      } : {})}
-      className="group"
-    >
+    <motion.div whileHover={{ scale: 1.02 }} className="group">
       <Link href={`/models/${slug}/`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:rounded-none rounded-lg">
-          {/* Booked status — sits just above the name gradient */}
           {booked && (
             <div className="absolute bottom-12 left-0 right-0 z-10 px-4 flex items-center gap-2.5 opacity-100 group-hover:opacity-0 transition-opacity duration-300">
               <span className="relative flex h-1.5 w-1.5">
@@ -76,18 +62,16 @@ export default function ModelCard({
               )}
             </div>
           )}
-          {/* Featured image with blur on hover */}
           <div className="w-full h-full group-hover:blur-sm transition-all duration-300">
             <OptimizedImage
               src={featuredImage}
               alt={name}
               fill
               priority={isPriority}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              sizes={GRID_IMAGE_SIZES}
               className="group-hover:scale-110 transition-all duration-500"
             />
           </div>
-          {/* Stats overlay on hover */}
           <div className="absolute inset-0 flex flex-col justify-center items-center p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
             <h3 className="text-white text-xl font-semibold mb-6 uppercase tracking-wide text-center">
               {name}
@@ -101,7 +85,6 @@ export default function ModelCard({
               ))}
             </div>
           </div>
-          {/* Name overlay (hidden on hover) */}
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-100 group-hover:opacity-0 transition-opacity duration-300">
             <h3 className="text-white text-xl font-semibold uppercase tracking-wide">
               {name}
@@ -112,4 +95,3 @@ export default function ModelCard({
     </motion.div>
   );
 }
-

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/Header";
 import GoogleTagManager from "@/components/GoogleTagManager";
@@ -8,8 +10,9 @@ import Cookiebot from "@/components/Cookiebot";
 import PageViewTracker from "@/components/PageViewTracker";
 import StructuredData from "@/components/StructuredData";
 import { ModelsProvider } from "@/contexts/ModelsContext";
-import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE, TWITTER_HANDLE } from "@/lib/metadata";
+import { SITE_NAME, SITE_URL, LEGAL_NAME, DEFAULT_OG_IMAGE, TWITTER_HANDLE, TRUSTPILOT_URL } from "@/lib/metadata";
 import { getEnabledBoards } from "@/lib/models";
+import { resolveClientAnalytics } from "@/lib/analytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -110,31 +113,32 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const enabledBoards = await getEnabledBoards();
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
-  const gaId = process.env.NEXT_PUBLIC_GA_ID || "G-PQJ4JZ1BC7";
+  const { gtmId, gaId } = resolveClientAnalytics({
+    gtmId: process.env.NEXT_PUBLIC_GTM_ID,
+    gaId: process.env.NEXT_PUBLIC_GA_ID || "G-PQJ4JZ1BC7",
+  });
   const cookiebotId = process.env.NEXT_PUBLIC_COOKIEBOT_ID || "0a3be31f-8747-4f7b-8b6a-256aed707f7a";
 
   return (
-    <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
-      <head>
-        <script
-          type="text/javascript"
-          src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
-          async
-        />
-      </head>
+    <html lang="en" className={`h-full ${inter.variable}`} data-scroll-behavior="smooth">
       <body
-        className="antialiased bg-white text-gray-900"
+        className="antialiased bg-white text-gray-900 min-h-full flex flex-col"
         suppressHydrationWarning
       >
+        <Script
+          id="trustpilot-widget"
+          src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+          strategy="lazyOnload"
+        />
         <StructuredData />
         <Cookiebot cbid={cookiebotId} />
         {gtmId && <GoogleTagManager gtmId={gtmId} />}
         {gaId && <GoogleAnalytics gaId={gaId} />}
+        <Analytics />
         <PageViewTracker />
         <ModelsProvider>
           <Header enabledBoards={enabledBoards} />
-          <main className="min-h-screen">
+          <main className="flex-1">
             {children}
           </main>
         </ModelsProvider>
@@ -151,7 +155,7 @@ export default async function RootLayout({
                 data-token="2029db83-629c-44d8-a8dd-beaf514874b0"
               >
                 <a
-                  href="https://www.trustpilot.com/review/velishemodelmanagement.com"
+                  href={TRUSTPILOT_URL}
                   target="_blank"
                   rel="noopener"
                 >
@@ -160,7 +164,7 @@ export default async function RootLayout({
               </div>
             </div>
             <p className="text-center text-sm text-gray-500">
-              © 2025 Velishe Model Management Ltd.
+              © {new Date().getFullYear()} {LEGAL_NAME}
             </p>
           </div>
         </footer>

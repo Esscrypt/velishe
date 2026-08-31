@@ -1,19 +1,34 @@
 import Link from "next/link";
-import { Instagram } from "lucide-react";
-import { buildPageMetadata } from "@/lib/metadata";
+import { Instagram, Linkedin } from "lucide-react";
+import {
+  buildPageMetadata,
+  FOUNDER,
+  GOOGLE_BUSINESS_URL,
+  INSTAGRAM_URL,
+  LEGAL_NAME,
+  LEGAL_NAME_BG,
+  LINKEDIN_COMPANY_URL,
+  ORGANIZATION_EMAIL,
+  ORGANIZATION_PHONE,
+  ORGANIZATION_PHONE_DISPLAY,
+  ORGANIZATION_UIC,
+  SITE_URL,
+  WHATSAPP_URL,
+} from "@/lib/metadata";
 
 export const metadata = buildPageMetadata({
   title: "Contact",
   description:
-    "Get in touch with Velishe Model Management in Sofia, Bulgaria. Book talent, casting inquiries, and general contact.",
+    "Contact Velishe Model Management EOOD in Sofia, Bulgaria. Book talent, send a casting brief, or reach Founder & CEO Christiana Velichkova.",
   path: "/contact/",
+  modifiedTime: new Date(),
 });
 
 const contactPageSchema = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
   name: "Contact Velishe Model Management",
-  url: "https://www.velishemodelmanagement.com/contact/",
+  url: `${SITE_URL}/contact/`,
   description:
     "Get in touch with Velishe Model Management in Sofia, Bulgaria. Book talent, casting inquiries, and general contact.",
   breadcrumb: {
@@ -23,13 +38,13 @@ const contactPageSchema = {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://www.velishemodelmanagement.com/",
+        item: `${SITE_URL}/`,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Contact",
-        item: "https://www.velishemodelmanagement.com/contact/",
+        item: `${SITE_URL}/contact/`,
       },
     ],
   },
@@ -46,31 +61,50 @@ export default function ContactPage() {
 
       <div className="prose prose-lg max-w-none mb-12">
         <p className="text-lg text-gray-700 mb-4">
-          VÈLISHE Model Management is a new–generation boutique agency based in
-          Sofia, Bulgaria.
+          VÈLISHE Model Management is a boutique agency founded in 2025 and
+          based in Sofia, Bulgaria. We represent, develop, and book women and
+          men for editorial, commercial, catalogue, runway, beauty, lifestyle,
+          and digital work.
         </p>
 
-        <p className="text-lg text-gray-700 mb-4">
-          We represent, develop, and elevate talent - women and men with
-          distinct presence, attitude, and authenticity.
-        </p>
-
-        <p className="text-lg text-gray-700 mb-4">
-          Our vision goes beyond trends. We focus on timeless beauty,
-          individuality, and a sense of narrative within every model we work
-          with.
-        </p>
-
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
+          Founder
+        </h2>
         <p className="text-lg text-gray-700 mb-8">
-          VÈLISHE is a statement - selective, bold, and quietly assured. We
-          exist to shape faces, stories, and moments that leave an imprint.
+          {FOUNDER.name} is {FOUNDER.jobTitle} of Velishe Model Management. She
+          is also a signed model on the roster. For agency matters, write to{" "}
+          {ORGANIZATION_EMAIL}. Her LinkedIn profile is{" "}
+          <a
+            href={FOUNDER.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-900 underline hover:text-gray-600"
+          >
+            {FOUNDER.name}
+          </a>
+          ; her portfolio is on{" "}
+          <Link
+            href={`/models/${FOUNDER.slug}/`}
+            className="text-gray-900 underline hover:text-gray-600"
+          >
+            her Velishe model page
+          </Link>
+          .
         </p>
+
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-            Velishe Model Management Ltd
+            {LEGAL_NAME}
           </h2>
 
           <div className="space-y-4 text-gray-700">
+            <div>
+              <p className="font-medium mb-1">Legal name:</p>
+              <p>
+                {LEGAL_NAME} ({LEGAL_NAME_BG}), UIC {ORGANIZATION_UIC}
+              </p>
+            </div>
+
             <div>
               <p className="font-medium mb-1">Office Address:</p>
               <p>Sofia, Bulgaria</p>
@@ -79,18 +113,28 @@ export default function ContactPage() {
             <div>
               <p className="font-medium mb-1">Email:</p>
               <a
-                href="mailto:models@velishemodelmanagement.com"
+                href={`mailto:${ORGANIZATION_EMAIL}`}
                 className="text-gray-900 hover:text-gray-600 transition-colors"
               >
-                models@velishemodelmanagement.com
+                {ORGANIZATION_EMAIL}
+              </a>
+            </div>
+
+            <div>
+              <p className="font-medium mb-1">Phone:</p>
+              <a
+                href={`tel:${ORGANIZATION_PHONE}`}
+                className="text-gray-900 hover:text-gray-600 transition-colors"
+              >
+                {ORGANIZATION_PHONE_DISPLAY}
               </a>
             </div>
 
             <div>
               <p className="font-medium mb-1">Social Media:</p>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <a
-                  href="https://www.instagram.com/velishe.mgmt"
+                  href={INSTAGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-2"
@@ -99,7 +143,24 @@ export default function ContactPage() {
                   @velishe.mgmt
                 </a>
                 <a
-                  href="https://wa.me/359885835499"
+                  href={LINKEDIN_COMPANY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-2"
+                >
+                  <Linkedin size={20} />
+                  LinkedIn
+                </a>
+                <a
+                  href={GOOGLE_BUSINESS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
+                >
+                  Google Business
+                </a>
+                <a
+                  href={WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-2"
@@ -121,11 +182,8 @@ export default function ContactPage() {
         </div>
 
         <div className="space-y-6">
-
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Legal
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Legal</h2>
             <div className="flex flex-wrap gap-4 text-sm text-gray-600">
               <Link
                 href="/terms"

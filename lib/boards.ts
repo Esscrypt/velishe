@@ -4,11 +4,11 @@ export const BOARD_CONFIG: Record<BoardId, { title: string; description: string 
   mainboard: {
     title: "Mainboard",
     description:
-      "Meet the main board of Velishe Model Management — established fashion and commercial talent represented in Sofia, Bulgaria.",
+      "The Velishe Mainboard is the signed roster of established fashion and commercial models at Velishe Model Management in Sofia, Bulgaria.",
   },
   development: {
     title: "Development",
     description:
-      "Discover the development board of Velishe Model Management — new faces and emerging talent in Sofia, Bulgaria.",
+      "The Velishe Development board is the new-face roster at Velishe Model Management in Sofia, Bulgaria — emerging talent building editorial and commercial careers.",
   },
 };

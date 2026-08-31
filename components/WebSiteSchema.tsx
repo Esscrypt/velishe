@@ -1,16 +1,17 @@
-export default function WebSiteSchema() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
+import { SITE_NAME, SITE_URL } from "@/lib/metadata";
 
+export default function WebSiteSchema() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Velishe Model Management",
-    url: `${baseUrl}/`,
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: `${SITE_URL}/`,
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${baseUrl}/search?q={search_term_string}`,
+        urlTemplate: `${SITE_URL}/search/?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },

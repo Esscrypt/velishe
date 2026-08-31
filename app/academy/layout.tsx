@@ -1,10 +1,11 @@
-import { buildPageMetadata } from "@/lib/metadata";
+import { buildPageMetadata, SITE_URL } from "@/lib/metadata";
 
 export const metadata = buildPageMetadata({
   title: "Academy",
   description:
-    "VÈLISHE Academy is a learning path for aspiring and signed talents who want to understand how the modeling industry really works. Based in Sofia, Bulgaria.",
+    "The VÈLISHE Academy is a structured training programme in Sofia for aspiring and signed models. It covers composites, casting preparation, on-set conduct, industry etiquette, and building a sustainable modeling career.",
   path: "/academy/",
+  modifiedTime: new Date(),
 });
 
 export default function AcademyLayout({
@@ -12,9 +13,6 @@ export default function AcademyLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://velishemodelmanagement.com";
-
   const courseSchema = {
     "@context": "https://schema.org",
     "@type": "Course",
@@ -23,10 +21,10 @@ export default function AcademyLayout({
       "A structured training programme for aspiring and signed models covering composites, casting preparation, professional conduct on set, industry etiquette, and building a sustainable modeling career.",
     provider: {
       "@type": "Organization",
-      "@id": `${baseUrl}/#organization`,
+      "@id": `${SITE_URL}/#organization`,
       name: "Velishe Model Management",
     },
-    url: `${baseUrl}/academy/`,
+    url: `${SITE_URL}/academy/`,
     availableLanguage: ["English", "Bulgarian"],
     hasCourseInstance: {
       "@type": "CourseInstance",

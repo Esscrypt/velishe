@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Skeleton } from "@/components/Skeleton";
+import { GRID_IMAGE_SIZES, LCP_IMAGE_QUALITY } from "@/lib/lcp";
 
 interface OptimizedImageProps {
   src: string;
@@ -14,6 +16,11 @@ interface OptimizedImageProps {
   sizes?: string;
   loading?: "lazy" | "eager";
   objectFit?: "contain" | "cover" | "fill" | "none" | "scale-down";
+  quality?: number;
+}
+
+function isOptimizableSrc(src: string): boolean {
+  return src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://");
 }
 
 export default function OptimizedImage({
@@ -24,80 +31,119 @@ export default function OptimizedImage({
   className = "",
   priority = false,
   fill = false,
-  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+  sizes = GRID_IMAGE_SIZES,
   loading,
   objectFit = "cover",
+  quality,
 }: OptimizedImageProps) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!priority);
   const [hasError, setHasError] = useState(false);
 
-  if (hasError) {
+  if (!src || hasError) {
     return (
       <div
         className={`bg-gray-200 flex items-center justify-center ${className}`}
         style={fill ? {} : { width, height }}
       >
-        <span className="text-gray-400 text-sm">Failed to load image</span>
+        {hasError ? (
+          <span className="text-gray-400 text-sm">Failed to load image</span>
+        ) : null}
       </div>
     );
   }
 
-  const imageStyle = fill
-    ? {
-        objectFit,
-        width: "100%",
-        height: "100%",
-      }
-    : {
-        objectFit,
-        width: width ? `${width}px` : "auto",
-        height: height ? `${height}px` : "auto",
-      };
+  const imageClassName = [
+    fill ? "h-full w-full" : className,
+    !priority && isLoading ? "opacity-0" : "opacity-100",
+    !priority ? "transition-opacity duration-300" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const containerStyle = fill
-    ? {
-        position: "relative" as const,
-        width: "100%",
-        height: "100%",
-      }
-    : {
-        position: "relative" as const,
-        width: width ? `${width}px` : undefined,
-        height: height ? `${height}px` : undefined,
-      };
+  const imageStyle = { objectFit };
 
-  // Determine loading strategy
-  const loadingStrategy = loading !== undefined
-    ? loading
-    : (priority ? "eager" : "lazy");
+  const imageQuality = quality ?? (priority ? LCP_IMAGE_QUALITY : 75);
+  const handleLoad = () => setIsLoading(false);
+  const handleError = () => {
+    setHasError(true);
+    setIsLoading(false);
+  };
+
+  const image = isOptimizableSrc(src) ? (
+    fill ? (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        fetchPriority={priority ? "high" : "auto"}
+        loading={priority ? undefined : loading ?? "lazy"}
+        decoding={priority ? "sync" : "async"}
+        quality={imageQuality}
+        className={imageClassName}
+        style={imageStyle}
+        onLoad={handleLoad}
+        onError={handleError}
+      />
+    ) : (
+      <Image
+        src={src}
+        alt={alt}
+        width={width ?? 800}
+        height={height ?? 1067}
+        sizes={sizes}
+        priority={priority}
+        fetchPriority={priority ? "high" : "auto"}
+        loading={priority ? undefined : loading ?? "lazy"}
+        decoding={priority ? "sync" : "async"}
+        quality={imageQuality}
+        className={imageClassName}
+        style={imageStyle}
+        onLoad={handleLoad}
+        onError={handleError}
+      />
+    )
+  ) : (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt}
+      width={fill ? undefined : width}
+      height={fill ? undefined : height}
+      loading={priority ? "eager" : loading ?? "lazy"}
+      decoding={priority ? "sync" : "async"}
+      fetchPriority={priority ? "high" : "auto"}
+      sizes={sizes}
+      onLoad={handleLoad}
+      onError={handleError}
+      style={{
+        ...imageStyle,
+        width: fill ? "100%" : width ? `${width}px` : "auto",
+        height: fill ? "100%" : height ? `${height}px` : "auto",
+      }}
+      className={imageClassName}
+    />
+  );
 
   return (
-    <div style={containerStyle} className={fill ? className : "relative"}>
-      {isLoading && (
+    <div
+      className={fill ? `relative h-full w-full ${className}` : "relative"}
+      style={
+        fill
+          ? undefined
+          : {
+              width: width ? `${width}px` : undefined,
+              height: height ? `${height}px` : undefined,
+            }
+      }
+    >
+      {!priority && isLoading && (
         <Skeleton
           className={`absolute inset-0 ${fill ? "h-full w-full" : className}`}
         />
       )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={alt}
-        loading={loadingStrategy}
-        decoding="async"
-        fetchPriority={priority ? "high" : "auto"}
-        sizes={sizes}
-        onLoad={() => setIsLoading(false)}
-        onError={() => {
-          setHasError(true);
-          setIsLoading(false);
-        }}
-        style={imageStyle}
-        className={`${fill ? "relative h-full w-full" : className} ${
-          isLoading ? "opacity-0" : "opacity-100"
-        } transition-opacity duration-300`}
-        width={fill ? undefined : width}
-        height={fill ? undefined : height}
-      />
+      {image}
     </div>
   );
 }

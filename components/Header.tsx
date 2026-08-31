@@ -1,9 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Instagram, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Instagram, Linkedin, Menu, X } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
+import {
+  INSTAGRAM_URL,
+  LINKEDIN_COMPANY_URL,
+  WHATSAPP_URL,
+} from "@/lib/metadata";
+import { nextHeaderScrollState } from "@/lib/header-scroll";
 
 interface Board {
   id: string;
@@ -12,6 +19,10 @@ interface Board {
 
 export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  const scrollStateRef = useRef({ hidden: false, lastY: 0 });
+  const pathname = usePathname();
+  const isZh = pathname === "/zh" || pathname === "/zh/";
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -21,18 +32,47 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
     setIsMenuOpen(false);
   };
 
+  useEffect(() => {
+    scrollStateRef.current.lastY = Math.max(0, window.scrollY);
+
+    const onScroll = () => {
+      const next = nextHeaderScrollState(
+        scrollStateRef.current,
+        window.scrollY,
+        { menuOpen: isMenuOpen },
+      );
+      const hiddenChanged = next.hidden !== scrollStateRef.current.hidden;
+      scrollStateRef.current = next;
+      if (hiddenChanged) {
+        setIsHeaderHidden(next.hidden);
+      }
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isMenuOpen]);
+
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+      <header
+        className={`sticky top-0 z-50 bg-white border-b border-gray-200 transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+          isHeaderHidden ? "-translate-y-full md:translate-y-0" : "translate-y-0"
+        }`}
+      >
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-32 py-4">
+          <div className="flex justify-between items-center h-40 md:h-48">
             <Link href="/" className="flex items-center" onClick={closeMenu}>
+              {/* SVG logo — next/image does not optimize SVG */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo/logo.svg"
                 alt="Velishe Model Management"
-                className="h-40 md:h-64 w-auto"
+                className="h-36 md:h-44 w-auto"
                 width={800}
                 height={320}
+                fetchPriority="low"
+                decoding="async"
               />
             </Link>
             <nav className="hidden md:flex items-center gap-10">
@@ -53,12 +93,19 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               <Link href="/contact" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 CONTACT
               </Link>
+              <Link
+                href={isZh ? "/" : "/zh/"}
+                className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide"
+                hrefLang={isZh ? "en" : "zh-CN"}
+              >
+                {isZh ? "EN" : "中文"}
+              </Link>
             </nav>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 hidden md:flex">
                 <Tooltip label="Instagram">
                   <a
-                    href="https://instagram.com/velishe.mgmt"
+                    href={INSTAGRAM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-black hover:text-gray-600 transition-colors flex items-center"
@@ -67,9 +114,20 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
                     <Instagram size={32} />
                   </a>
                 </Tooltip>
+                <Tooltip label="LinkedIn">
+                  <a
+                    href={LINKEDIN_COMPANY_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-black hover:text-gray-600 transition-colors flex items-center"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin size={32} />
+                  </a>
+                </Tooltip>
                 <Tooltip label="WhatsApp">
                   <a
-                    href="https://wa.me/359885835499"
+                    href={WHATSAPP_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-black hover:text-gray-600 transition-colors flex items-center"
@@ -161,10 +219,18 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
             >
               CONTACT
             </Link>
+            <Link
+              href={isZh ? "/" : "/zh/"}
+              onClick={closeMenu}
+              hrefLang={isZh ? "en" : "zh-CN"}
+              className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide py-2"
+            >
+              {isZh ? "EN" : "中文"}
+            </Link>
           </nav>
           <div className="p-4 border-t border-gray-200 space-y-3">
             <a
-              href="https://instagram.com/velishe.mgmt"
+              href={INSTAGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-black hover:text-gray-600 transition-colors flex items-center gap-2"
@@ -174,7 +240,17 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               <span className="text-sm font-medium">Instagram</span>
             </a>
             <a
-              href="https://wa.me/359885835499"
+              href={LINKEDIN_COMPANY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-black hover:text-gray-600 transition-colors flex items-center gap-2"
+              aria-label="LinkedIn"
+            >
+              <Linkedin size={24} />
+              <span className="text-sm font-medium">LinkedIn</span>
+            </a>
+            <a
+              href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-black hover:text-gray-600 transition-colors flex items-center gap-2"

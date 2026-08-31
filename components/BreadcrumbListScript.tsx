@@ -1,5 +1,4 @@
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
+import { SITE_URL } from "@/lib/metadata";
 
 interface BreadcrumbListScriptProps {
   slug: string;
@@ -18,19 +17,19 @@ export default function BreadcrumbListScript({
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: BASE_URL,
+        item: `${SITE_URL}/`,
       },
       {
         "@type": "ListItem",
         position: 2,
-        name: "Models",
-        item: `${BASE_URL}/models/`,
+        name: "Mainboard",
+        item: `${SITE_URL}/mainboard/`,
       },
       {
         "@type": "ListItem",
         position: 3,
         name: modelName,
-        item: `${BASE_URL}/models/${slug}/`,
+        item: `${SITE_URL}/models/${slug}/`,
       },
     ],
   };

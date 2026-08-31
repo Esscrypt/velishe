@@ -1,12 +1,12 @@
 import { MetadataRoute } from "next";
 import { getPublishedPosts } from "@/lib/blog";
 import { getAllModels, getEnabledBoards } from "@/lib/models";
+import { SITE_URL, ZH_PATH, languageAlternates } from "@/lib/metadata";
 
 const SITE_LAUNCHED = new Date("2026-02-10");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
+  const baseUrl = SITE_URL;
   const [models, boards, posts] = await Promise.all([
     getAllModels(),
     getEnabledBoards(),
@@ -14,12 +14,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
   const now = new Date();
 
+  const languages = languageAlternates();
+
   const staticPages = [
     {
       url: `${baseUrl}/`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 1.0,
+      alternates: { languages },
+    },
+    {
+      url: `${baseUrl}${ZH_PATH}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+      alternates: { languages },
     },
     {
       url: `${baseUrl}/blog/`,
