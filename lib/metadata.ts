@@ -27,6 +27,26 @@ export const DEFAULT_OG_IMAGE: OgImage = {
   type: "image/jpeg",
 };
 
+export const META_DESCRIPTION_MAX = 160;
+
+/** Trim to a search-snippet-friendly length (≤160 chars, word-aware when possible). */
+export function trimMetaDescription(
+  text: string,
+  maxLen = META_DESCRIPTION_MAX,
+): string {
+  const collapsed = text.replace(/\s+/g, " ").trim();
+  if (collapsed.length <= maxLen) return collapsed;
+
+  const slice = collapsed.slice(0, maxLen - 1).trimEnd();
+  const lastSpace = slice.lastIndexOf(" ");
+  const trimmed =
+    lastSpace > Math.floor(maxLen * 0.6)
+      ? slice.slice(0, lastSpace).trimEnd()
+      : slice;
+
+  return `${trimmed}…`;
+}
+
 type BuildMetadataArgs = {
   title?: string;
   description: string;
@@ -47,25 +67,28 @@ export function buildPageMetadata({
   const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
   const url = `${SITE_URL}${path}`;
   const og = image ?? DEFAULT_OG_IMAGE;
+  const trimmedDescription = trimMetaDescription(description);
 
   return {
     ...(title ? { title } : {}),
-    description,
+    description: trimmedDescription,
     alternates: { canonical: url },
-    ...(index ? {} : { robots: { index: false, follow: false } }),
+    robots: index
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
     openGraph: {
       type,
       locale: "en_US",
       url,
       siteName: SITE_NAME,
       title: fullTitle,
-      description,
+      description: trimmedDescription,
       images: [og],
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
-      description,
+      description: trimmedDescription,
       images: [og.url],
       site: TWITTER_HANDLE,
       creator: TWITTER_HANDLE,

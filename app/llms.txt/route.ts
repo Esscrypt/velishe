@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+import { getPublishedPosts } from "@/lib/blog";
 import { getAllModels } from "@/lib/models";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
 
 async function buildLlmsTxt(): Promise<string> {
-  const models = await getAllModels();
+  const [models, posts] = await Promise.all([
+    getAllModels(),
+    getPublishedPosts(),
+  ]);
 
   const staticSections = `# Velishe Model Management
 > Boutique modeling agency in Sofia, Bulgaria representing fashion and commercial talent.
@@ -38,6 +42,7 @@ Velishe Model Management (VÈLISHE) is a boutique model management agency founde
 ### Main Pages
 - [Home](${BASE_URL}/): Agency overview with model spotlight
 - [Models](${BASE_URL}/models/): Full model roster listing
+- [Journal / Blog](${BASE_URL}/blog/): Agency journal and newsletter archive
 - [Become a Model](${BASE_URL}/become-a-model/): Application form for aspiring models
 - [Contact](${BASE_URL}/contact/): Booking and general enquiries
 - [Academy](${BASE_URL}/academy/): VÈLISHE Academy waitlist and information
@@ -47,6 +52,18 @@ Velishe Model Management (VÈLISHE) is a boutique model management agency founde
 
 ### Model Profile Pages
 Each model has a dedicated profile page at \`${BASE_URL}/models/[slug]/\` with photos, measurements, and social links.
+${
+  posts.length === 0
+    ? ""
+    : `
+## Blog
+${posts
+  .map((post) => {
+    const teaser = post.teaser ? `: ${post.teaser}` : "";
+    return `- [${post.title}](${BASE_URL}/blog/${post.slug}/)${teaser}`;
+  })
+  .join("\n")}`
+}
 
 ### API Endpoints
 - \`/api/models\` - Model listing data

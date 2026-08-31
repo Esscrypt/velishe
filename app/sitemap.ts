@@ -1,11 +1,17 @@
 import { MetadataRoute } from "next";
+import { getPublishedPosts } from "@/lib/blog";
 import { getAllModels, getEnabledBoards } from "@/lib/models";
 
 const SITE_LAUNCHED = new Date("2026-02-10");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
-  const [models, boards] = await Promise.all([getAllModels(), getEnabledBoards()]);
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.velishemodelmanagement.com";
+  const [models, boards, posts] = await Promise.all([
+    getAllModels(),
+    getEnabledBoards(),
+    getPublishedPosts(),
+  ]);
   const now = new Date();
 
   const staticPages = [
@@ -14,6 +20,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/blog/`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/contact/`,
@@ -61,5 +73,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...boardPages, ...modelPages];
+  const blogPages = posts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}/`,
+    lastModified: post.publishedAt ?? now,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...boardPages, ...modelPages, ...blogPages];
 }

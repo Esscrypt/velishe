@@ -1,15 +1,33 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { CACHE_TAG_BLOG } from "@/lib/blog";
 import { CACHE_TAG_BOARDS, CACHE_TAG_MODELS } from "@/lib/models";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
-    const { secret, slug } = await request.json();
+    const body = await request.json();
+    const { secret, slug, type } = body as {
+      secret?: string;
+      slug?: string;
+      type?: "blog" | "models";
+    };
 
     if (!secret || secret !== process.env.REVALIDATION_SECRET) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (type === "blog") {
+      revalidateTag(CACHE_TAG_BLOG, "max");
+      if (slug) {
+        revalidateTag(`blog-${slug}`, "max");
+      }
+      revalidatePath("/blog/");
+      if (slug) {
+        revalidatePath(`/blog/${slug}/`);
+      }
+      return NextResponse.json({ revalidated: true, type: "blog" });
     }
 
     // Invalidate cached DB reads (unstable_cache tags).

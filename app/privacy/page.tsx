@@ -114,6 +114,27 @@ export default function PrivacyPage() {
           </ul>
 
           <h3 className="text-xl font-semibold text-gray-900 mb-3">
+            3.1a Mailing List / Velishe Journal
+          </h3>
+          <p className="text-gray-700 mb-4">
+            If you subscribe to Velishe Journal, we collect your email address
+            with your explicit consent so we can send you journal updates and
+            related agency news. Subscription uses double opt-in: you must
+            confirm via a link we email you before we add you to the active
+            list. Every newsletter includes an unsubscribe link. If you
+            unsubscribe, we retain your email on a suppressed list so we do not
+            email you again by mistake; you may request deletion by contacting
+            us at{" "}
+            <a
+              href="mailto:models@velishemodelmanagement.com"
+              className="text-gray-900 hover:text-gray-600 transition-colors"
+            >
+              models@velishemodelmanagement.com
+            </a>
+            .
+          </p>
+
+          <h3 className="text-xl font-semibold text-gray-900 mb-3">
             3.2 Information We Collect Automatically
           </h3>
           <p className="text-gray-700 mb-4">

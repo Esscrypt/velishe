@@ -47,11 +47,11 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               <Link href="/become-a-model" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 BECOME A MODEL
               </Link>
+              <Link href="/blog" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                BLOG
+              </Link>
               <Link href="/contact" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 CONTACT
-              </Link>
-              <Link href="/academy" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                ACADEMY
               </Link>
             </nav>
             <div className="flex items-center gap-4">
@@ -148,18 +148,18 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               BECOME A MODEL
             </Link>
             <Link
+              href="/blog"
+              onClick={closeMenu}
+              className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
+            >
+              BLOG
+            </Link>
+            <Link
               href="/contact"
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
               CONTACT
-            </Link>
-            <Link
-              href="/academy"
-              onClick={closeMenu}
-              className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
-            >
-              ACADEMY
             </Link>
           </nav>
           <div className="p-4 border-t border-gray-200 space-y-3">

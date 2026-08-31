@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, schema } from "@/lib/db/index";
+import { ensureConfirmedMailingListSubscriber } from "@/lib/mailing-list-academy-sync";
 import { eq, or } from "drizzle-orm";
 
 function validateEmail(email: string): boolean {
@@ -76,6 +77,12 @@ export async function POST(request: NextRequest) {
         email,
         phoneNumber,
       });
+
+    try {
+      await ensureConfirmedMailingListSubscriber(email);
+    } catch (syncError) {
+      console.error("[academy-wishlist] mailing list sync failed", syncError);
+    }
 
     return NextResponse.json(
       { message: "Wishlist entry stored successfully" },

@@ -8,6 +8,7 @@
     "start": "bunx serve@latest out",
     "preview": "bun run build && bun run start",
     "lint": "eslint",
+    "test": "bun test",
     "optimize-images": "bun run scripts/optimize-images.ts",
     "populate-db": "bun run scripts/populate-db.ts",
     "clear-db": "bun run scripts/clear-db.ts",
