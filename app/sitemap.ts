@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getPublishedPosts } from "@/lib/blog";
 import { getAllModels, getEnabledBoards } from "@/lib/models";
+import { coerceDate } from "@/lib/format-date";
 import { SITE_URL, ZH_PATH, languageAlternates } from "@/lib/metadata";
 
 const SITE_LAUNCHED = new Date("2026-02-10");
@@ -13,6 +14,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPublishedPosts(),
   ]);
   const now = new Date();
+  const latestBlogPostAt = posts.reduce<Date | null>((latest, post) => {
+    const publishedAt = coerceDate(post.publishedAt);
+    if (!publishedAt) return latest;
+    if (!latest || publishedAt > latest) return publishedAt;
+    return latest;
+  }, null);
 
   const languages = languageAlternates();
 
@@ -33,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/blog/`,
-      lastModified: now,
+      lastModified: latestBlogPostAt ?? now,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
@@ -85,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const blogPages = posts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}/`,
-    lastModified: post.publishedAt ?? now,
+    lastModified: coerceDate(post.publishedAt) ?? now,
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));

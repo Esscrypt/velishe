@@ -85,6 +85,11 @@ export default async function ZhHomePage() {
         },
         {
           "@type": "Question",
+          name: copy.questions.journal,
+          acceptedAnswer: { "@type": "Answer", text: copy.journal },
+        },
+        {
+          "@type": "Question",
           name: copy.questions.booking,
           acceptedAnswer: { "@type": "Answer", text: copy.booking },
         },
@@ -133,6 +138,18 @@ export default async function ZhHomePage() {
             <p>{copy.academy}</p>
           </ZhFaqItem>
 
+          <ZhFaqItem title={copy.questions.journal}>
+            <p>{copy.journal}</p>
+            <p>
+              <Link
+                href="/blog/"
+                className="text-gray-900 underline hover:text-gray-600 transition-colors"
+              >
+                Velishe Journal
+              </Link>
+            </p>
+          </ZhFaqItem>
+
           <ZhFaqItem title={copy.questions.booking}>
             <p>{copy.booking}</p>
             <p>
@@ -160,6 +177,12 @@ export default async function ZhHomePage() {
               className="inline-block px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >
               查看模特
+            </Link>
+            <Link
+              href="/blog/"
+              className="inline-block px-6 py-3 border border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            >
+              Velishe Journal
             </Link>
             <Link
               href="/contact/"

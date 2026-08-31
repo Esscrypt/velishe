@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPublishedPosts } from "@/lib/blog";
 import { getAllModels } from "@/lib/models";
 import { buildModelBio } from "@/lib/model-bio";
+import { JOURNAL_ABOUT, JOURNAL_TITLE } from "@/lib/blog-journal";
 import { buildZhHomeCopy } from "@/lib/zh-content";
 import {
   FOUNDER,
@@ -71,7 +72,7 @@ ${buildZhHomeCopy({ modelCount: models.length, locationPhrase: "" }).intro}
 - [中文简介](${SITE_URL}${ZH_PATH}): Chinese-language agency facts for Baidu, DeepSeek, and Doubao
 - [Mainboard](${SITE_URL}/mainboard/): Established signed roster
 - [Development](${SITE_URL}/development/): New-face roster
-- [Journal / Blog](${SITE_URL}/blog/): Agency journal and newsletter archive
+- [${JOURNAL_TITLE}](${SITE_URL}/blog/): ${JOURNAL_ABOUT}
 - [Become a Model](${SITE_URL}/become-a-model/): Application form for aspiring models
 - [Contact](${SITE_URL}/contact/): Booking and general enquiries
 - [Academy](${SITE_URL}/academy/): VÈLISHE Academy waitlist and curriculum
@@ -85,7 +86,8 @@ ${
   posts.length === 0
     ? ""
     : `
-## Blog
+## ${JOURNAL_TITLE}
+${JOURNAL_ABOUT}
 ${posts
   .map((post) => {
     const teaser = post.teaser ? `: ${post.teaser}` : "";

@@ -1,45 +1,37 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import BlogSubscribeForm from "@/components/BlogSubscribeForm";
 import { getPublishedPosts } from "@/lib/blog";
-import { formatBlogDate } from "@/lib/format-date";
+import {
+  JOURNAL_ABOUT,
+  JOURNAL_FAQ,
+  JOURNAL_INTRO,
+  JOURNAL_META_DESCRIPTION,
+  JOURNAL_TITLE,
+  journalOgImage,
+  journalPageJsonLd,
+} from "@/lib/blog-journal";
+import { formatBlogDate, toIsoDateString } from "@/lib/format-date";
 import { publicBlogImageUrl } from "@/lib/image-url";
-import { buildPageMetadata, SITE_NAME, SITE_URL } from "@/lib/metadata";
+import { buildPageMetadata, SITE_NAME } from "@/lib/metadata";
 
 export const revalidate = 60;
 
-export const metadata = buildPageMetadata({
-  title: "Journal",
-  description:
-    "Notes from Velishe Model Management — castings, new faces, and what we’re watching.",
-  path: "/blog/",
-  index: true,
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const posts = await getPublishedPosts();
+  return buildPageMetadata({
+    title: JOURNAL_TITLE,
+    description: JOURNAL_META_DESCRIPTION,
+    path: "/blog/",
+    image: journalOgImage(posts),
+    index: true,
+  });
+}
 
 export default async function BlogIndexPage() {
   const posts = await getPublishedPosts();
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Blog",
-        name: `${SITE_NAME} Journal`,
-        url: `${SITE_URL}/blog/`,
-        description:
-          "Notes from Velishe Model Management — castings, new faces, and what we’re watching.",
-      },
-      {
-        "@type": "ItemList",
-        itemListElement: posts.map((post, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          url: `${SITE_URL}/blog/${post.slug}/`,
-          name: post.title,
-        })),
-      },
-    ],
-  };
+  const jsonLd = journalPageJsonLd(posts);
 
   return (
     <div className="max-w-[680px] mx-auto px-4 sm:px-6 py-12 sm:py-16">
@@ -47,15 +39,27 @@ export default async function BlogIndexPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <nav aria-label="Breadcrumb" className="text-sm text-gray-500 mb-6">
+        <ol className="flex flex-wrap items-center gap-1">
+          <li>
+            <Link href="/" className="hover:text-gray-800">
+              Home
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-gray-800">
+            {JOURNAL_TITLE}
+          </li>
+        </ol>
+      </nav>
       <p className="text-xs tracking-[0.16em] uppercase text-gray-500 mb-2">
         Journal
       </p>
       <h1 className="font-serif text-4xl sm:text-5xl font-bold text-black leading-tight mb-3">
-        Velishe Journal
+        {JOURNAL_TITLE}
       </h1>
-      <p className="text-base text-gray-600 mb-8">
-        Notes from the agency — castings, new faces, and what we’re watching.
-      </p>
+      <p className="text-base text-gray-600 mb-4">{JOURNAL_INTRO}</p>
+      <p className="text-base text-gray-700 mb-8">{JOURNAL_ABOUT}</p>
 
       {posts.length === 0 ? (
         <p className="text-gray-600 mb-10">No posts yet. Check back soon.</p>
@@ -68,7 +72,7 @@ export default async function BlogIndexPage() {
                   <div className="relative w-full aspect-[16/10] mb-4 overflow-hidden bg-gray-100">
                     <Image
                       src={publicBlogImageUrl(post.coverImageId)}
-                      alt=""
+                      alt={`${post.title} — ${SITE_NAME} Journal`}
                       fill
                       className="object-cover transition-opacity group-hover:opacity-90"
                       sizes="(max-width: 680px) 100vw, 680px"
@@ -85,13 +89,34 @@ export default async function BlogIndexPage() {
               ) : null}
               {post.publishedAt ? (
                 <p className="text-sm text-gray-500 mt-2">
-                  {formatBlogDate(post.publishedAt)}
+                  <time dateTime={toIsoDateString(post.publishedAt)}>
+                    {formatBlogDate(post.publishedAt)}
+                  </time>
                 </p>
               ) : null}
             </article>
           ))}
         </div>
       )}
+
+      <section className="mb-10 border-t border-gray-200 pt-8" aria-labelledby="journal-faq-heading">
+        <h2
+          id="journal-faq-heading"
+          className="font-serif text-2xl font-bold text-black mb-4"
+        >
+          About this journal
+        </h2>
+        <dl className="space-y-5">
+          {JOURNAL_FAQ.map((item) => (
+            <div key={item.question}>
+              <dt className="text-base font-semibold text-gray-900">
+                {item.question}
+              </dt>
+              <dd className="text-base text-gray-600 mt-1">{item.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <BlogSubscribeForm />
     </div>

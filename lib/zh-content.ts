@@ -1,3 +1,4 @@
+import { JOURNAL_ZH_BLURB } from "@/lib/blog-journal";
 import {
   FOUNDER,
   LEGAL_NAME,
@@ -42,17 +43,21 @@ export function buildZhHomeCopy({ modelCount, locationPhrase }: ZhHomeCopyArgs) 
 
   const booking = `客户预订 Velishe 模特用于广告、杂志大片与商业制作，请将试镜需求或制作简报发送至 ${ORGANIZATION_EMAIL}。请注明日期、使用权、拍摄地，以及需要 Mainboard、Development 或指定模特。团队从索非亚回复，工作语言为英语与保加利亚语。也可通过 WhatsApp ${ORGANIZATION_PHONE_DISPLAY} 或 Instagram @velishe.mgmt 做首次联系。公司资料、UIC 与创始人信息见 Contact 页面。法定实体为在保加利亚注册的 ${LEGAL_NAME}。有意成为模特者请通过 Become a Model 页面申请；请勿把申请发到预订邮箱。`;
 
+  const journal = `${JOURNAL_ZH_BLURB} 文章为英文，可在 /blog/ 页面阅读并订阅邮件更新。`;
+
   return {
     intro,
     whatWeDo,
     requirements,
     academy,
     booking,
+    journal,
     questions: {
       about: "关于 VÈLISHE",
       whatWeDo: "Velishe Model Management 做什么？",
       requirements: "成为 Velishe 模特需要什么条件？",
       academy: "VÈLISHE 模特学院是什么？",
+      journal: "Velishe Journal 是什么？",
       booking: "如何预订模特或申请加入 Velishe？",
     },
   };

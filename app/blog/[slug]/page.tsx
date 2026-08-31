@@ -5,6 +5,7 @@ import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/blog";
 import { plainTextFromMarkdown, markdownToSafeHtml } from "@/lib/blog-markdown";
 import { formatBlogDate, toIsoDateString } from "@/lib/format-date";
 import { publicBlogImageUrl } from "@/lib/image-url";
+import { JOURNAL_TITLE } from "@/lib/blog-journal";
 import {
   buildPageMetadata,
   DEFAULT_OG_IMAGE,
@@ -93,7 +94,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           {
             "@type": "ListItem",
             position: 2,
-            name: "Journal",
+            name: JOURNAL_TITLE,
             item: `${SITE_URL}/blog/`,
           },
           {
@@ -136,7 +137,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         <div className="relative w-full aspect-[16/10] mb-8 overflow-hidden bg-gray-100">
           <Image
             src={publicBlogImageUrl(post.coverImageId)}
-            alt=""
+            alt={`${post.title} — ${SITE_NAME} Journal`}
             fill
             className="object-cover"
             sizes="(max-width: 680px) 100vw, 680px"
@@ -160,7 +161,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             >
               <Image
                 src={publicBlogImageUrl(imageId)}
-                alt=""
+                alt={`${post.title} — ${SITE_NAME} Journal`}
                 fill
                 className="object-cover"
                 sizes="(max-width: 680px) 50vw, 340px"
