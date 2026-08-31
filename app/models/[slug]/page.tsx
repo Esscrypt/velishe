@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
+import { getPublishedPostsByModelId } from "@/lib/blog";
 import { getModelBySlug } from "@/lib/models";
 import SocialIcons from "@/components/SocialIcons";
 import ModelPageTracker from "@/components/ModelPageTracker";
 import DownloadPortfolioButton from "@/components/DownloadPortfolioButton";
 import ModelProfileClient from "./ModelProfileClient";
 import { buildModelBio } from "@/lib/model-bio";
+import { formatBlogDate, toIsoDateString } from "@/lib/format-date";
+import { publicBlogImageUrl } from "@/lib/image-url";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -39,6 +43,11 @@ export default async function ModelPage({ params }: Props) {
       ? [{ label: "Eyes", value: model.stats.eyeColor }]
       : []),
   ];
+
+  const modelIdNum = Number.parseInt(model.id, 10);
+  const journalPosts = Number.isNaN(modelIdNum)
+    ? []
+    : await getPublishedPostsByModelId(modelIdNum, { limit: 3 });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -131,6 +140,51 @@ export default async function ModelPage({ params }: Props) {
           </details>
         </div>
       </div>
+
+      {journalPosts.length > 0 ? (
+        <section
+          className="mt-12 border-t border-gray-200 pt-10"
+          aria-labelledby="in-journal-heading"
+        >
+          <h2
+            id="in-journal-heading"
+            className="text-2xl font-semibold text-gray-900 mb-6"
+          >
+            In the Journal
+          </h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {journalPosts.map((post) => (
+              <li key={post.id}>
+                <Link href={`/blog/${post.slug}/`} className="group block">
+                  {post.cover?.hasData ? (
+                    <div className="mb-3 overflow-hidden bg-gray-100">
+                      <Image
+                        src={publicBlogImageUrl(post.cover.id)}
+                        alt=""
+                        width={800}
+                        height={1000}
+                        className="h-auto w-full transition-opacity group-hover:opacity-90"
+                        sizes="(max-width: 640px) 100vw, 33vw"
+                        unoptimized
+                      />
+                    </div>
+                  ) : null}
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-gray-700">
+                    {post.title}
+                  </h3>
+                  {post.publishedAt ? (
+                    <p className="text-sm text-gray-500 mt-1">
+                      <time dateTime={toIsoDateString(post.publishedAt)}>
+                        {formatBlogDate(post.publishedAt)}
+                      </time>
+                    </p>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }

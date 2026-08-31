@@ -1,8 +1,15 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import BlogPostModelCta from "@/components/BlogPostModelCta";
+import BlogRelatedPosts from "@/components/BlogRelatedPosts";
 import BlogSubscribeForm from "@/components/BlogSubscribeForm";
 import BlogVideoEmbed from "@/components/BlogVideoEmbed";
-import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/blog";
+import {
+  getPublishedPostBySlug,
+  getPublishedPosts,
+  getPublishedPostsByModelId,
+} from "@/lib/blog";
 import { plainTextFromMarkdown, markdownToSafeHtml } from "@/lib/blog-markdown";
 import { formatBlogDate, toIsoDateString } from "@/lib/format-date";
 import { publicBlogImageUrl } from "@/lib/image-url";
@@ -106,6 +113,12 @@ export default async function BlogPostPage({ params }: PageProps) {
     stillImageUrl(post.cover) ||
     stillImageUrl(post.gallery.find((item) => item.hasData) ?? null) ||
     DEFAULT_OG_IMAGE.url;
+  const relatedPosts = post.model
+    ? await getPublishedPostsByModelId(post.model.id, {
+        excludePostId: post.id,
+        limit: 3,
+      })
+    : [];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -159,6 +172,17 @@ export default async function BlogPostPage({ params }: PageProps) {
       <h1 className="font-serif text-4xl sm:text-5xl font-bold text-black leading-tight mb-3">
         {post.title}
       </h1>
+      {post.model ? (
+        <p className="text-sm text-gray-500 mb-3">
+          With{" "}
+          <Link
+            href={`/models/${post.model.slug}/`}
+            className="underline hover:text-gray-800"
+          >
+            {post.model.name}
+          </Link>
+        </p>
+      ) : null}
       {post.teaser ? (
         <p className="text-lg text-gray-600 mb-3">{post.teaser}</p>
       ) : null}
@@ -191,6 +215,11 @@ export default async function BlogPostPage({ params }: PageProps) {
             </div>
           ))}
         </div>
+      ) : null}
+
+      {post.model ? <BlogPostModelCta model={post.model} /> : null}
+      {post.model ? (
+        <BlogRelatedPosts modelName={post.model.name} posts={relatedPosts} />
       ) : null}
 
       <BlogSubscribeForm />

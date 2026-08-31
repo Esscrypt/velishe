@@ -89,6 +89,16 @@ export default async function BlogIndexPage() {
                   {post.title}
                 </h2>
               </Link>
+              {post.model ? (
+                <p className="mt-1 text-sm text-gray-500">
+                  <Link
+                    href={`/models/${post.model.slug}/`}
+                    className="hover:text-gray-800"
+                  >
+                    {post.model.name}
+                  </Link>
+                </p>
+              ) : null}
               {post.teaser ? (
                 <p className="text-base text-gray-600 mt-2">{post.teaser}</p>
               ) : null}

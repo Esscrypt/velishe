@@ -10,6 +10,12 @@ export type BlogMediaItem = {
   videoProvider: BlogVideoProvider | null;
 };
 
+export type BlogLinkedModel = {
+  id: number;
+  slug: string;
+  name: string;
+};
+
 export type BlogPostListItem = {
   id: number;
   slug: string;
@@ -17,6 +23,7 @@ export type BlogPostListItem = {
   teaser: string | null;
   publishedAt: Date | null;
   cover: BlogMediaItem | null;
+  model: BlogLinkedModel | null;
 };
 
 export type BlogPostDetail = BlogPostListItem & {

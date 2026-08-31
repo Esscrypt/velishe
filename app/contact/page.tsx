@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Instagram, Linkedin } from "lucide-react";
+import { getModelBySlug } from "@/lib/models";
 import {
   buildPageMetadata,
   FOUNDER,
@@ -50,7 +51,25 @@ const contactPageSchema = {
   },
 };
 
-export default function ContactPage() {
+type Props = {
+  searchParams: Promise<{ model?: string }>;
+};
+
+export default async function ContactPage({ searchParams }: Props) {
+  const { model: modelSlugParam } = await searchParams;
+  const linked =
+    typeof modelSlugParam === "string" && modelSlugParam.trim()
+      ? await getModelBySlug(modelSlugParam.trim())
+      : undefined;
+
+  const mailtoHref = linked
+    ? `mailto:${ORGANIZATION_EMAIL}?subject=${encodeURIComponent(
+        `Booking enquiry — ${linked.name}`,
+      )}&body=${encodeURIComponent(
+        `I would like to enquire about booking ${linked.name}.\n\n`,
+      )}`
+    : `mailto:${ORGANIZATION_EMAIL}`;
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <script
@@ -66,6 +85,24 @@ export default function ContactPage() {
           men for editorial, commercial, catalogue, runway, beauty, lifestyle,
           and digital work.
         </p>
+
+        {linked ? (
+          <div className="not-prose mb-8 border border-gray-200 bg-gray-50 p-6">
+            <p className="text-base font-medium text-gray-900">
+              Booking enquiry for {linked.name}
+            </p>
+            <p className="mt-2 text-sm text-gray-600">
+              <Link
+                href={`/models/${linked.slug}/`}
+                className="underline hover:text-gray-900"
+              >
+                View portfolio
+              </Link>
+              {" · "}
+              Use the email below — the subject is prefilled for this booking.
+            </p>
+          </div>
+        ) : null}
 
         <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">
           Founder
@@ -113,7 +150,7 @@ export default function ContactPage() {
             <div>
               <p className="font-medium mb-1">Email:</p>
               <a
-                href={`mailto:${ORGANIZATION_EMAIL}`}
+                href={mailtoHref}
                 className="text-gray-900 hover:text-gray-600 transition-colors"
               >
                 {ORGANIZATION_EMAIL}
