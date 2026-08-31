@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import BlogSubscribeForm from "@/components/BlogSubscribeForm";
+import BlogVideoEmbed from "@/components/BlogVideoEmbed";
 import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/blog";
 import { plainTextFromMarkdown, markdownToSafeHtml } from "@/lib/blog-markdown";
 import { formatBlogDate, toIsoDateString } from "@/lib/format-date";
@@ -12,12 +13,45 @@ import {
   SITE_NAME,
   SITE_URL,
 } from "@/lib/metadata";
+import type { BlogMediaItem } from "@/types/blog";
 
 export const revalidate = 60;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+function stillImageUrl(media: BlogMediaItem | null | undefined): string | null {
+  if (!media?.hasData) return null;
+  return `${SITE_URL}${publicBlogImageUrl(media.id)}`;
+}
+
+function PostMedia({
+  media,
+  title,
+  priority = false,
+}: {
+  media: BlogMediaItem;
+  title: string;
+  priority?: boolean;
+}) {
+  if (media.kind === "video") {
+    return <BlogVideoEmbed media={media} titleFallback={title} />;
+  }
+  if (!media.hasData) return null;
+  return (
+    <Image
+      src={publicBlogImageUrl(media.id)}
+      alt={media.alt || `${title} — ${SITE_NAME} Journal`}
+      width={1600}
+      height={2000}
+      className="h-auto w-full"
+      sizes="(max-width: 680px) 100vw, 680px"
+      priority={priority}
+      unoptimized
+    />
+  );
+}
 
 export async function generateStaticParams() {
   const posts = await getPublishedPosts();
@@ -38,9 +72,12 @@ export async function generateMetadata({ params }: PageProps) {
 
   const description =
     post.teaser?.trim() || plainTextFromMarkdown(post.body, 160);
-  const image = post.coverImageId
+  const still =
+    stillImageUrl(post.cover) ||
+    stillImageUrl(post.gallery.find((item) => item.hasData) ?? null);
+  const image = still
     ? {
-        url: `${SITE_URL}${publicBlogImageUrl(post.coverImageId)}`,
+        url: still,
         width: 1200,
         height: 750,
         alt: post.title,
@@ -65,6 +102,10 @@ export default async function BlogPostPage({ params }: PageProps) {
   const bodyHtml = markdownToSafeHtml(post.body);
   const description =
     post.teaser?.trim() || plainTextFromMarkdown(post.body, 160);
+  const jsonLdImage =
+    stillImageUrl(post.cover) ||
+    stillImageUrl(post.gallery.find((item) => item.hasData) ?? null) ||
+    DEFAULT_OG_IMAGE.url;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -78,9 +119,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         author: { "@type": "Organization", name: SITE_NAME },
         publisher: { "@type": "Organization", name: SITE_NAME },
         mainEntityOfPage: `${SITE_URL}/blog/${post.slug}/`,
-        image: post.coverImageId
-          ? `${SITE_URL}${publicBlogImageUrl(post.coverImageId)}`
-          : DEFAULT_OG_IMAGE.url,
+        image: jsonLdImage,
       },
       {
         "@type": "BreadcrumbList",
@@ -133,17 +172,9 @@ export default async function BlogPostPage({ params }: PageProps) {
         </p>
       ) : null}
 
-      {post.coverImageId ? (
-        <div className="relative w-full aspect-[16/10] mb-8 overflow-hidden bg-gray-100">
-          <Image
-            src={publicBlogImageUrl(post.coverImageId)}
-            alt={`${post.title} — ${SITE_NAME} Journal`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 680px) 100vw, 680px"
-            priority
-            unoptimized
-          />
+      {post.cover ? (
+        <div className="mb-8 w-full overflow-hidden bg-gray-100">
+          <PostMedia media={post.cover} title={post.title} priority />
         </div>
       ) : null}
 
@@ -152,21 +183,11 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: bodyHtml }}
       />
 
-      {post.galleryImageIds.length > 0 ? (
-        <div className="grid grid-cols-2 gap-2 mb-10">
-          {post.galleryImageIds.map((imageId) => (
-            <div
-              key={imageId}
-              className="relative aspect-[3/4] overflow-hidden bg-gray-100"
-            >
-              <Image
-                src={publicBlogImageUrl(imageId)}
-                alt={`${post.title} — ${SITE_NAME} Journal`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 680px) 50vw, 340px"
-                unoptimized
-              />
+      {post.gallery.length > 0 ? (
+        <div className="mb-10 grid grid-cols-2 gap-2">
+          {post.gallery.map((media) => (
+            <div key={media.id} className="overflow-hidden bg-gray-100">
+              <PostMedia media={media} title={post.title} />
             </div>
           ))}
         </div>

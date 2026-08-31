@@ -32,10 +32,10 @@ export const JOURNAL_FAQ = [
 ] as const;
 
 export function journalOgImage(posts: BlogPostListItem[]): OgImage {
-  const coverId = posts.find((post) => post.coverImageId)?.coverImageId;
-  if (coverId) {
+  const still = posts.find((post) => post.cover?.hasData)?.cover;
+  if (still) {
     return {
-      url: `${SITE_URL}${publicBlogImageUrl(coverId)}`,
+      url: `${SITE_URL}${publicBlogImageUrl(still.id)}`,
       width: 1200,
       height: 750,
       alt: `${JOURNAL_TITLE} — ${SITE_NAME}`,

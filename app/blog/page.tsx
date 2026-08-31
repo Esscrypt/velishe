@@ -68,16 +68,21 @@ export default async function BlogIndexPage() {
           {posts.map((post) => (
             <article key={post.id}>
               <Link href={`/blog/${post.slug}/`} className="group block">
-                {post.coverImageId ? (
-                  <div className="relative w-full aspect-[16/10] mb-4 overflow-hidden bg-gray-100">
+                {post.cover?.hasData ? (
+                  <div className="mb-4 w-full overflow-hidden bg-gray-100">
                     <Image
-                      src={publicBlogImageUrl(post.coverImageId)}
+                      src={publicBlogImageUrl(post.cover.id)}
                       alt={`${post.title} — ${SITE_NAME} Journal`}
-                      fill
-                      className="object-cover transition-opacity group-hover:opacity-90"
+                      width={1600}
+                      height={2000}
+                      className="h-auto w-full transition-opacity group-hover:opacity-90"
                       sizes="(max-width: 680px) 100vw, 680px"
                       unoptimized
                     />
+                  </div>
+                ) : post.cover?.kind === "video" ? (
+                  <div className="mb-4 flex aspect-video w-full items-center justify-center bg-gray-200 text-sm text-gray-600">
+                    ▶ Video
                   </div>
                 ) : null}
                 <h2 className="font-serif text-2xl sm:text-3xl font-bold text-black leading-tight group-hover:text-gray-700">

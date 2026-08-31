@@ -1,6 +1,31 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db/index";
-import type { BlogPostDetail, BlogPostListItem } from "@/types/blog";
+import type {
+  BlogMediaItem,
+  BlogPostDetail,
+  BlogPostListItem,
+  BlogVideoProvider,
+} from "@/types/blog";
+
+function mapMediaRow(row: {
+  id: string;
+  order: number;
+  kind: string | null;
+  alt: string;
+  videoUrl: string | null;
+  videoProvider: string | null;
+  hasData: boolean | null;
+}): BlogMediaItem {
+  return {
+    id: row.id,
+    order: row.order,
+    kind: row.kind === "video" ? "video" : "image",
+    alt: row.alt || "",
+    hasData: Boolean(row.hasData),
+    videoUrl: row.videoUrl,
+    videoProvider: (row.videoProvider as BlogVideoProvider | null) ?? null,
+  };
+}
 
 export async function fetchPublishedPosts(): Promise<BlogPostListItem[] | null> {
   const db = getDb();
@@ -14,7 +39,13 @@ export async function fetchPublishedPosts(): Promise<BlogPostListItem[] | null> 
         title: schema.blogPosts.title,
         teaser: schema.blogPosts.teaser,
         publishedAt: schema.blogPosts.publishedAt,
-        coverImageId: schema.blogImages.id,
+        coverId: schema.blogImages.id,
+        coverOrder: schema.blogImages.order,
+        coverKind: schema.blogImages.kind,
+        coverAlt: schema.blogImages.alt,
+        coverVideoUrl: schema.blogImages.videoUrl,
+        coverVideoProvider: schema.blogImages.videoProvider,
+        coverHasData: sql<boolean>`(${schema.blogImages.data} is not null)`,
       })
       .from(schema.blogPosts)
       .leftJoin(
@@ -33,7 +64,17 @@ export async function fetchPublishedPosts(): Promise<BlogPostListItem[] | null> 
       title: row.title,
       teaser: row.teaser,
       publishedAt: row.publishedAt,
-      coverImageId: row.coverImageId,
+      cover: row.coverId
+        ? mapMediaRow({
+            id: row.coverId,
+            order: row.coverOrder ?? 0,
+            kind: row.coverKind,
+            alt: row.coverAlt ?? "",
+            videoUrl: row.coverVideoUrl,
+            videoProvider: row.coverVideoProvider,
+            hasData: row.coverHasData,
+          })
+        : null,
     }));
   } catch (error) {
     console.error("[fetchPublishedPosts] Failed:", error);
@@ -74,15 +115,19 @@ export async function fetchPublishedPostBySlug(
       .select({
         id: schema.blogImages.id,
         order: schema.blogImages.order,
+        kind: schema.blogImages.kind,
+        alt: schema.blogImages.alt,
+        videoUrl: schema.blogImages.videoUrl,
+        videoProvider: schema.blogImages.videoProvider,
+        hasData: sql<boolean>`(${schema.blogImages.data} is not null)`,
       })
       .from(schema.blogImages)
       .where(eq(schema.blogImages.postId, post.id))
       .orderBy(asc(schema.blogImages.order));
 
-    const cover = images.find((image) => image.order === 0) ?? null;
-    const galleryImageIds = images
-      .filter((image) => image.order > 0)
-      .map((image) => image.id);
+    const media = images.map(mapMediaRow);
+    const cover = media.find((item) => item.order === 0) ?? null;
+    const gallery = media.filter((item) => item.order > 0);
 
     return {
       id: post.id,
@@ -90,9 +135,9 @@ export async function fetchPublishedPostBySlug(
       title: post.title,
       teaser: post.teaser,
       publishedAt: post.publishedAt,
-      coverImageId: cover?.id ?? null,
+      cover,
       body: post.body,
-      galleryImageIds,
+      gallery,
       updatedAt: post.updatedAt,
     };
   } catch (error) {
