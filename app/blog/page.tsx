@@ -55,11 +55,11 @@ export default async function BlogIndexPage() {
       <p className="text-xs tracking-[0.16em] uppercase text-gray-500 mb-2">
         Journal
       </p>
-      <h1 className="font-serif text-4xl sm:text-5xl font-bold text-black leading-tight mb-3">
+      <h1 className="font-serif text-4xl sm:text-5xl font-bold text-black leading-tight mb-8">
         {JOURNAL_TITLE}
       </h1>
-      <p className="text-base text-gray-600 mb-4">{JOURNAL_INTRO}</p>
-      <p className="text-base text-gray-700 mb-8">{JOURNAL_ABOUT}</p>
+      <p className="sr-only">{JOURNAL_INTRO}</p>
+      <p className="sr-only">{JOURNAL_ABOUT}</p>
 
       {posts.length === 0 ? (
         <p className="text-gray-600 mb-10">No posts yet. Check back soon.</p>
@@ -114,20 +114,13 @@ export default async function BlogIndexPage() {
         </div>
       )}
 
-      <section className="mb-10 border-t border-gray-200 pt-8" aria-labelledby="journal-faq-heading">
-        <h2
-          id="journal-faq-heading"
-          className="font-serif text-2xl font-bold text-black mb-4"
-        >
-          About this journal
-        </h2>
-        <dl className="space-y-5">
+      <section className="sr-only" aria-labelledby="journal-faq-heading">
+        <h2 id="journal-faq-heading">About this journal</h2>
+        <dl>
           {JOURNAL_FAQ.map((item) => (
             <div key={item.question}>
-              <dt className="text-base font-semibold text-gray-900">
-                {item.question}
-              </dt>
-              <dd className="text-base text-gray-600 mt-1">{item.answer}</dd>
+              <dt>{item.question}</dt>
+              <dd>{item.answer}</dd>
             </div>
           ))}
         </dl>
