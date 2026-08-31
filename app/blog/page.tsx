@@ -4,9 +4,6 @@ import Link from "next/link";
 import BlogSubscribeForm from "@/components/BlogSubscribeForm";
 import { getPublishedPosts } from "@/lib/blog";
 import {
-  JOURNAL_ABOUT,
-  JOURNAL_FAQ,
-  JOURNAL_INTRO,
   JOURNAL_META_DESCRIPTION,
   JOURNAL_TITLE,
   journalOgImage,
@@ -58,8 +55,6 @@ export default async function BlogIndexPage() {
       <h1 className="font-serif text-4xl sm:text-5xl font-bold text-black leading-tight mb-8">
         {JOURNAL_TITLE}
       </h1>
-      <p className="sr-only">{JOURNAL_INTRO}</p>
-      <p className="sr-only">{JOURNAL_ABOUT}</p>
 
       {posts.length === 0 ? (
         <p className="text-gray-600 mb-10">No posts yet. Check back soon.</p>
@@ -113,18 +108,6 @@ export default async function BlogIndexPage() {
           ))}
         </div>
       )}
-
-      <section className="sr-only" aria-labelledby="journal-faq-heading">
-        <h2 id="journal-faq-heading">About this journal</h2>
-        <dl>
-          {JOURNAL_FAQ.map((item) => (
-            <div key={item.question}>
-              <dt>{item.question}</dt>
-              <dd>{item.answer}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
 
       <BlogSubscribeForm />
     </div>

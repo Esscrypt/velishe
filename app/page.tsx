@@ -112,14 +112,6 @@ export default async function Home() {
       />
       <HomeSpotlight initialModels={models} />
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100">
-        <h1 className="sr-only">
-          VÈLISHE Model Management — Sofia, Bulgaria
-        </h1>
-        <p className="sr-only">
-          Boutique modeling agency in Sofia. {modelCount} signed women and men
-          on Mainboard and Development.
-        </p>
-
         <div className="text-gray-700">
           <HomeFaqItem title="About VÈLISHE">
             <p>{intro}</p>
