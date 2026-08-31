@@ -26,8 +26,28 @@ export type BlogPostListItem = {
   model: BlogLinkedModel | null;
 };
 
+export type BlogCreditLink = {
+  name: string;
+  url: string | null;
+};
+
+export type BlogCreditExtra = {
+  role: string;
+  name: string;
+  url: string | null;
+};
+
+export type BlogCredits = {
+  brand: BlogCreditLink | null;
+  photographer: BlogCreditLink | null;
+  magazine: BlogCreditLink | null;
+  extras: BlogCreditExtra[];
+  sourceUrl: string | null;
+};
+
 export type BlogPostDetail = BlogPostListItem & {
   body: string;
   gallery: BlogMediaItem[];
   updatedAt: Date;
+  credits: BlogCredits | null;
 };

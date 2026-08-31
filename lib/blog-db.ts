@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db/index";
 import { mapBlogLinkedModel } from "@/lib/blog-model";
+import { normalizeBlogCredits } from "@/lib/blog-credits";
 import type {
   BlogMediaItem,
   BlogPostDetail,
@@ -173,6 +174,7 @@ export async function fetchPublishedPostBySlug(
         body: schema.blogPosts.body,
         publishedAt: schema.blogPosts.publishedAt,
         updatedAt: schema.blogPosts.updatedAt,
+        credits: schema.blogPosts.credits,
         modelId: schema.models.id,
         modelSlug: schema.models.slug,
         modelName: schema.models.name,
@@ -225,6 +227,7 @@ export async function fetchPublishedPostBySlug(
       body: post.body,
       gallery,
       updatedAt: post.updatedAt,
+      credits: normalizeBlogCredits(post.credits),
     };
   } catch (error) {
     console.error("[fetchPublishedPostBySlug] Failed:", error);

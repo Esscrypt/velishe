@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import BlogCredits from "@/components/BlogCredits";
+import BlogCopyLink from "@/components/BlogCopyLink";
 import BlogPostModelCta from "@/components/BlogPostModelCta";
 import BlogRelatedPosts from "@/components/BlogRelatedPosts";
 import BlogSubscribeForm from "@/components/BlogSubscribeForm";
@@ -187,7 +189,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         <p className="text-lg text-gray-600 mb-3">{post.teaser}</p>
       ) : null}
       {post.publishedAt ? (
-        <p className="text-sm text-gray-500 mb-8">
+        <p className="text-sm text-gray-500 mb-2">
           {formatBlogDate(post.publishedAt, {
             year: "numeric",
             month: "long",
@@ -195,6 +197,9 @@ export default async function BlogPostPage({ params }: PageProps) {
           })}
         </p>
       ) : null}
+      <p className="mb-8">
+        <BlogCopyLink url={`${SITE_URL}/blog/${post.slug}/`} />
+      </p>
 
       {post.cover ? (
         <div className="mb-8 w-full overflow-hidden bg-gray-100">
@@ -216,6 +221,8 @@ export default async function BlogPostPage({ params }: PageProps) {
           ))}
         </div>
       ) : null}
+
+      <BlogCredits credits={post.credits} model={post.model} />
 
       {post.model ? <BlogPostModelCta model={post.model} /> : null}
       {post.model ? (
