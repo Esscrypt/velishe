@@ -32,6 +32,33 @@ export default function BlogVideoEmbed({
     );
   }
 
+  if (parsed?.provider === "instagram") {
+    return (
+      <div className="mx-auto w-full max-w-[540px] overflow-hidden bg-black">
+        <iframe
+          src={parsed.embedUrl}
+          title={title}
+          className="w-full border-0"
+          style={{ height: 720, maxWidth: "100%" }}
+          loading="lazy"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
+        <p className="bg-white px-2 py-2 text-center text-sm">
+          <a
+            href={parsed.canonicalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Open on Instagram
+          </a>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <a
       href={media.videoUrl}
@@ -48,10 +75,10 @@ export default function BlogVideoEmbed({
         />
       ) : (
         <div className="flex min-h-[280px] items-center justify-center bg-gray-200 px-4 text-center text-sm text-gray-700">
-          Watch on Instagram
+          Open video
         </div>
       )}
-      <p className="px-2 py-2 text-sm underline">Watch on Instagram</p>
+      <p className="px-2 py-2 text-sm underline">Open video</p>
     </a>
   );
 }
