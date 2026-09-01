@@ -1,5 +1,9 @@
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db/index";
+import {
+  shouldApplyUnsubscribe,
+  unsubscribeSubscriberFields,
+} from "@/lib/mailing-list-token-actions";
 import { buildPageMetadata } from "@/lib/metadata";
 
 export const dynamic = "force-dynamic";
@@ -47,10 +51,10 @@ export default async function BlogUnsubscribePage({ params }: PageProps) {
   }
 
   const row = rows[0];
-  if (!row.unsubscribedAt) {
+  if (shouldApplyUnsubscribe(row)) {
     await db
       .update(schema.mailingListSubscribers)
-      .set({ unsubscribedAt: new Date() })
+      .set(unsubscribeSubscriberFields())
       .where(eq(schema.mailingListSubscribers.id, row.id));
   }
 

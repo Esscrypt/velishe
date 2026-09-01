@@ -1,5 +1,9 @@
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db/index";
+import {
+  confirmSubscriberFields,
+  shouldApplyConfirm,
+} from "@/lib/mailing-list-token-actions";
 import { buildPageMetadata } from "@/lib/metadata";
 
 export const dynamic = "force-dynamic";
@@ -47,14 +51,10 @@ export default async function BlogConfirmPage({ params }: PageProps) {
   }
 
   const row = rows[0];
-  if (!row.confirmed || row.unsubscribedAt) {
+  if (shouldApplyConfirm(row)) {
     await db
       .update(schema.mailingListSubscribers)
-      .set({
-        confirmed: true,
-        confirmedAt: new Date(),
-        unsubscribedAt: null,
-      })
+      .set(confirmSubscriberFields())
       .where(eq(schema.mailingListSubscribers.id, row.id));
   }
 
