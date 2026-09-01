@@ -29,6 +29,9 @@ export default function BoardModels({
     if (!hasInteracted.current) {
       return;
     }
+    if (window.matchMedia("(min-width: 768px)").matches) {
+      return;
+    }
     document
       .getElementById(ROSTER_ANCHOR_ID)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
