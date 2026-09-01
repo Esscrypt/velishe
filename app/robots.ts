@@ -11,22 +11,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/api/", "/_next/"],
       },
-      {
-        userAgent: "CCBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "Bytespider",
-        disallow: "/",
-      },
-      {
-        userAgent: "cohere-ai",
-        disallow: "/",
-      },
-      {
-        userAgent: "GPTBot",
-        disallow: "/",
-      },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
   };
