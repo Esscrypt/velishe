@@ -63,8 +63,8 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
         }`}
       >
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-40 md:h-48">
-            <Link href={homeHref} className="flex items-center" onClick={closeMenu}>
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center h-40 md:h-48">
+            <Link href={homeHref} className="flex items-center justify-self-start" onClick={closeMenu}>
               {/* SVG logo — next/image does not optimize SVG */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -77,7 +77,7 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
                 decoding="async"
               />
             </Link>
-            <nav className="hidden md:flex items-center gap-10">
+            <nav className="hidden md:flex items-center justify-center gap-10">
               {enabledBoards.map((b) => (
                 <Link key={b.id} href={localizedHref(`/${b.id}/`, siteLocale)} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                   {b.label.toUpperCase()}
@@ -95,9 +95,11 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               <Link href={localizedHref("/contact/", siteLocale)} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 {nav.contact}
               </Link>
-              <LanguageSwitcher />
             </nav>
-            <div className="flex items-center gap-4 md:hidden">
+            <div className="hidden md:flex items-center justify-self-end">
+              <LanguageSwitcher />
+            </div>
+            <div className="flex items-center gap-4 justify-self-end md:hidden col-start-3">
               {!isMenuOpen && (
                 <Tooltip label="Toggle menu">
                   <button
