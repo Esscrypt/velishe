@@ -1,5 +1,6 @@
 import { parseBlogVideoUrl } from "@/lib/blog-video-url";
 import { publicBlogImageUrl } from "@/lib/image-url";
+import BlogInstagramEmbed from "@/components/BlogInstagramEmbed";
 import type { BlogMediaItem } from "@/types/blog";
 
 type BlogVideoEmbedProps = {
@@ -34,27 +35,11 @@ export default function BlogVideoEmbed({
 
   if (parsed?.provider === "instagram") {
     return (
-      <div className="mx-auto w-full max-w-[540px] overflow-hidden bg-black">
-        <iframe
-          src={parsed.embedUrl}
+      <div className="w-full overflow-hidden bg-white">
+        <BlogInstagramEmbed
+          permalink={parsed.canonicalUrl}
           title={title}
-          className="w-full border-0"
-          style={{ height: 720, maxWidth: "100%" }}
-          loading="lazy"
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
         />
-        <p className="bg-white px-2 py-2 text-center text-sm">
-          <a
-            href={parsed.canonicalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            Open on Instagram
-          </a>
-        </p>
       </div>
     );
   }

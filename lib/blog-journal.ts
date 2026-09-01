@@ -1,5 +1,5 @@
-import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL, type OgImage } from "@/lib/metadata";
-import { publicBlogImageUrl } from "@/lib/image-url";
+import { SITE_NAME, SITE_URL, type OgImage } from "@/lib/metadata";
+import { buildJournalIndexOgImage } from "@/lib/blog-og";
 import type { BlogPostListItem } from "@/types/blog";
 
 export const JOURNAL_TITLE = "Velishe Journal";
@@ -35,19 +35,7 @@ export const JOURNAL_FAQ = [
 ] as const;
 
 export function journalOgImage(posts: BlogPostListItem[]): OgImage {
-  const still = posts.find((post) => post.cover?.hasData)?.cover;
-  if (still) {
-    return {
-      url: `${SITE_URL}${publicBlogImageUrl(still.id)}`,
-      width: 1200,
-      height: 750,
-      alt: `${JOURNAL_TITLE} — ${SITE_NAME}`,
-    };
-  }
-  return {
-    ...DEFAULT_OG_IMAGE,
-    alt: `${JOURNAL_TITLE} — ${SITE_NAME}`,
-  };
+  return buildJournalIndexOgImage(posts);
 }
 
 export function journalBreadcrumbJsonLd() {

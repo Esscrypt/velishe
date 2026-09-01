@@ -12,6 +12,8 @@ import {
   getPublishedPosts,
   getPublishedPostsByModelId,
 } from "@/lib/blog";
+import { buildBlogPostOgImage } from "@/lib/blog-og";
+import { pickStillBlogMedia } from "@/lib/blog-media";
 import { plainTextFromMarkdown, markdownToSafeHtml } from "@/lib/blog-markdown";
 import { coerceDate, formatBlogDate, toIsoDateString } from "@/lib/format-date";
 import { publicBlogImageUrl } from "@/lib/image-url";
@@ -81,17 +83,12 @@ export async function generateMetadata({ params }: PageProps) {
 
   const description =
     post.teaser?.trim() || plainTextFromMarkdown(post.body, 160);
-  const still =
-    stillImageUrl(post.cover) ||
-    stillImageUrl(post.gallery.find((item) => item.hasData) ?? null);
-  const image = still
-    ? {
-        url: still,
-        width: 1200,
-        height: 750,
-        alt: post.title,
-      }
-    : DEFAULT_OG_IMAGE;
+  const image = buildBlogPostOgImage({
+    slug: post.slug,
+    title: post.title,
+    cover: post.cover,
+    gallery: post.gallery,
+  });
 
   return buildPageMetadata({
     title: post.title,
@@ -114,8 +111,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const description =
     post.teaser?.trim() || plainTextFromMarkdown(post.body, 160);
   const jsonLdImage =
-    stillImageUrl(post.cover) ||
-    stillImageUrl(post.gallery.find((item) => item.hasData) ?? null) ||
+    stillImageUrl(pickStillBlogMedia(post.cover, post.gallery)) ||
     DEFAULT_OG_IMAGE.url;
   const relatedPosts = post.model
     ? await getPublishedPostsByModelId(post.model.id, {

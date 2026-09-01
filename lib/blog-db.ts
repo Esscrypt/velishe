@@ -158,6 +158,46 @@ export async function fetchPublishedPostsByModelId(
   }
 }
 
+export async function fetchBlogOgSourceBySlug(
+  slug: string,
+): Promise<{ imageId: string; data: string } | null> {
+  const db = getDb();
+  if (!db) return null;
+
+  try {
+    const posts = await db
+      .select({ id: schema.blogPosts.id })
+      .from(schema.blogPosts)
+      .where(
+        and(
+          eq(schema.blogPosts.slug, slug),
+          eq(schema.blogPosts.published, true),
+        ),
+      )
+      .limit(1);
+
+    if (posts.length === 0) return null;
+
+    const images = await db
+      .select({
+        id: schema.blogImages.id,
+        order: schema.blogImages.order,
+        data: schema.blogImages.data,
+      })
+      .from(schema.blogImages)
+      .where(eq(schema.blogImages.postId, posts[0].id))
+      .orderBy(asc(schema.blogImages.order));
+
+    const withData = images.find((row) => row.data);
+    if (!withData?.data) return null;
+
+    return { imageId: withData.id, data: withData.data };
+  } catch (error) {
+    console.error("[fetchBlogOgSourceBySlug] Failed:", error);
+    return null;
+  }
+}
+
 export async function fetchPublishedPostBySlug(
   slug: string,
 ): Promise<BlogPostDetail | null> {
