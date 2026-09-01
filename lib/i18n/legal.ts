@@ -38,7 +38,7 @@ const PRIVACY_BG: LegalDocCopy = {
     {
       title: "2. Администратор на данни",
       paragraphs: [
-        `Администратор е ${LEGAL_NAME} (${LEGAL_NAME_BG}), София, България. Имейл за поверителност: ${ORGANIZATION_EMAIL}.`,
+        `Администратор е ${LEGAL_NAME} (${LEGAL_NAME_BG}), София. Имейл за поверителност: ${ORGANIZATION_EMAIL}.`,
       ],
     },
     {
@@ -119,7 +119,7 @@ const PRIVACY_BG: LegalDocCopy = {
 const TERMS_BG: LegalDocCopy = {
   metaTitle: "Общи условия",
   metaDescription:
-    "Общи условия за използване на сайта и услугите на Velishe Model Management, София, България.",
+    "Общи условия за използване на сайта и услугите на Velishe Model Management, София.",
   heading: "Общи условия",
   lastUpdated: "Последна актуализация: 10 февруари 2026 г.",
   englishNote: "Пълният правен текст на английски:",
@@ -133,7 +133,7 @@ const TERMS_BG: LegalDocCopy = {
     {
       title: "2. Услуги на агенцията",
       paragraphs: [
-        `${LEGAL_NAME} представлява модели за мода и търговска реклама от София. Сайтът предоставя информация, портфолиа, формуляри за кандидати и контакт.`,
+        `${LEGAL_NAME} представлява модели за мода и реклама от София. Сайтът предоставя информация, портфолиа, формуляри за кандидати и контакт.`,
       ],
     },
     {
@@ -180,7 +180,7 @@ const TERMS_BG: LegalDocCopy = {
     },
     {
       title: "10. Контакт",
-      paragraphs: [`${ORGANIZATION_EMAIL}, София, България.`],
+      paragraphs: [`${ORGANIZATION_EMAIL}, София.`],
     },
   ],
 };

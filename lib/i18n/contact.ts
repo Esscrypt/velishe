@@ -70,15 +70,15 @@ const EN: ContactCopy = {
 const BG: ContactCopy = {
   metaTitle: "Контакт",
   metaDescription:
-    "Свържете се с Velishe Model Management в София, България. Резервации на модели, кастинг запитвания и общ контакт.",
+    "Свържете се с Velishe Model Management в София. Резервации на модели, кастинг запитвания и общ контакт.",
   schemaName: "Контакт с Velishe Model Management",
   schemaDescription:
-    "Свържете се с Velishe Model Management в София, България. Резервации, кастинг и общи запитвания.",
+    "Свържете се с Velishe Model Management в София. Резервации, кастинг и общи запитвания.",
   breadcrumbHome: "Начало",
   breadcrumbContact: "Контакт",
   heading: "Контакт",
   intro1:
-    "VÈLISHE Model Management е бутикова агенция от ново поколение, базирана в София, България.",
+    "VÈLISHE Model Management е бутикова агенция от ново поколение, базирана в София.",
   intro2:
     "Представляваме, развиваме и издигаме талант — жени и мъже с отличително присъствие, attitude и автентичност.",
   intro3:
@@ -91,7 +91,7 @@ const BG: ContactCopy = {
     "Използвайте имейла по-долу — темата е предварително попълнена за тази резервация.",
   companyHeading: "Velishe Model Management Ltd",
   officeAddressLabel: "Адрес на офиса:",
-  officeAddress: "София, България",
+  officeAddress: "София",
   emailLabel: "Имейл:",
   socialMediaLabel: "Социални мрежи:",
   linkedInLabel: "LinkedIn",

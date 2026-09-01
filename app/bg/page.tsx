@@ -1,16 +1,14 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import HomeSpotlight from "@/components/HomeSpotlight";
 import WebSiteSchema from "@/components/WebSiteSchema";
 import { getModelsForListing } from "@/lib/models";
 import {
   formatLocationList,
   uniqueBookedLocations,
 } from "@/lib/model-bio";
-import {
-  ORGANIZATION_EMAIL,
-  SITE_URL,
-  BG_PATH,
-} from "@/lib/metadata";
+import { ORGANIZATION_EMAIL, SITE_URL, BG_PATH } from "@/lib/metadata";
+import { localizedHref } from "@/lib/i18n/locale";
 import {
   BG_PAGE_TITLE,
   BG_WORK_CATEGORIES,
@@ -52,6 +50,11 @@ export default async function BgHomePage() {
   });
 
   const pageUrl = `${SITE_URL}${BG_PATH}`;
+  const mainboardHref = localizedHref("/mainboard/", "bg");
+  const blogHref = localizedHref("/blog/", "bg");
+  const contactHref = localizedHref("/contact/", "bg");
+  const becomeHref = localizedHref("/become-a-model/", "bg");
+
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -98,7 +101,7 @@ export default async function BgHomePage() {
   ];
 
   return (
-    <article lang="bg">
+    <>
       <WebSiteSchema />
       {jsonLd.map((block) => (
         <script
@@ -107,15 +110,12 @@ export default async function BgHomePage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
         />
       ))}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">
-          VÈLISHE Model Management — София, България
-        </h1>
-        <p className="text-lg text-gray-600 mb-10 max-w-2xl">
-          Бутикова модел агенция в София. {models.length} подписани модели —
-          жени и мъже — на Mainboard и Development.
-        </p>
-
+      <h1 className="sr-only">{BG_PAGE_TITLE}</h1>
+      <HomeSpotlight initialModels={models} />
+      <section
+        className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100"
+        lang="bg"
+      >
         <div className="text-gray-700">
           <BgFaqItem title={copy.questions.about}>
             <p>{copy.intro}</p>
@@ -142,7 +142,7 @@ export default async function BgHomePage() {
             <p>{copy.journal}</p>
             <p>
               <Link
-                href="/blog/"
+                href={blogHref}
                 className="text-gray-900 underline hover:text-gray-600 transition-colors"
               >
                 Velishe Journal
@@ -155,10 +155,10 @@ export default async function BgHomePage() {
             <p>
               Кандидати за модели подават през{" "}
               <Link
-                href="/become-a-model/"
+                href={becomeHref}
                 className="text-gray-900 underline hover:text-gray-600 transition-colors"
               >
-                Become a Model
+                Стани модел
               </Link>
               . Резервации и клиентски запитвания:{" "}
               <a
@@ -173,39 +173,20 @@ export default async function BgHomePage() {
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
-              href="/mainboard/"
+              href={mainboardHref}
               className="inline-block px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >
               Виж моделите
             </Link>
             <Link
-              href="/blog/"
-              className="inline-block px-6 py-3 border border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-            >
-              Velishe Journal
-            </Link>
-            <Link
-              href="/contact/"
+              href={contactHref}
               className="inline-block px-6 py-3 border border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
             >
               Контакт
             </Link>
-            <Link
-              href="/"
-              className="inline-block px-6 py-3 border border-gray-300 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-            >
-              English
-            </Link>
-            <Link
-              href="/zh/"
-              className="inline-block px-6 py-3 border border-gray-300 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-              hrefLang="zh-CN"
-            >
-              中文
-            </Link>
           </div>
         </div>
       </section>
-    </article>
+    </>
   );
 }

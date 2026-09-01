@@ -6,6 +6,7 @@ import OptimizedImage from "./OptimizedImage";
 import { GRID_IMAGE_SIZES, isLcpImageIndex } from "@/lib/lcp";
 import { ModelStats } from "@/types/model";
 import { modelPageLabels } from "@/lib/i18n/model-page";
+import { translateEyeColor, translateHairColor } from "@/lib/i18n/model-colors";
 import type { SiteLocale } from "@/lib/i18n/locale";
 import { localizedHref } from "@/lib/i18n/locale";
 
@@ -42,8 +43,12 @@ export default function ModelCard({
     { label: labels.statWaist, value: stats.waist },
     { label: labels.statHips, value: stats.hips },
     ...(stats.shoeSize ? [{ label: labels.statShoe, value: stats.shoeSize }] : []),
-    ...(stats.hairColor ? [{ label: labels.statHair, value: stats.hairColor }] : []),
-    ...(stats.eyeColor ? [{ label: labels.statEyes, value: stats.eyeColor }] : []),
+    ...(stats.hairColor
+      ? [{ label: labels.statHair, value: translateHairColor(stats.hairColor, locale) }]
+      : []),
+    ...(stats.eyeColor
+      ? [{ label: labels.statEyes, value: translateEyeColor(stats.eyeColor, locale) }]
+      : []),
   ];
 
   return (

@@ -37,12 +37,18 @@ export const LOCALE_OPTIONS: {
   id: SiteLocalePage;
   label: string;
   hrefLang: string;
+  code: string;
+  flag: string;
 }[] = [
-  { id: "en", label: "English", hrefLang: "en" },
-  { id: "bg", label: "Български", hrefLang: "bg" },
-  { id: "zh", label: "中文", hrefLang: "zh-CN" },
+  { id: "en", label: "English", hrefLang: "en", code: "EN", flag: "🇬🇧" },
+  { id: "bg", label: "Български", hrefLang: "bg", code: "BG", flag: "🇧🇬" },
+  { id: "zh", label: "中文", hrefLang: "zh-CN", code: "CN", flag: "🇨🇳" },
 ];
 
+export function localeOption(locale: SiteLocalePage) {
+  return LOCALE_OPTIONS.find((option) => option.id === locale) ?? LOCALE_OPTIONS[0];
+}
+
 export function currentLocaleLabel(locale: SiteLocalePage): string {
-  return LOCALE_OPTIONS.find((option) => option.id === locale)?.label ?? "English";
+  return localeOption(locale).label;
 }

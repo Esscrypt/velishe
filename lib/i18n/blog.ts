@@ -20,7 +20,7 @@ const EN_ABOUT =
   "Velishe Journal is the official blog of Velishe Model Management (VÈLISHE), a boutique model agency in Sofia, Bulgaria. We publish casting notes, roster updates, campaign stories, and industry news for clients, models, and collaborators. Subscribe below for email updates.";
 
 const BG_ABOUT =
-  "Velishe Journal е официалният блог на Velishe Model Management (VÈLISHE) — бутикова модел агенция в София, България. Публикуваме бележки за кастинги, актуализации на roster-а, истории от кампании и новини от индустрията за клиенти, модели и партньори. Абонирайте се по-долу за имейл актуализации.";
+  "Velishe Journal е официалният блог на Velishe Model Management (VÈLISHE) — бутикова модел агенция в София. Публикуваме бележки за кастинги, актуализации на roster-а, истории от кампании и новини от индустрията за клиенти, модели и партньори. Абонирайте се по-долу за имейл актуализации.";
 
 const EN: BlogCopy = {
   metaTitle: "Velishe Journal",
@@ -65,12 +65,12 @@ const BG: BlogCopy = {
     {
       question: "Какво е Velishe Journal?",
       answer:
-        "Velishe Journal е блогът на Velishe Model Management — бутикова модел агенция в София, България. Охваща кастинги, нови лица, кампании и новини от агенцията.",
+        "Velishe Journal е блогът на Velishe Model Management — бутикова модел агенция в София. Охваща кастинги, нови лица, кампании и новини от агенцията.",
     },
     {
       question: "Кой публикува Velishe Journal?",
       answer:
-        "Публикациите са от Velishe Model Management (VÈLISHE) — агенция в София, представляваща модели за мода и търговска реклама в България и международно.",
+        "Публикациите са от Velishe Model Management (VÈLISHE) — агенция в София, представляваща модели за мода и реклама в България и международно.",
     },
     {
       question: "Как мога да се абонирам за Velishe Journal?",

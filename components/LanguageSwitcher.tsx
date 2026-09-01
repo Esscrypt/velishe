@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import {
   LOCALE_OPTIONS,
-  currentLocaleLabel,
   detectLocalePage,
+  localeOption,
   localeSwitchHref,
   type SiteLocalePage,
 } from "@/lib/i18n/locale-switch";
@@ -17,12 +17,37 @@ type LanguageSwitcherProps = {
   onNavigate?: () => void;
 };
 
+function LocaleDisplay({
+  flag,
+  code,
+  label,
+  compact = false,
+}: {
+  flag: string;
+  code: string;
+  label: string;
+  compact?: boolean;
+}) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span className="text-base leading-none" aria-hidden>
+        {flag}
+      </span>
+      <span className="font-medium tracking-wide">{code}</span>
+      {!compact ? (
+        <span className="text-gray-600 font-normal">{label}</span>
+      ) : null}
+    </span>
+  );
+}
+
 export default function LanguageSwitcher({
   className = "",
   onNavigate,
 }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const locale = detectLocalePage(pathname);
+  const current = localeOption(locale);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const listboxId = useId();
@@ -48,7 +73,7 @@ export default function LanguageSwitcher({
     };
   }, [open]);
 
-  function handleSelect(option: SiteLocalePage) {
+  function handleSelect() {
     setOpen(false);
     onNavigate?.();
   }
@@ -61,9 +86,15 @@ export default function LanguageSwitcher({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listboxId}
+        aria-label={`Language: ${current.label}`}
         onClick={() => setOpen((value) => !value)}
       >
-        {currentLocaleLabel(locale)}
+        <LocaleDisplay
+          flag={current.flag}
+          code={current.code}
+          label={current.label}
+          compact
+        />
         <ChevronDown
           size={16}
           className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
@@ -75,7 +106,7 @@ export default function LanguageSwitcher({
           id={listboxId}
           role="listbox"
           aria-label="Language"
-          className="absolute right-0 top-full z-50 mt-2 min-w-[10rem] border border-gray-200 bg-white py-1 shadow-md"
+          className="absolute right-0 top-full z-50 mt-2 min-w-[12rem] border border-gray-200 bg-white py-1 shadow-md"
         >
           {LOCALE_OPTIONS.map((option) => {
             const selected = option.id === locale;
@@ -89,9 +120,13 @@ export default function LanguageSwitcher({
                       ? "bg-gray-50 font-medium text-black"
                       : "text-gray-700 hover:bg-gray-50 hover:text-black"
                   }`}
-                  onClick={() => handleSelect(option.id)}
+                  onClick={handleSelect}
                 >
-                  {option.label}
+                  <LocaleDisplay
+                    flag={option.flag}
+                    code={option.code}
+                    label={option.label}
+                  />
                 </Link>
               </li>
             );

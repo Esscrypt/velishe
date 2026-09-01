@@ -63,7 +63,7 @@ const MODEL_PAGE: Record<SiteLocale, ModelPageLabels> = {
   bg: {
     backToBoard: (boardTitle) => `Към ${boardTitle}`,
     measurements: "Мерки",
-    connect: "Контакт",
+    connect: "Мрежи",
     about: (name) => `За ${name}`,
     inTheJournal: "В Journal",
     currentlyBooked: "В момента зает/а",
@@ -80,7 +80,7 @@ const MODEL_PAGE: Record<SiteLocale, ModelPageLabels> = {
     statHeight: "Височина",
     statHips: "Ханш",
     statWaist: "Талия",
-    statBust: "Гърди",
+    statBust: "Бюст",
     statShoeSize: "Обувки",
     statHair: "Коса",
     statEyes: "Очи",

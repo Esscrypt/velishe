@@ -10,6 +10,7 @@ import DownloadPortfolioButton from "@/components/DownloadPortfolioButton";
 import ModelProfileClient from "@/components/ModelProfileClient";
 import { buildModelBio } from "@/lib/model-bio";
 import { boardConfig } from "@/lib/i18n/boards";
+import { translateEyeColor, translateHairColor } from "@/lib/i18n/model-colors";
 import { modelPageLabels } from "@/lib/i18n/model-page";
 import type { SiteLocale } from "@/lib/i18n/locale";
 import { localizedHref } from "@/lib/i18n/locale";
@@ -48,10 +49,16 @@ export default async function ModelPageContent({
       ? [{ label: labels.statShoeSize, value: model.stats.shoeSize }]
       : []),
     ...(model.stats.hairColor
-      ? [{ label: labels.statHair, value: model.stats.hairColor }]
+      ? [{
+          label: labels.statHair,
+          value: translateHairColor(model.stats.hairColor, locale),
+        }]
       : []),
     ...(model.stats.eyeColor
-      ? [{ label: labels.statEyes, value: model.stats.eyeColor }]
+      ? [{
+          label: labels.statEyes,
+          value: translateEyeColor(model.stats.eyeColor, locale),
+        }]
       : []),
   ];
 

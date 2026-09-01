@@ -5,6 +5,7 @@ import { Download, Loader2 } from "lucide-react";
 import jsPDF from "jspdf";
 import type { Model, ModelMedia, ModelStats } from "@/types/model";
 import { modelPageLabels } from "@/lib/i18n/model-page";
+import { translateEyeColor, translateHairColor } from "@/lib/i18n/model-colors";
 import type { SiteLocale } from "@/lib/i18n/locale";
 
 interface DownloadPortfolioButtonProps {
@@ -78,8 +79,12 @@ function buildStatsLine(stats: ModelStats, locale: SiteLocale = "en"): string {
   if (stats.waist) parts.push(`${labels.statWaist} ${stats.waist}`);
   if (stats.hips) parts.push(`${labels.statHips} ${stats.hips}`);
   if (stats.shoeSize) parts.push(`${labels.statShoe} ${stats.shoeSize}`);
-  if (stats.hairColor) parts.push(`${labels.statHair} ${stats.hairColor}`);
-  if (stats.eyeColor) parts.push(`${labels.statEyes} ${stats.eyeColor}`);
+  if (stats.hairColor) {
+    parts.push(`${labels.statHair} ${translateHairColor(stats.hairColor, locale)}`);
+  }
+  if (stats.eyeColor) {
+    parts.push(`${labels.statEyes} ${translateEyeColor(stats.eyeColor, locale)}`);
+  }
   return parts.join("   \u2022   ");
 }
 

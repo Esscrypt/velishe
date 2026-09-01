@@ -1,6 +1,10 @@
 import { Model } from "@/types/model";
 import { ORGANIZATION_EMAIL, SITE_NAME } from "@/lib/metadata";
 import type { SiteLocale } from "@/lib/i18n/locale";
+import {
+  eyeColorBioPhrase,
+  hairColorBioPhrase,
+} from "@/lib/i18n/model-colors";
 
 type BioModel = Pick<
   Model,
@@ -129,79 +133,82 @@ function bgJoinList(items: string[]): string {
   return `${items.slice(0, -1).join(", ")} и ${items[items.length - 1]}`;
 }
 
+function bgWithTraits(traits: string[]): string {
+  const phrase = bgJoinList(traits);
+  const first = phrase.trim().charAt(0).toLocaleLowerCase("bg");
+  const preposition = ["с", "з", "ш", "щ"].includes(first) ? "със" : "с";
+  return `${preposition} ${phrase}`;
+}
+
 function grammarForBg(model: BioModel): {
-  role: string;
-  pronoun: "Той" | "Тя" | "Те";
-  verb: "е" | "са";
-  have: "има" | "имат";
+  intro: string;
+  heightLead: string;
+  have: string;
+  booked: string;
 } {
   const isDuo = /&/.test(model.name);
   if (isDuo) {
     return {
-      role: "модели за мода и търговска реклама",
-      pronoun: "Те",
-      verb: "са",
-      have: "имат",
+      intro: `${model.name} са модели в ${SITE_NAME}.`,
+      heightLead: "Височината им е",
+      have: "Имат",
+      booked: "В момента са заети",
     };
   }
   if (model.gender === "male") {
     return {
-      role: "мъжки модел за мода и търговска реклама",
-      pronoun: "Той",
-      verb: "е",
-      have: "има",
+      intro: `${model.name} е модел, представен от ${SITE_NAME}.`,
+      heightLead: "Висок е",
+      have: "Има",
+      booked: "В момента е зает",
     };
   }
   if (model.gender === "female") {
     return {
-      role: "женски модел за мода и търговска реклама",
-      pronoun: "Тя",
-      verb: "е",
-      have: "има",
+      intro: `${model.name} е модел, представена от ${SITE_NAME}.`,
+      heightLead: "Висока е",
+      have: "Има",
+      booked: "В момента е заета",
     };
   }
   return {
-    role: "модел за мода и търговска реклама",
-    pronoun: "Те",
-    verb: "са",
-    have: "имат",
+    intro: `${model.name} е модел в ${SITE_NAME}.`,
+    heightLead: "Височината е",
+    have: "Има",
+    booked: "В момента е зает/а",
   };
 }
 
 function buildModelBioBg(model: BioModel): string {
-  const { role, pronoun, verb, have } = grammarForBg(model);
-  const isDuo = /&/.test(model.name);
-
-  const sentences: string[] = [
-    `${model.name} ${isDuo ? "са" : "е"} ${role}, представляван${isDuo ? "и" : model.gender === "male" ? "" : "а"} от ${SITE_NAME} в София, България.`,
-  ];
+  const { intro, heightLead, have, booked } = grammarForBg(model);
+  const sentences: string[] = [intro];
 
   const height = model.stats.height?.trim();
   const hair = model.stats.hairColor?.trim();
   const eyes = model.stats.eyeColor?.trim();
   const traits: string[] = [];
-  if (hair) traits.push(`${phraseColor(hair)} коса`);
-  if (eyes) traits.push(`${phraseColor(eyes)} очи`);
+  if (hair) traits.push(`${hairColorBioPhrase(hair, "bg")} коса`);
+  if (eyes) traits.push(`${eyeColorBioPhrase(eyes, "bg")} очи`);
 
   if (height && traits.length > 0) {
-    sentences.push(`${pronoun} ${verb} ${height} с ${bgJoinList(traits)}.`);
+    sentences.push(`${heightLead} ${height}, ${bgWithTraits(traits)}.`);
   } else if (height) {
-    sentences.push(`${pronoun} ${verb} ${height}.`);
+    sentences.push(`${heightLead} ${height}.`);
   } else if (traits.length > 0) {
-    sentences.push(`${pronoun} ${have} ${bgJoinList(traits)}.`);
+    sentences.push(`${have} ${bgJoinList(traits)}.`);
   }
 
   const location = model.targetLocation?.trim();
+  const bookingLine = `За резервации: ${ORGANIZATION_EMAIL}.`;
+
   if (model.booked && location) {
-    sentences.push(
-      `${pronoun} ${verb === "е" ? "е" : "са"} в момента зает${isDuo ? "и" : model.gender === "male" ? "" : "а"} в ${location}. Запитвания за booking: ${ORGANIZATION_EMAIL}.`,
-    );
+    sentences.push(`${booked} в ${location}. ${bookingLine}`);
   } else if (model.board === "development") {
     sentences.push(
-      `${pronoun} ${verb} в Development дъската на Velishe. Запитвания за booking: ${ORGANIZATION_EMAIL}.`,
+      `${model.name} е част от Development board на Velishe. ${bookingLine}`,
     );
   } else {
-    sentences.push(`Запитвания за booking: ${ORGANIZATION_EMAIL}.`);
+    sentences.push(bookingLine);
   }
 
   return sentences.join(" ");
