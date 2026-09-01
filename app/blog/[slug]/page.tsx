@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import BlogBodyContent from "@/components/BlogBodyContent";
 import BlogCredits from "@/components/BlogCredits";
 import BlogPostModelCta from "@/components/BlogPostModelCta";
 import BlogRelatedPosts from "@/components/BlogRelatedPosts";
@@ -14,6 +15,7 @@ import {
 } from "@/lib/blog";
 import { buildBlogPostOgImage } from "@/lib/blog-og";
 import { pickStillBlogMedia } from "@/lib/blog-media";
+import { isBlocksDocument, plainTextFromBody } from "@/lib/blog-blocks";
 import { plainTextFromMarkdown, markdownToSafeHtml } from "@/lib/blog-markdown";
 import { coerceDate, formatBlogDate, toIsoDateString } from "@/lib/format-date";
 import { publicBlogImageUrl } from "@/lib/image-url";
@@ -82,7 +84,7 @@ export async function generateMetadata({ params }: PageProps) {
   }
 
   const description =
-    post.teaser?.trim() || plainTextFromMarkdown(post.body, 160);
+    post.teaser?.trim() || plainTextFromBody(post.body, 160);
   const image = buildBlogPostOgImage({
     slug: post.slug,
     title: post.title,
@@ -108,8 +110,12 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post) notFound();
 
   const bodyHtml = markdownToSafeHtml(post.body);
+  const usesBlocks = isBlocksDocument(post.body);
+  const allMedia = [post.cover, ...post.gallery].filter(
+    (item): item is BlogMediaItem => item !== null,
+  );
   const description =
-    post.teaser?.trim() || plainTextFromMarkdown(post.body, 160);
+    post.teaser?.trim() || plainTextFromBody(post.body, 160);
   const jsonLdImage =
     stillImageUrl(pickStillBlogMedia(post.cover, post.gallery)) ||
     DEFAULT_OG_IMAGE.url;
@@ -203,18 +209,26 @@ export default async function BlogPostPage({ params }: PageProps) {
         />
       </div>
 
-      {post.cover ? (
+      {!usesBlocks && post.cover ? (
         <div className="mb-8 w-full overflow-hidden bg-gray-100">
           <PostMedia media={post.cover} title={post.title} priority />
         </div>
       ) : null}
 
-      <div
-        className="blog-prose text-base leading-7 text-gray-900 space-y-4 mb-10 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-6 [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_blockquote]:border-l-2 [&_blockquote]:border-black [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-700"
-        dangerouslySetInnerHTML={{ __html: bodyHtml }}
-      />
+      {usesBlocks ? (
+        <BlogBodyContent
+          body={post.body}
+          mediaItems={allMedia}
+          title={post.title}
+        />
+      ) : (
+        <div
+          className="blog-prose text-base leading-7 text-gray-900 space-y-4 mb-10 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-6 [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_blockquote]:border-l-2 [&_blockquote]:border-black [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-700"
+          dangerouslySetInnerHTML={{ __html: bodyHtml }}
+        />
+      )}
 
-      {post.gallery.length > 0 ? (
+      {!usesBlocks && post.gallery.length > 0 ? (
         <div className="mb-10 grid grid-cols-2 gap-2">
           {post.gallery.map((media) => (
             <div key={media.id} className="overflow-hidden bg-gray-100">
