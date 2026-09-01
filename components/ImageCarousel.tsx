@@ -114,7 +114,7 @@ export default function ImageCarousel({
     }
   }, [slug, isLoadingMore, hasReachedEnd, lastLoadedOffset, isDigital]);
 
-  // Initial load - make 4 requests in parallel ONCE per slug: featured (limit=1), gallery (limit=10), first digital (limit=1), digitals (limit=10)
+  // Initial load — one batch request for gallery photos and one for digitals.
   useEffect(() => {
     if (!slug) return;
     
@@ -136,21 +136,12 @@ export default function ImageCarousel({
       }
     }
 
-    // Check cache first before making any requests
     const cachedModel = getFullModel(slug);
-    const hasGallery = cachedModel?.gallery && cachedModel.gallery.length > 0;
-    const hasDigitals = cachedModel?.digitals && cachedModel.digitals.length > 0;
-    
-    // If we have both gallery and digitals in cache, skip fetching
-    if (hasGallery && hasDigitals) {
+    if (cachedModel) {
       hasInitializedRef.current = true;
       isFetchingRef.current = false;
-      // Set loaded counts from cache
-      setGalleryLoadedCount(cachedModel.gallery.length);
-      if (cachedModel.digitals) {
-        setDigitalsLoadedCount(cachedModel.digitals.length);
-      }
-      // Media will be set by the switch effect below
+      setGalleryLoadedCount(cachedModel.gallery?.length ?? 0);
+      setDigitalsLoadedCount(cachedModel.digitals?.length ?? 0);
       return;
     }
 
@@ -160,210 +151,93 @@ export default function ImageCarousel({
     isFetchingRef.current = true;
     hasInitializedRef.current = true;
 
+    const buildGalleryMedia = (modelData: Model): ModelMedia[] => {
+      const featuredMedia: ModelMedia | null =
+        featuredImage && isValidImageSrc(featuredImage)
+          ? { type: "image", src: featuredImage, alt: `${modelName || "Model"} - Featured` }
+          : modelData.featuredImage && isValidImageSrc(modelData.featuredImage)
+            ? { type: "image", src: modelData.featuredImage, alt: `${modelName || "Model"} - Featured` }
+            : null;
+
+      const galleryItems = (modelData.gallery || []).filter(
+        (item): item is ModelMedia => isValidImageSrc(item.src),
+      );
+      const galleryWithoutFeatured =
+        galleryItems.length > 0 &&
+        featuredMedia &&
+        galleryItems[0]?.src === featuredMedia.src
+          ? galleryItems.slice(1)
+          : galleryItems;
+
+      return featuredMedia
+        ? [featuredMedia, ...galleryWithoutFeatured]
+        : galleryWithoutFeatured;
+    };
+
     const fetchModelImages = async () => {
       try {
-        // Check cache first to see what we already have
-        const cachedModel = getFullModel(slug);
-        const hasGallery = cachedModel?.gallery && cachedModel.gallery.length > 0;
-        const hasDigitals = cachedModel?.digitals && cachedModel.digitals.length > 0;
-        
-        // Initialize state with cached data
-        const state = {
-          featuredMedia: null as ModelMedia | null,
-          featuredModel: cachedModel || null,
-          galleryMedia: (cachedModel?.gallery || []) as ModelMedia[],
-          galleryModel: cachedModel || null,
-          digitalsMedia: (cachedModel?.digitals || []) as ModelMedia[],
-          digitalsModel: cachedModel || null,
-        };
-        
-        // Set loaded counts from cache if available
-        if (hasGallery) {
-          setGalleryLoadedCount(state.galleryMedia.length);
-        }
-        if (hasDigitals && cachedModel.digitals) {
-          setDigitalsLoadedCount(cachedModel.digitals.length);
-        }
-        
-        // Only fetch what's missing from cache
-        const promises: Array<Promise<Response> & { type?: string }> = [];
-        
-        if (!hasGallery) {
-          const featuredPromise = fetch(`/api/models/${slug}?offset=0&limit=1&type=image`) as Promise<Response> & { type?: string };
-          featuredPromise.type = "featured";
-          promises.push(featuredPromise);
-          
-          const galleryPromise = fetch(`/api/models/${slug}?offset=0&limit=10&type=image`) as Promise<Response> & { type?: string };
-          galleryPromise.type = "gallery";
-          promises.push(galleryPromise);
-        }
-        
-        if (!hasDigitals) {
-          const firstDigitalPromise = fetch(`/api/models/${slug}?offset=0&limit=1&type=digital`) as Promise<Response> & { type?: string };
-          firstDigitalPromise.type = "firstDigital";
-          promises.push(firstDigitalPromise);
-        
-          const digitalsPromise = fetch(`/api/models/${slug}?offset=0&limit=10&type=digital`) as Promise<Response> & { type?: string };
-          digitalsPromise.type = "digitals";
-          promises.push(digitalsPromise);
-        }
-        
-        // If we have everything in cache, update media and return
-        if (promises.length === 0) {
-          // Update media based on current imageType using cached data
-          if (isDigital && state.digitalsMedia.length > 0) {
-            setMedia(state.digitalsMedia);
-            setLoadedCount(state.digitalsMedia.length);
-          } else if (!isDigital) {
-            const featuredMediaForDisplay: ModelMedia | null = featuredImage && isValidImageSrc(featuredImage)
-              ? { type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }
-              : null;
-            
-            const galleryWithoutFeatured = state.galleryMedia.length > 0 && featuredMediaForDisplay && state.galleryMedia[0]?.src === featuredMediaForDisplay.src
-              ? state.galleryMedia.slice(1)
-              : state.galleryMedia;
-            
-            const allMedia: ModelMedia[] = [
-              ...(featuredMediaForDisplay ? [featuredMediaForDisplay] : []),
-              ...galleryWithoutFeatured,
-            ];
-        
-        if (allMedia.length > 0) {
-          setMedia(allMedia);
-              setLoadedCount(galleryWithoutFeatured.length);
+        const [imagesResponse, digitalsResponse] = await Promise.all([
+          fetch(`/api/models/${slug}?offset=0&limit=10&type=image`),
+          fetch(`/api/models/${slug}?offset=0&limit=10&type=digital`),
+        ]);
+
+        let galleryMedia: ModelMedia[] = [];
+        let digitalsMedia: ModelMedia[] = [];
+        let baseModel: Model | null = null;
+
+        if (imagesResponse.ok) {
+          const imagesData: Model = await imagesResponse.json();
+          baseModel = imagesData;
+          galleryMedia = (imagesData.gallery || []).filter(
+            (item): item is ModelMedia => isValidImageSrc(item.src),
+          );
+          setGalleryLoadedCount(galleryMedia.length);
+
+          if (!isDigital) {
+            const allMedia = buildGalleryMedia(imagesData);
+            if (allMedia.length > 0) {
+              setMedia(allMedia);
+              setLoadedCount(Math.max(0, allMedia.length - 1));
             }
           }
-          return;
         }
 
-        // Process requests as they resolve
-        promises.forEach((promise) => {
-          if (promise.type === "featured" || promise.type === "gallery") {
-            promise
-              .then(async (response) => {
-                if (!response.ok) return;
-                const modelData = await response.json();
-                
-                if (promise.type === "featured") {
-                  // Process featured image
-                  if (modelData.gallery && modelData.gallery.length > 0) {
-                    const featured = modelData.gallery[0];
-                    if (isValidImageSrc(featured.src)) {
-                      state.featuredMedia = {
-                        type: "image" as const,
-                        src: featured.src,
-                        alt: `${modelName || "Model"} - Featured`,
-                      };
-                    }
-                  }
-                  state.featuredModel = modelData;
-                  
-                  // Update media immediately with featured image if in gallery mode
-                  if (!isDigital && state.featuredMedia) {
-                    const featuredMediaForDisplay: ModelMedia = featuredImage && isValidImageSrc(featuredImage)
-                      ? { type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }
-                      : state.featuredMedia;
-                    
-                    setMedia([featuredMediaForDisplay]);
-                  }
-                } else if (promise.type === "gallery") {
-                  // Process gallery images
-                  state.galleryModel = modelData;
-                  state.galleryMedia = (modelData.gallery || [])
-                    .filter((item: ModelMedia): item is ModelMedia => isValidImageSrc(item.src));
-                  setGalleryLoadedCount(state.galleryMedia.length);
-                  
-                  // Update media with gallery if in gallery mode
-                  if (!isDigital) {
-                    const featuredMediaForDisplay: ModelMedia | null = featuredImage && isValidImageSrc(featuredImage)
-                      ? { type: "image" as const, src: featuredImage, alt: `${modelName || "Model"} - Featured` }
-                      : state.featuredMedia;
-                    
-                    const galleryWithoutFeatured = state.galleryMedia.length > 0 && featuredMediaForDisplay && state.galleryMedia[0]?.src === featuredMediaForDisplay.src
-                      ? state.galleryMedia.slice(1)
-                      : state.galleryMedia;
-                    
-                    const allMedia: ModelMedia[] = [
-                      ...(featuredMediaForDisplay ? [featuredMediaForDisplay] : []),
-                      ...galleryWithoutFeatured,
-                    ];
-                    
-                    if (allMedia.length > 0) {
-                      setMedia(allMedia);
-                      setLoadedCount(galleryWithoutFeatured.length);
-                    }
-                  }
-                }
-                
-                // Update context
-                const cachedModel = getFullModel(slug);
-                const baseModel = cachedModel || state.galleryModel || state.featuredModel;
-                if (baseModel) {
-                  setFullModel({
-                    ...baseModel,
-                    slug: slug,
-                    gallery: state.galleryMedia,
-                    digitals: state.digitalsMedia,
-                  });
-                }
-              })
-              .catch((error) => {
-                console.error(`Error fetching ${promise.type}:`, error);
-              });
-          } else if (promise.type === "firstDigital" || promise.type === "digitals") {
-            promise
-              .then(async (response) => {
-                if (!response.ok) return;
-                const modelData = await response.json();
-                
-                if (promise.type === "digitals") {
-                  // Process digitals
-                  state.digitalsModel = modelData;
-                  state.digitalsMedia = (modelData.digitals || [])
-                    .filter((item: ModelMedia): item is ModelMedia => isValidImageSrc(item.src));
-                  setDigitalsLoadedCount(state.digitalsMedia.length);
-                  
-                  // Update context with digitals
-                  const cachedModel = getFullModel(slug);
-                  const baseModel = cachedModel || state.galleryModel || state.digitalsModel || state.featuredModel;
-                  if (baseModel) {
-                    setFullModel({
-                      ...baseModel,
-                      slug: slug,
-                      gallery: state.galleryMedia,
-                      digitals: state.digitalsMedia,
-                    });
-                    
-                    // Trigger effect update when digitals are added
-                    if (state.digitalsMedia.length > 0) {
-                      setDigitalsUpdateTrigger(prev => prev + 1);
-                    }
-                    
-                    // Force update media if in digital mode
-                    if (currentImageTypeRef.current === "digital" && state.digitalsMedia.length > 0) {
-                      setMedia(state.digitalsMedia);
-                      setLoadedCount(state.digitalsMedia.length);
-                    }
-                  }
-                }
-              })
-              .catch((error) => {
-                console.error(`Error fetching ${promise.type}:`, error);
-              });
+        if (digitalsResponse.ok) {
+          const digitalsData: Model = await digitalsResponse.json();
+          if (!baseModel) {
+            baseModel = digitalsData;
           }
-        });
-        
-        // Wait for all requests to complete
-        await Promise.allSettled(promises);
+          digitalsMedia = (digitalsData.digitals || []).filter(
+            (item): item is ModelMedia => isValidImageSrc(item.src),
+          );
+          setDigitalsLoadedCount(digitalsMedia.length);
+
+          if (digitalsMedia.length > 0) {
+            setDigitalsUpdateTrigger((prev) => prev + 1);
+            if (currentImageTypeRef.current === "digital") {
+              setMedia(digitalsMedia);
+              setLoadedCount(digitalsMedia.length);
+            }
+          }
+        }
+
+        if (baseModel) {
+          setFullModel({
+            ...baseModel,
+            slug,
+            gallery: galleryMedia,
+            digitals: digitalsMedia,
+          });
+        }
       } catch (error) {
         console.error("Error fetching model images:", error);
-        hasInitializedRef.current = false; // Allow retry on error
+        hasInitializedRef.current = false;
       } finally {
         isFetchingRef.current = false;
       }
     };
 
-    fetchModelImages();
+    void fetchModelImages();
   }, [slug, featuredImage, modelName, setFullModel, getFullModel]);
 
   // Switch media when imageType changes OR after initial data load
