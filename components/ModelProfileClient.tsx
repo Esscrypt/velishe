@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import ImageCarousel from "@/components/ImageCarousel";
 import { useModels } from "@/contexts/ModelsContext";
+import { useModelPageLoad } from "@/contexts/ModelPageLoadContext";
 
 interface ModelProfileClientProps {
   slug: string;
@@ -21,6 +22,7 @@ export default function ModelProfileClient({
 }: ModelProfileClientProps) {
   const [imageMode, setImageMode] = useState<"image" | "digital">("image");
   const { getFullModel } = useModels();
+  const { notifyCarouselReady } = useModelPageLoad();
   const [hasDigitals, setHasDigitals] = useState(false);
 
   useEffect(() => {
@@ -59,6 +61,7 @@ export default function ModelProfileClient({
         featuredImage={imageMode === "image" ? featuredImage : undefined}
         modelName={modelName}
         imageType={imageMode}
+        onInitialLoadComplete={notifyCarouselReady}
       />
       {hasDigitals && (
         <div className="flex items-center gap-4 mt-4">

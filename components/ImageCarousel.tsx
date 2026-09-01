@@ -17,6 +17,7 @@ interface ImageCarouselProps {
   modelName?: string;
   className?: string;
   imageType?: "image" | "digital";
+  onInitialLoadComplete?: () => void;
 }
 
 export default function ImageCarousel({ 
@@ -25,7 +26,8 @@ export default function ImageCarousel({
   featuredImage,
   modelName,
   className = "",
-  imageType = "image"
+  imageType = "image",
+  onInitialLoadComplete,
 }: ImageCarouselProps) {
   const { getFullModel, setFullModel, fullModels } = useModels();
   const isDigital = imageType === "digital";
@@ -53,8 +55,18 @@ export default function ImageCarousel({
   // Refs to prevent duplicate fetches and unnecessary updates
   const isFetchingRef = useRef(false);
   const hasInitializedRef = useRef(false);
+  const hasNotifiedLoadRef = useRef(false);
+  const onInitialLoadCompleteRef = useRef(onInitialLoadComplete);
   const currentSlugRef = useRef(slug);
   const currentImageTypeRef = useRef(imageType);
+
+  onInitialLoadCompleteRef.current = onInitialLoadComplete;
+
+  const notifyInitialLoadComplete = useCallback(() => {
+    if (hasNotifiedLoadRef.current) return;
+    hasNotifiedLoadRef.current = true;
+    onInitialLoadCompleteRef.current?.();
+  }, []);
 
   const isValidImageSrc = (src: string): boolean => {
     return (
@@ -116,12 +128,16 @@ export default function ImageCarousel({
 
   // Initial load — one batch request for gallery photos and one for digitals.
   useEffect(() => {
-    if (!slug) return;
+    if (!slug) {
+      notifyInitialLoadComplete();
+      return;
+    }
     
     // Only reset if slug changed (not on imageType change)
     if (currentSlugRef.current !== slug) {
       currentSlugRef.current = slug;
       hasInitializedRef.current = false;
+      hasNotifiedLoadRef.current = false;
       isFetchingRef.current = false;
       setLastLoadedOffset(null);
       setHasReachedEnd(false);
@@ -142,6 +158,7 @@ export default function ImageCarousel({
       isFetchingRef.current = false;
       setGalleryLoadedCount(cachedModel.gallery?.length ?? 0);
       setDigitalsLoadedCount(cachedModel.digitals?.length ?? 0);
+      notifyInitialLoadComplete();
       return;
     }
 
@@ -234,11 +251,12 @@ export default function ImageCarousel({
         hasInitializedRef.current = false;
       } finally {
         isFetchingRef.current = false;
+        notifyInitialLoadComplete();
       }
     };
 
     void fetchModelImages();
-  }, [slug, featuredImage, modelName, setFullModel, getFullModel]);
+  }, [slug, featuredImage, modelName, setFullModel, getFullModel, notifyInitialLoadComplete]);
 
   // Switch media when imageType changes OR after initial data load
   useEffect(() => {

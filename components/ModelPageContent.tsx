@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import ModelJournalSection from "@/components/ModelJournalSection";
+import { ModelPageLoadProvider } from "@/contexts/ModelPageLoadContext";
 import { getModelBySlug } from "@/lib/models";
 import SocialIcons from "@/components/SocialIcons";
 import ModelPageTracker from "@/components/ModelPageTracker";
@@ -62,10 +63,11 @@ export default async function ModelPageContent({
   const showJournalSection = !Number.isNaN(modelIdNum);
 
   return (
-    <div
-      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
-      lang={locale === "bg" ? "bg" : "en"}
-    >
+    <ModelPageLoadProvider>
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+        lang={locale === "bg" ? "bg" : "en"}
+      >
       <ModelPageTracker modelSlug={slug} modelName={model.name} />
       <Link
         href={backHref}
@@ -161,6 +163,7 @@ export default async function ModelPageContent({
       {showJournalSection ? (
         <ModelJournalSection modelId={modelIdNum} locale={locale} />
       ) : null}
-    </div>
+      </div>
+    </ModelPageLoadProvider>
   );
 }
