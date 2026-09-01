@@ -83,7 +83,7 @@ describe("buildModelBio", () => {
 
   test("writes Bulgarian bio for a female model", () => {
     const bio = buildModelBio(sample(), "bg");
-    expect(bio).toContain("Raya е модел, представена от Velishe Model Management.");
+    expect(bio).toContain("Raya е модел, представлявана от Velishe Model Management.");
     expect(bio).toContain("Висока е 179 cm, с кафява коса и зелени очи.");
     expect(bio).toContain("За резервации:");
     expect(bio).not.toMatch(/brown|green/i);
@@ -98,7 +98,7 @@ describe("buildModelBio", () => {
       }),
       "bg",
     );
-    expect(bio).toContain("Kaloyan е модел, представен от Velishe Model Management.");
+    expect(bio).toContain("Kaloyan е модел, представляван от Velishe Model Management.");
     expect(bio).toContain("Висок е 185 cm, със светлокафява коса и лешникови очи.");
   });
 });

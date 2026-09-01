@@ -157,7 +157,7 @@ function grammarForBg(model: BioModel): {
   }
   if (model.gender === "male") {
     return {
-      intro: `${model.name} е модел, представен от ${SITE_NAME}.`,
+      intro: `${model.name} е модел, представляван от ${SITE_NAME}.`,
       heightLead: "Висок е",
       have: "Има",
       booked: "В момента е зает",
@@ -165,7 +165,7 @@ function grammarForBg(model: BioModel): {
   }
   if (model.gender === "female") {
     return {
-      intro: `${model.name} е модел, представена от ${SITE_NAME}.`,
+      intro: `${model.name} е модел, представлявана от ${SITE_NAME}.`,
       heightLead: "Висока е",
       have: "Има",
       booked: "В момента е заета",

@@ -52,7 +52,7 @@ const EN: ContactCopy = {
   viewPortfolio: "View portfolio",
   bookingHint:
     "Use the email below — the subject is prefilled for this booking.",
-  companyHeading: "Velishe Model Management Ltd",
+  companyHeading: "Velishe Model Management Ltd.",
   officeAddressLabel: "Office Address:",
   officeAddress: "Sofia, Bulgaria",
   emailLabel: "Email:",
@@ -89,7 +89,7 @@ const BG: ContactCopy = {
   viewPortfolio: "Виж портфолио",
   bookingHint:
     "Използвайте имейла по-долу — темата е предварително попълнена за тази резервация.",
-  companyHeading: "Velishe Model Management Ltd",
+  companyHeading: "Velishe Model Management Ltd.",
   officeAddressLabel: "Адрес на офиса:",
   officeAddress: "София",
   emailLabel: "Имейл:",

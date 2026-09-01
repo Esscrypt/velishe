@@ -4,10 +4,6 @@ import HomeSpotlight from "@/components/HomeSpotlight";
 import WebSiteSchema from "@/components/WebSiteSchema";
 import { getModelsForListing } from "@/lib/models";
 import {
-  formatLocationList,
-  uniqueBookedLocations,
-} from "@/lib/model-bio";
-import {
   languageAlternates,
   ORGANIZATION_EMAIL,
   ORGANIZATION_PHONE_DISPLAY,
@@ -60,13 +56,9 @@ export const revalidate = 3600;
 
 export default async function Home() {
   const models = await getModelsForListing();
-  const modelCount = models.length;
-  const locationPhrase = formatLocationList(uniqueBookedLocations(models));
-  const bookingsClause = locationPhrase
-    ? ` Current bookings include ${locationPhrase}.`
-    : "";
 
-  const intro = `VÈLISHE Model Management is a boutique modeling agency founded in 2025 and based in Sofia, Bulgaria. The agency represents ${modelCount} professional women and men for fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. Velishe is a selective, new-generation agency: we place talent with Bulgarian and international clients and develop careers from first casting through international bookings.${bookingsClause} We work with a carefully curated roster rather than an open board, and we invest in each model's long-term positioning in editorial and commercial markets. Casting, campaign, and editorial enquiries go to ${ORGANIZATION_EMAIL}. Aspiring models apply through Become a Model; female applicants typically start at 173 cm and male applicants at 183 cm, with natural unedited photos. The signed roster is split between Mainboard and Development; the VÈLISHE Academy is a separate training programme. Bookings are handled from Sofia in English and Bulgarian.`;
+  const intro =
+    "VÈLISHE Model Management is a boutique modeling agency founded in 2025 and based in Sofia, Bulgaria. We represent and develop professional fashion and commercial models — women and men with a distinct presence, individual attitude, and authentic character that translates across editorial, campaign, and digital work. We are a new-generation agency built on the belief that great representation shapes careers. We work with a selective, carefully curated roster and invest in each model's long-term development — from first casting to international placement.";
 
   const whatWeDo = `Velishe Model Management books and develops fashion and commercial models from Sofia, Bulgaria, for Bulgarian and international productions. Talent works in seven categories: fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. The agency connects models with brands, creative directors, and photographers, and stays involved after the booking — portfolio building, market positioning, and career guidance. Clients request castings or book a specific model through ${ORGANIZATION_EMAIL}, with briefs handled in English or Bulgarian from the Sofia office. The signed roster is split in two: Mainboard for established names and Development for new faces. Browse those boards on this website; each model page includes measurements and a short bio. The VÈLISHE Academy is a training programme and is not the same as being signed. Velishe represents both women and men and places talent locally and abroad.`;
 

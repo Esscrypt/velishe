@@ -14,6 +14,7 @@ const HAIR_COLOR_BG: Record<string, string> = {
   "strawberry blonde": "Ягодово руса",
   auburn: "Червеникава",
   red: "Рижа",
+  ginger: "Рижава",
   grey: "Сива",
   gray: "Сива",
   white: "Бяла",

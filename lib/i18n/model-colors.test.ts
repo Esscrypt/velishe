@@ -8,7 +8,7 @@ describe("model color translations", () => {
   test("translates common hair colors to Bulgarian", () => {
     expect(translateHairColor("Brown", "bg")).toBe("Кафява");
     expect(translateHairColor("Light Brown", "bg")).toBe("Светлокафява");
-    expect(translateHairColor("Blonde", "bg")).toBe("Руса");
+    expect(translateHairColor("Ginger", "bg")).toBe("Рижава");
   });
 
   test("translates common eye colors to Bulgarian", () => {
