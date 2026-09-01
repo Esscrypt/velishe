@@ -26,6 +26,7 @@ export const WIKIDATA_URL = "https://www.wikidata.org/wiki/Q141222478";
 
 export const FOUNDER = {
   name: "Christiana Velichkova",
+  nameBg: "Кристияна Величкова",
   nameZh: "克里斯蒂安娜·韦利奇科娃",
   slug: "christiana",
   jobTitle: "Founder & CEO",
@@ -33,10 +34,12 @@ export const FOUNDER = {
 } as const;
 
 export const ZH_PATH = "/zh/";
+export const BG_PATH = "/bg/";
 
 export function languageAlternates(): Record<string, string> {
   return {
     en: `${SITE_URL}/`,
+    bg: `${SITE_URL}${BG_PATH}`,
     "zh-CN": `${SITE_URL}${ZH_PATH}`,
     "x-default": `${SITE_URL}/`,
   };

@@ -1,10 +1,12 @@
 import { buildPageMetadata } from "@/lib/metadata";
+import { pageLanguageAlternates } from "@/lib/i18n/locale";
 
 export const metadata = buildPageMetadata({
   title: "Terms and Conditions",
   description:
     "Terms and Conditions for using the Velishe Model Management website and services.",
   path: "/terms/",
+  languages: pageLanguageAlternates("/terms/"),
 });
 
 export default function TermsPage() {

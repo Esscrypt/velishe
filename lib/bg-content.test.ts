@@ -6,23 +6,12 @@ import {
   ORGANIZATION_EMAIL,
   ORGANIZATION_UIC,
   SITE_URL,
-  ZH_PATH,
-  languageAlternates,
+  BG_PATH,
 } from "./metadata";
-import { ZH_PAGE_DESCRIPTION, buildZhHomeCopy } from "./zh-content";
+import { BG_PAGE_DESCRIPTION, buildBgHomeCopy } from "./bg-content";
 
-describe("languageAlternates", () => {
-  test("points en, bg, and zh-CN at the live www host", () => {
-    const languages = languageAlternates();
-    expect(languages.en).toBe(`${SITE_URL}/`);
-    expect(languages.bg).toBe(`${SITE_URL}/bg/`);
-    expect(languages["zh-CN"]).toBe(`${SITE_URL}${ZH_PATH}`);
-    expect(languages["x-default"]).toBe(`${SITE_URL}/`);
-  });
-});
-
-describe("buildZhHomeCopy", () => {
-  const copy = buildZhHomeCopy({
+describe("buildBgHomeCopy", () => {
+  const copy = buildBgHomeCopy({
     modelCount: 28,
     locationPhrase: "Shanghai, China, and Milan, Italy",
   });
@@ -31,7 +20,7 @@ describe("buildZhHomeCopy", () => {
     expect(copy.intro).toContain(LEGAL_NAME);
     expect(copy.intro).toContain(LEGAL_NAME_BG);
     expect(copy.intro).toContain(ORGANIZATION_UIC);
-    expect(copy.intro).toContain(FOUNDER.nameZh);
+    expect(copy.intro).toContain(FOUNDER.nameBg);
     expect(copy.intro).toContain(FOUNDER.name);
     expect(copy.intro).toContain(ORGANIZATION_EMAIL);
     expect(copy.intro).toContain("28");
@@ -46,9 +35,14 @@ describe("buildZhHomeCopy", () => {
     expect(copy.whatWeDo).toContain(ORGANIZATION_EMAIL);
   });
 
-  test("keeps the meta description citeable for Baidu and DeepSeek", () => {
-    expect(ZH_PAGE_DESCRIPTION).toContain("索非亚");
-    expect(ZH_PAGE_DESCRIPTION).toContain(ORGANIZATION_UIC);
-    expect(ZH_PAGE_DESCRIPTION).toContain(ORGANIZATION_EMAIL);
+  test("keeps the meta description citeable for Bulgarian search", () => {
+    expect(BG_PAGE_DESCRIPTION).toContain("София");
+    expect(BG_PAGE_DESCRIPTION).toContain(ORGANIZATION_UIC);
+    expect(BG_PAGE_DESCRIPTION).toContain(ORGANIZATION_EMAIL);
+    expect(BG_PAGE_DESCRIPTION).toContain(LEGAL_NAME_BG);
+  });
+
+  test("links the Bulgarian SEO page path", () => {
+    expect(`${SITE_URL}${BG_PATH}`).toContain("/bg/");
   });
 });

@@ -4,6 +4,7 @@ import { getAllModels } from "@/lib/models";
 import { buildModelBio } from "@/lib/model-bio";
 import { JOURNAL_ABOUT, JOURNAL_TITLE } from "@/lib/blog-journal";
 import { buildZhHomeCopy } from "@/lib/zh-content";
+import { buildBgHomeCopy } from "@/lib/bg-content";
 import {
   FOUNDER,
   GOOGLE_BUSINESS_URL,
@@ -17,6 +18,7 @@ import {
   SITE_URL,
   WIKIDATA_URL,
   ZH_PATH,
+  BG_PATH,
 } from "@/lib/metadata";
 
 async function buildLlmsTxt(): Promise<string> {
@@ -59,7 +61,12 @@ Velishe Model Management (VÈLISHE) is a boutique model management agency founde
 - Female model minimum height: 173 cm
 - Male model minimum height: 183 cm
 - Academy: VÈLISHE Academy (waitlist-based enrollment)
+- Bulgarian page: ${SITE_URL}${BG_PATH}
 - Chinese page: ${SITE_URL}${ZH_PATH}
+
+## Български
+${buildBgHomeCopy({ modelCount: models.length, locationPhrase: "" }).intro}
+Пълна страница: ${SITE_URL}${BG_PATH}
 
 ## 中文简介
 ${buildZhHomeCopy({ modelCount: models.length, locationPhrase: "" }).intro}
@@ -69,6 +76,7 @@ ${buildZhHomeCopy({ modelCount: models.length, locationPhrase: "" }).intro}
 
 ### Main Pages
 - [Home](${SITE_URL}/): Agency overview with model spotlight
+- [Български](${SITE_URL}${BG_PATH}): Bulgarian-language agency facts for local SEO in Sofia and Bulgaria
 - [中文简介](${SITE_URL}${ZH_PATH}): Chinese-language agency facts for Baidu, DeepSeek, and Doubao
 - [Mainboard](${SITE_URL}/mainboard/): Established signed roster
 - [Development](${SITE_URL}/development/): New-face roster

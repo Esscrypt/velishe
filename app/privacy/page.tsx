@@ -1,10 +1,12 @@
 import { buildPageMetadata } from "@/lib/metadata";
+import { pageLanguageAlternates } from "@/lib/i18n/locale";
 
 export const metadata = buildPageMetadata({
   title: "Privacy Policy",
   description:
     "Privacy Policy for Velishe Model Management. How we collect, use, and protect your personal data.",
   path: "/privacy/",
+  languages: pageLanguageAlternates("/privacy/"),
 });
 
 export default function PrivacyPage() {

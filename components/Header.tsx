@@ -9,7 +9,11 @@ import {
   INSTAGRAM_URL,
   LINKEDIN_COMPANY_URL,
   WHATSAPP_URL,
+  BG_PATH,
+  ZH_PATH,
 } from "@/lib/metadata";
+import { navLabels } from "@/lib/i18n/nav";
+import { localizedHref } from "@/lib/i18n/locale";
 import { nextHeaderScrollState } from "@/lib/header-scroll";
 
 interface Board {
@@ -17,12 +21,41 @@ interface Board {
   label: string;
 }
 
+type LocalePage = "en" | "bg" | "zh";
+
+function detectLocalePage(pathname: string): LocalePage {
+  if (pathname === "/bg" || pathname === BG_PATH) return "bg";
+  if (pathname === "/zh" || pathname === ZH_PATH) return "zh";
+  return "en";
+}
+
+const LOCALE_LINKS: Record<
+  LocalePage,
+  { href: string; hrefLang: string; label: string }[]
+> = {
+  en: [
+    { href: BG_PATH, hrefLang: "bg", label: "БГ" },
+    { href: ZH_PATH, hrefLang: "zh-CN", label: "中文" },
+  ],
+  bg: [
+    { href: "/", hrefLang: "en", label: "EN" },
+    { href: ZH_PATH, hrefLang: "zh-CN", label: "中文" },
+  ],
+  zh: [
+    { href: "/", hrefLang: "en", label: "EN" },
+    { href: BG_PATH, hrefLang: "bg", label: "БГ" },
+  ],
+};
+
 export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
   const scrollStateRef = useRef({ hidden: false, lastY: 0 });
   const pathname = usePathname();
-  const isZh = pathname === "/zh" || pathname === "/zh/";
+  const localePage = detectLocalePage(pathname);
+  const localeLinks = LOCALE_LINKS[localePage];
+  const nav = navLabels(localePage === "bg" ? "bg" : "en");
+  const homeHref = localizedHref("/", localePage === "bg" ? "bg" : "en");
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -62,7 +95,7 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
       >
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-40 md:h-48">
-            <Link href="/" className="flex items-center" onClick={closeMenu}>
+            <Link href={homeHref} className="flex items-center" onClick={closeMenu}>
               {/* SVG logo — next/image does not optimize SVG */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -77,29 +110,32 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
             </Link>
             <nav className="hidden md:flex items-center gap-10">
               {enabledBoards.map((b) => (
-                <Link key={b.id} href={`/${b.id}`} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                <Link key={b.id} href={localizedHref(`/${b.id}/`, localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                   {b.label.toUpperCase()}
                 </Link>
               ))}
-              <Link href="/search" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                SEARCH
+              <Link href={localizedHref("/search", localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                {nav.search}
               </Link>
-              <Link href="/become-a-model" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                BECOME A MODEL
+              <Link href={localizedHref("/become-a-model/", localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                {nav.becomeAModel}
               </Link>
-              <Link href="/blog" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                BLOG
+              <Link href={localizedHref("/blog/", localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                {nav.blog}
               </Link>
-              <Link href="/contact" className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
-                CONTACT
+              <Link href={localizedHref("/contact/", localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                {nav.contact}
               </Link>
-              <Link
-                href={isZh ? "/" : "/zh/"}
-                className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide"
-                hrefLang={isZh ? "en" : "zh-CN"}
-              >
-                {isZh ? "EN" : "中文"}
-              </Link>
+              {localeLinks.map((link) => (
+                <Link
+                  key={link.hrefLang}
+                  href={link.href}
+                  className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide"
+                  hrefLang={link.hrefLang}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 hidden md:flex">
@@ -169,7 +205,7 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
       >
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center p-4 border-b border-gray-200">
-            <span className="text-lg font-semibold text-black">Menu</span>
+            <span className="text-lg font-semibold text-black">{nav.menu}</span>
             <Tooltip label="Close menu">
               <button
                 onClick={closeMenu}
@@ -184,7 +220,7 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
             {enabledBoards.map((b) => (
               <Link
                 key={b.id}
-                href={`/${b.id}`}
+                href={localizedHref(`/${b.id}/`, localePage === "bg" ? "bg" : "en")}
                 onClick={closeMenu}
                 className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
               >
@@ -192,41 +228,44 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               </Link>
             ))}
             <Link
-              href="/search"
+              href={localizedHref("/search", localePage === "bg" ? "bg" : "en")}
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
-              SEARCH
+              {nav.search}
             </Link>
             <Link
-              href="/become-a-model"
+              href={localizedHref("/become-a-model/", localePage === "bg" ? "bg" : "en")}
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
-              BECOME A MODEL
+              {nav.becomeAModel}
             </Link>
             <Link
-              href="/blog"
+              href={localizedHref("/blog/", localePage === "bg" ? "bg" : "en")}
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
-              BLOG
+              {nav.blog}
             </Link>
             <Link
-              href="/contact"
+              href={localizedHref("/contact/", localePage === "bg" ? "bg" : "en")}
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
-              CONTACT
+              {nav.contact}
             </Link>
-            <Link
-              href={isZh ? "/" : "/zh/"}
-              onClick={closeMenu}
-              hrefLang={isZh ? "en" : "zh-CN"}
-              className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide py-2"
-            >
-              {isZh ? "EN" : "中文"}
-            </Link>
+            {localeLinks.map((link) => (
+              <Link
+                key={link.hrefLang}
+                href={link.href}
+                onClick={closeMenu}
+                hrefLang={link.hrefLang}
+                className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide py-2"
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
           <div className="p-4 border-t border-gray-200 space-y-3">
             <a

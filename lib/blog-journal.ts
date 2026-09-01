@@ -15,6 +15,9 @@ export const JOURNAL_ABOUT = `${JOURNAL_TITLE} is the official blog of ${SITE_NA
 export const JOURNAL_ZH_BLURB =
   "Velishe Journal（英文）发布索非亚精品模特经纪公司 VÈLISHE 的选角动态、新面孔介绍与广告战役故事。";
 
+export const JOURNAL_BG_BLURB =
+  "Velishe Journal (на английски) публикува новини за кастинги, нови лица и кампании от бутиковата модел агенция VÈLISHE в София.";
+
 export const JOURNAL_FAQ = [
   {
     question: "What is Velishe Journal?",

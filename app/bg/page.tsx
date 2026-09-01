@@ -9,15 +9,15 @@ import {
 import {
   ORGANIZATION_EMAIL,
   SITE_URL,
-  ZH_PATH,
+  BG_PATH,
 } from "@/lib/metadata";
 import {
-  ZH_PAGE_TITLE,
-  ZH_WORK_CATEGORIES,
-  buildZhHomeCopy,
-} from "@/lib/zh-content";
+  BG_PAGE_TITLE,
+  BG_WORK_CATEGORIES,
+  buildBgHomeCopy,
+} from "@/lib/bg-content";
 
-function ZhFaqItem({
+function BgFaqItem({
   title,
   children,
 }: {
@@ -44,29 +44,29 @@ function ZhFaqItem({
 
 export const revalidate = 60;
 
-export default async function ZhHomePage() {
+export default async function BgHomePage() {
   const models = await getModelsForListing();
-  const copy = buildZhHomeCopy({
+  const copy = buildBgHomeCopy({
     modelCount: models.length,
     locationPhrase: formatLocationList(uniqueBookedLocations(models)),
   });
 
-  const pageUrl = `${SITE_URL}${ZH_PATH}`;
+  const pageUrl = `${SITE_URL}${BG_PATH}`;
   const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
       "@id": `${pageUrl}#webpage`,
       url: pageUrl,
-      name: `${ZH_PAGE_TITLE} | Velishe Model Management`,
-      inLanguage: "zh-CN",
+      name: `${BG_PAGE_TITLE} | Velishe Model Management`,
+      inLanguage: "bg",
       isPartOf: { "@id": `${SITE_URL}/#website` },
       about: { "@id": `${SITE_URL}/#organization` },
     },
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      inLanguage: "zh-CN",
+      inLanguage: "bg",
       mainEntity: [
         {
           "@type": "Question",
@@ -98,7 +98,7 @@ export default async function ZhHomePage() {
   ];
 
   return (
-    <article lang="zh-Hans">
+    <article lang="bg">
       <WebSiteSchema />
       {jsonLd.map((block) => (
         <script
@@ -109,36 +109,36 @@ export default async function ZhHomePage() {
       ))}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">
-          VÈLISHE Model Management — 保加利亚索非亚
+          VÈLISHE Model Management — София, България
         </h1>
         <p className="text-lg text-gray-600 mb-10 max-w-2xl">
-          索非亚精品模特经纪公司。{models.length}{" "}
-          名已签约女模与男模，分属 Mainboard 与 Development。
+          Бутикова модел агенция в София. {models.length} подписани модели —
+          жени и мъже — на Mainboard и Development.
         </p>
 
         <div className="text-gray-700">
-          <ZhFaqItem title={copy.questions.about}>
+          <BgFaqItem title={copy.questions.about}>
             <p>{copy.intro}</p>
-          </ZhFaqItem>
+          </BgFaqItem>
 
-          <ZhFaqItem title={copy.questions.whatWeDo}>
+          <BgFaqItem title={copy.questions.whatWeDo}>
             <p>{copy.whatWeDo}</p>
             <ul className="list-disc list-inside space-y-1">
-              {ZH_WORK_CATEGORIES.map((category) => (
+              {BG_WORK_CATEGORIES.map((category) => (
                 <li key={category}>{category}</li>
               ))}
             </ul>
-          </ZhFaqItem>
+          </BgFaqItem>
 
-          <ZhFaqItem title={copy.questions.requirements}>
+          <BgFaqItem title={copy.questions.requirements}>
             <p>{copy.requirements}</p>
-          </ZhFaqItem>
+          </BgFaqItem>
 
-          <ZhFaqItem title={copy.questions.academy}>
+          <BgFaqItem title={copy.questions.academy}>
             <p>{copy.academy}</p>
-          </ZhFaqItem>
+          </BgFaqItem>
 
-          <ZhFaqItem title={copy.questions.journal}>
+          <BgFaqItem title={copy.questions.journal}>
             <p>{copy.journal}</p>
             <p>
               <Link
@@ -148,35 +148,35 @@ export default async function ZhHomePage() {
                 Velishe Journal
               </Link>
             </p>
-          </ZhFaqItem>
+          </BgFaqItem>
 
-          <ZhFaqItem title={copy.questions.booking}>
+          <BgFaqItem title={copy.questions.booking}>
             <p>{copy.booking}</p>
             <p>
-              有意成为模特者请通过{" "}
+              Кандидати за модели подават през{" "}
               <Link
                 href="/become-a-model/"
                 className="text-gray-900 underline hover:text-gray-600 transition-colors"
               >
                 Become a Model
-              </Link>{" "}
-              页面提交资料。预订与客户询盘请发邮件至{" "}
+              </Link>
+              . Резервации и клиентски запитвания:{" "}
               <a
                 href={`mailto:${ORGANIZATION_EMAIL}`}
                 className="text-gray-900 underline hover:text-gray-600 transition-colors"
               >
                 {ORGANIZATION_EMAIL}
               </a>
-              。
+              .
             </p>
-          </ZhFaqItem>
+          </BgFaqItem>
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/mainboard/"
               className="inline-block px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >
-              查看模特
+              Виж моделите
             </Link>
             <Link
               href="/blog/"
@@ -188,7 +188,7 @@ export default async function ZhHomePage() {
               href="/contact/"
               className="inline-block px-6 py-3 border border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
             >
-              联系我们
+              Контакт
             </Link>
             <Link
               href="/"
@@ -197,11 +197,11 @@ export default async function ZhHomePage() {
               English
             </Link>
             <Link
-              href="/bg/"
+              href="/zh/"
               className="inline-block px-6 py-3 border border-gray-300 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-              hrefLang="bg"
+              hrefLang="zh-CN"
             >
-              Български
+              中文
             </Link>
           </div>
         </div>

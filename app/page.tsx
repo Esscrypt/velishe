@@ -170,6 +170,13 @@ export default async function Home() {
             >
               Get in Touch
             </Link>
+            <Link
+              href="/bg/"
+              className="inline-block px-6 py-3 border border-gray-300 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              hrefLang="bg"
+            >
+              Български
+            </Link>
           </div>
         </div>
       </section>

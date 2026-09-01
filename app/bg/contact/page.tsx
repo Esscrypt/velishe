@@ -1,26 +1,25 @@
 import ContactPageContent from "@/components/ContactPageContent";
 import { contactCopy } from "@/lib/i18n/contact";
-import { pageLanguageAlternates } from "@/lib/i18n/locale";
+import { bgPageMetadataPath, pageLanguageAlternates } from "@/lib/i18n/locale";
 import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  const copy = contactCopy("en");
+  const copy = contactCopy("bg");
   return buildPageMetadata({
     title: copy.metaTitle,
     description: copy.metaDescription,
-    path: "/contact/",
+    path: bgPageMetadataPath("/contact/"),
+    locale: "bg_BG",
     languages: pageLanguageAlternates("/contact/"),
     modifiedTime: new Date(),
   });
 }
 
-type Props = {
-  searchParams: Promise<{ model?: string }>;
-};
+type Props = { searchParams: Promise<{ model?: string }> };
 
-export default async function ContactPage({ searchParams }: Props) {
+export default async function BgContactPage({ searchParams }: Props) {
   const { model: modelSlugParam } = await searchParams;
   const modelSlug =
     typeof modelSlugParam === "string" ? modelSlugParam : undefined;
-  return <ContactPageContent locale="en" modelSlug={modelSlug} />;
+  return <ContactPageContent locale="bg" modelSlug={modelSlug} />;
 }
