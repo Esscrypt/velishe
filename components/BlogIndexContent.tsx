@@ -81,25 +81,27 @@ export default async function BlogIndexContent({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <nav aria-label="Breadcrumb" className="text-sm text-gray-500 mb-6">
-        <ol className="flex flex-wrap items-center gap-1">
-          <li>
-            <Link href={homeHref} className="hover:text-gray-800">
-              {labels.home}
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li aria-current="page" className="text-gray-800">
-            {JOURNAL_TITLE}
-          </li>
-        </ol>
-      </nav>
-      <p className="text-xs tracking-[0.16em] uppercase text-gray-500 mb-2">
-        {labels.journal}
-      </p>
-      <h1 className="font-serif text-4xl sm:text-5xl font-bold text-black leading-tight mb-4">
-        {JOURNAL_TITLE}
-      </h1>
+      <header className="text-center mb-8">
+        <h1 className="font-serif text-4xl sm:text-5xl font-bold text-black leading-tight mb-4">
+          {JOURNAL_TITLE}
+        </h1>
+        <nav aria-label="Breadcrumb" className="text-sm text-gray-500 mb-2">
+          <ol className="flex flex-wrap items-center justify-center gap-1">
+            <li>
+              <Link href={homeHref} className="hover:text-gray-800">
+                {labels.home}
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" className="text-gray-800">
+              {JOURNAL_TITLE}
+            </li>
+          </ol>
+        </nav>
+        <p className="text-xs tracking-[0.16em] uppercase text-gray-500">
+          {labels.journal}
+        </p>
+      </header>
       {locale === "bg" && copy.postsEnglishNote ? (
         <p className="text-sm text-gray-500 mb-8">{copy.postsEnglishNote}</p>
       ) : (
