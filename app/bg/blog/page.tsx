@@ -6,7 +6,7 @@ import { blogCopy } from "@/lib/i18n/blog";
 import { bgPageMetadataPath, pageLanguageAlternates } from "@/lib/i18n/locale";
 import { buildPageMetadata } from "@/lib/metadata";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const posts = await getPublishedPosts();

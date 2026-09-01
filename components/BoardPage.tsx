@@ -2,10 +2,7 @@ import { notFound } from "next/navigation";
 import { getModelsByBoard, getEnabledBoards } from "@/lib/models";
 import { SITE_NAME, SITE_URL } from "@/lib/metadata";
 import { BoardId } from "@/lib/boards";
-import {
-  formatLocationList,
-  uniqueBookedLocations,
-} from "@/lib/model-bio";
+import { uniqueBookedLocations } from "@/lib/model-bio";
 import { boardConfig, boardIntro } from "@/lib/i18n/boards";
 import { commonLabels } from "@/lib/i18n/common";
 import type { SiteLocale } from "@/lib/i18n/locale";
@@ -36,7 +33,7 @@ export default async function BoardPage({
     board,
     locale,
     models.length,
-    formatLocationList(uniqueBookedLocations(models)),
+    uniqueBookedLocations(models),
   );
   const homeUrl = `${SITE_URL}${localizedHref("/", locale)}`;
 
@@ -61,7 +58,7 @@ export default async function BoardPage({
         "@type": "ListItem",
         position: index + 1,
         name: model.name,
-        url: `${SITE_URL}/models/${model.slug}/`,
+        url: `${SITE_URL}${localizedHref(`/models/${model.slug}/`, locale)}`,
       })),
     },
   };
@@ -73,7 +70,7 @@ export default async function BoardPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
       <h1 className="sr-only">{cfg.title}</h1>
-      <BoardModels models={models} />
+      <BoardModels models={models} locale={locale} />
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <details className="group border-t border-gray-200 pt-6">
           <summary className="cursor-pointer list-none text-sm font-medium uppercase tracking-[0.2em] text-gray-900 flex items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">

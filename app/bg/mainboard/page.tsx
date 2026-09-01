@@ -3,7 +3,7 @@ import { boardConfig } from "@/lib/i18n/boards";
 import { bgPageMetadataPath, pageLanguageAlternates } from "@/lib/i18n/locale";
 import { buildPageMetadata } from "@/lib/metadata";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata = buildPageMetadata({
   title: boardConfig("mainboard", "bg").title,

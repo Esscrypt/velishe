@@ -4,12 +4,15 @@ import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
 import jsPDF from "jspdf";
 import type { Model, ModelMedia, ModelStats } from "@/types/model";
+import { modelPageLabels } from "@/lib/i18n/model-page";
+import type { SiteLocale } from "@/lib/i18n/locale";
 
 interface DownloadPortfolioButtonProps {
   slug: string;
   name: string;
   stats: ModelStats;
   featuredImage?: string;
+  locale?: SiteLocale;
 }
 
 interface LoadedImage {
@@ -67,15 +70,16 @@ function fitInBox(
   return { width: imgWidth * ratio, height: imgHeight * ratio };
 }
 
-function buildStatsLine(stats: ModelStats): string {
+function buildStatsLine(stats: ModelStats, locale: SiteLocale = "en"): string {
+  const labels = modelPageLabels(locale);
   const parts: string[] = [];
-  if (stats.height) parts.push(`Height ${stats.height}`);
-  if (stats.bust) parts.push(`Bust ${stats.bust}`);
-  if (stats.waist) parts.push(`Waist ${stats.waist}`);
-  if (stats.hips) parts.push(`Hips ${stats.hips}`);
-  if (stats.shoeSize) parts.push(`Shoe ${stats.shoeSize}`);
-  if (stats.hairColor) parts.push(`Hair ${stats.hairColor}`);
-  if (stats.eyeColor) parts.push(`Eyes ${stats.eyeColor}`);
+  if (stats.height) parts.push(`${labels.statHeight} ${stats.height}`);
+  if (stats.bust) parts.push(`${labels.statBust} ${stats.bust}`);
+  if (stats.waist) parts.push(`${labels.statWaist} ${stats.waist}`);
+  if (stats.hips) parts.push(`${labels.statHips} ${stats.hips}`);
+  if (stats.shoeSize) parts.push(`${labels.statShoe} ${stats.shoeSize}`);
+  if (stats.hairColor) parts.push(`${labels.statHair} ${stats.hairColor}`);
+  if (stats.eyeColor) parts.push(`${labels.statEyes} ${stats.eyeColor}`);
   return parts.join("   \u2022   ");
 }
 
@@ -193,8 +197,10 @@ export default function DownloadPortfolioButton({
   name,
   stats,
   featuredImage,
+  locale = "en",
 }: DownloadPortfolioButtonProps) {
   const [loading, setLoading] = useState(false);
+  const labels = modelPageLabels(locale);
 
   const handleClick = async () => {
     if (loading) return;
@@ -208,7 +214,7 @@ export default function DownloadPortfolioButton({
       const ordered = dedupeOrderedImages(resolvedFeatured, name, gallery);
 
       if (ordered.length === 0) {
-        window.alert("No images available to generate a portfolio PDF.");
+        window.alert(labels.noImagesForPdf);
         return;
       }
 
@@ -218,7 +224,7 @@ export default function DownloadPortfolioButton({
       const validImages = loaded.filter((img): img is LoadedImage => img !== null);
 
       if (validImages.length === 0) {
-        window.alert("Failed to load images for PDF.");
+        window.alert(labels.failedLoadImages);
         return;
       }
 
@@ -241,7 +247,7 @@ export default function DownloadPortfolioButton({
       const imageBoxWidth =
         (pageWidth - PDF_MARGIN_X_MM * 2 - PDF_IMAGE_GAP_MM) / 2;
       const imageBoxHeight = contentHeight;
-      const statsLine = buildStatsLine(stats);
+      const statsLine = buildStatsLine(stats, locale);
 
       for (let pageIndex = 0; pageIndex * 2 < validImages.length; pageIndex += 1) {
         if (pageIndex > 0) pdf.addPage();
@@ -278,7 +284,7 @@ export default function DownloadPortfolioButton({
       pdf.save(`${slug}-portfolio.pdf`);
     } catch (err) {
       console.error("[DownloadPortfolioButton] Failed to generate PDF:", err);
-      window.alert("Failed to generate PDF. Please try again.");
+      window.alert(labels.failedGeneratePdf);
     } finally {
       setLoading(false);
     }
@@ -290,17 +296,17 @@ export default function DownloadPortfolioButton({
       onClick={handleClick}
       disabled={loading}
       className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      aria-label="Download portfolio as PDF"
+      aria-label={labels.downloadPdfAria}
     >
       {loading ? (
         <>
           <Loader2 size={16} className="animate-spin" />
-          <span>Generating…</span>
+          <span>{labels.generatingPdf}</span>
         </>
       ) : (
         <>
           <Download size={16} />
-          <span>Download PDF</span>
+          <span>{labels.downloadPdf}</span>
         </>
       )}
     </button>

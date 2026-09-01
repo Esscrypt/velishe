@@ -19,7 +19,7 @@ const COMMON: Record<SiteLocale, CommonLabels> = {
   bg: {
     home: "Начало",
     journal: "Journal",
-    aboutThisBoard: "За тази дъска",
+    aboutThisBoard: "Повече информация",
     video: "Видео",
     noPostsYet: "Все още няма публикации. Проверете отново скоро.",
   },

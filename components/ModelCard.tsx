@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import OptimizedImage from "./OptimizedImage";
 import { GRID_IMAGE_SIZES, isLcpImageIndex } from "@/lib/lcp";
 import { ModelStats } from "@/types/model";
+import { modelPageLabels } from "@/lib/i18n/model-page";
+import type { SiteLocale } from "@/lib/i18n/locale";
+import { localizedHref } from "@/lib/i18n/locale";
 
 interface ModelCardProps {
   readonly slug: string;
@@ -15,6 +18,7 @@ interface ModelCardProps {
   readonly booked?: boolean;
   readonly targetLocation?: string;
   readonly priority?: boolean;
+  readonly locale?: SiteLocale;
 }
 
 export default function ModelCard({
@@ -26,22 +30,25 @@ export default function ModelCard({
   booked,
   targetLocation,
   priority,
+  locale = "en",
 }: ModelCardProps) {
   const isPriority = priority ?? isLcpImageIndex(index);
+  const labels = modelPageLabels(locale);
+  const modelHref = localizedHref(`/models/${slug}/`, locale);
 
   const statsList = [
-    { label: "Height", value: stats.height },
-    ...(stats.bust ? [{ label: "Bust", value: stats.bust }] : []),
-    { label: "Waist", value: stats.waist },
-    { label: "Hips", value: stats.hips },
-    ...(stats.shoeSize ? [{ label: "Shoe", value: stats.shoeSize }] : []),
-    ...(stats.hairColor ? [{ label: "Hair", value: stats.hairColor }] : []),
-    ...(stats.eyeColor ? [{ label: "Eyes", value: stats.eyeColor }] : []),
+    { label: labels.statHeight, value: stats.height },
+    ...(stats.bust ? [{ label: labels.statBust, value: stats.bust }] : []),
+    { label: labels.statWaist, value: stats.waist },
+    { label: labels.statHips, value: stats.hips },
+    ...(stats.shoeSize ? [{ label: labels.statShoe, value: stats.shoeSize }] : []),
+    ...(stats.hairColor ? [{ label: labels.statHair, value: stats.hairColor }] : []),
+    ...(stats.eyeColor ? [{ label: labels.statEyes, value: stats.eyeColor }] : []),
   ];
 
   return (
     <motion.div whileHover={{ scale: 1.02 }} className="group">
-      <Link href={`/models/${slug}/`} className="block">
+      <Link href={modelHref} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:rounded-none rounded-lg">
           {booked && (
             <div className="absolute bottom-12 left-0 right-0 z-10 px-4 flex items-center gap-2.5 opacity-100 group-hover:opacity-0 transition-opacity duration-300">
@@ -50,7 +57,7 @@ export default function ModelCard({
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
               </span>
               <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-white">
-                Booked
+                {labels.booked}
               </span>
               {targetLocation && (
                 <>

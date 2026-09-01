@@ -4,10 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { Model } from "@/types/model";
 import ModelGrid from "./ModelGrid";
 import { ROSTER_ANCHOR_ID } from "@/lib/lcp";
+import type { SiteLocale } from "@/lib/i18n/locale";
 
 type GenderFilter = "all" | "male" | "female";
 
-export default function BoardModels({ models }: { models: Model[] }) {
+export default function BoardModels({
+  models,
+  locale = "en",
+}: {
+  models: Model[];
+  locale?: SiteLocale;
+}) {
   const [filter, setFilter] = useState<GenderFilter>("all");
   const hasInteracted = useRef(false);
   const visible =
@@ -46,7 +53,7 @@ export default function BoardModels({ models }: { models: Model[] }) {
           </button>
         ))}
       </div>
-      <ModelGrid models={visible} />
+      <ModelGrid models={visible} locale={locale} />
     </>
   );
 }

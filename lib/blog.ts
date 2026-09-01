@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { ISR_SECONDS } from "@/lib/isr";
 import {
   fetchPublishedPosts,
   fetchPublishedPostBySlug,
@@ -6,7 +7,6 @@ import {
 } from "@/lib/blog-db";
 
 export const CACHE_TAG_BLOG = "blog";
-const ISR_SECONDS = 60;
 
 export async function getPublishedPosts() {
   return unstable_cache(

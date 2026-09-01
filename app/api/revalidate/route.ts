@@ -46,8 +46,12 @@ export async function POST(request: NextRequest) {
     revalidatePath("/models/");
     revalidatePath("/mainboard/");
     revalidatePath("/development/");
+    revalidatePath("/bg/");
+    revalidatePath("/bg/mainboard/");
+    revalidatePath("/bg/development/");
     if (slug) {
       revalidatePath(`/models/${slug}/`, "layout");
+      revalidatePath(`/bg/models/${slug}/`, "layout");
     }
 
     return NextResponse.json({ revalidated: true });

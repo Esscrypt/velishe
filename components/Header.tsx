@@ -4,16 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Instagram, Linkedin, Menu, X } from "lucide-react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Tooltip from "@/components/Tooltip";
 import {
   INSTAGRAM_URL,
   LINKEDIN_COMPANY_URL,
   WHATSAPP_URL,
-  BG_PATH,
-  ZH_PATH,
 } from "@/lib/metadata";
 import { navLabels } from "@/lib/i18n/nav";
 import { localizedHref } from "@/lib/i18n/locale";
+import { detectLocalePage } from "@/lib/i18n/locale-switch";
 import { nextHeaderScrollState } from "@/lib/header-scroll";
 
 interface Board {
@@ -21,41 +21,15 @@ interface Board {
   label: string;
 }
 
-type LocalePage = "en" | "bg" | "zh";
-
-function detectLocalePage(pathname: string): LocalePage {
-  if (pathname === "/bg" || pathname === BG_PATH) return "bg";
-  if (pathname === "/zh" || pathname === ZH_PATH) return "zh";
-  return "en";
-}
-
-const LOCALE_LINKS: Record<
-  LocalePage,
-  { href: string; hrefLang: string; label: string }[]
-> = {
-  en: [
-    { href: BG_PATH, hrefLang: "bg", label: "БГ" },
-    { href: ZH_PATH, hrefLang: "zh-CN", label: "中文" },
-  ],
-  bg: [
-    { href: "/", hrefLang: "en", label: "EN" },
-    { href: ZH_PATH, hrefLang: "zh-CN", label: "中文" },
-  ],
-  zh: [
-    { href: "/", hrefLang: "en", label: "EN" },
-    { href: BG_PATH, hrefLang: "bg", label: "БГ" },
-  ],
-};
-
 export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
   const scrollStateRef = useRef({ hidden: false, lastY: 0 });
   const pathname = usePathname();
   const localePage = detectLocalePage(pathname);
-  const localeLinks = LOCALE_LINKS[localePage];
   const nav = navLabels(localePage === "bg" ? "bg" : "en");
   const homeHref = localizedHref("/", localePage === "bg" ? "bg" : "en");
+  const siteLocale = localePage === "bg" ? "bg" : "en";
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -110,32 +84,23 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
             </Link>
             <nav className="hidden md:flex items-center gap-10">
               {enabledBoards.map((b) => (
-                <Link key={b.id} href={localizedHref(`/${b.id}/`, localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+                <Link key={b.id} href={localizedHref(`/${b.id}/`, siteLocale)} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                   {b.label.toUpperCase()}
                 </Link>
               ))}
-              <Link href={localizedHref("/search", localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+              <Link href={localizedHref("/search", siteLocale)} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 {nav.search}
               </Link>
-              <Link href={localizedHref("/become-a-model/", localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+              <Link href={localizedHref("/become-a-model/", siteLocale)} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 {nav.becomeAModel}
               </Link>
-              <Link href={localizedHref("/blog/", localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+              <Link href={localizedHref("/blog/", siteLocale)} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 {nav.blog}
               </Link>
-              <Link href={localizedHref("/contact/", localePage === "bg" ? "bg" : "en")} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
+              <Link href={localizedHref("/contact/", siteLocale)} className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide">
                 {nav.contact}
               </Link>
-              {localeLinks.map((link) => (
-                <Link
-                  key={link.hrefLang}
-                  href={link.href}
-                  className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide"
-                  hrefLang={link.hrefLang}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              <LanguageSwitcher />
             </nav>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 hidden md:flex">
@@ -220,7 +185,7 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
             {enabledBoards.map((b) => (
               <Link
                 key={b.id}
-                href={localizedHref(`/${b.id}/`, localePage === "bg" ? "bg" : "en")}
+                href={localizedHref(`/${b.id}/`, siteLocale)}
                 onClick={closeMenu}
                 className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
               >
@@ -228,44 +193,34 @@ export default function Header({ enabledBoards }: { enabledBoards: Board[] }) {
               </Link>
             ))}
             <Link
-              href={localizedHref("/search", localePage === "bg" ? "bg" : "en")}
+              href={localizedHref("/search", siteLocale)}
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
               {nav.search}
             </Link>
             <Link
-              href={localizedHref("/become-a-model/", localePage === "bg" ? "bg" : "en")}
+              href={localizedHref("/become-a-model/", siteLocale)}
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
               {nav.becomeAModel}
             </Link>
             <Link
-              href={localizedHref("/blog/", localePage === "bg" ? "bg" : "en")}
+              href={localizedHref("/blog/", siteLocale)}
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
               {nav.blog}
             </Link>
             <Link
-              href={localizedHref("/contact/", localePage === "bg" ? "bg" : "en")}
+              href={localizedHref("/contact/", siteLocale)}
               onClick={closeMenu}
               className="text-base font-medium text-black hover:text-gray-600 transition-colors uppercase tracking-wide py-2"
             >
               {nav.contact}
             </Link>
-            {localeLinks.map((link) => (
-              <Link
-                key={link.hrefLang}
-                href={link.href}
-                onClick={closeMenu}
-                hrefLang={link.hrefLang}
-                className="text-base font-medium text-black hover:text-gray-600 transition-colors tracking-wide py-2"
-              >
-                {link.label}
-              </Link>
-            ))}
+            <LanguageSwitcher onNavigate={closeMenu} className="py-2" />
           </nav>
           <div className="p-4 border-t border-gray-200 space-y-3">
             <a

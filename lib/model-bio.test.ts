@@ -80,4 +80,11 @@ describe("buildModelBio", () => {
     expect(bio).toContain("They are on the Velishe Development board.");
     expect(bio).not.toMatch(/They is/);
   });
+
+  test("writes Bulgarian bio for a female model", () => {
+    const bio = buildModelBio(sample(), "bg");
+    expect(bio).toContain("Raya е женски модел");
+    expect(bio).toContain("Тя е 179 cm");
+    expect(bio).toContain("brown коса");
+  });
 });

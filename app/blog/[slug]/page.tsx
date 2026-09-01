@@ -24,7 +24,7 @@ import {
 } from "@/lib/metadata";
 import type { BlogMediaItem } from "@/types/blog";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 type PageProps = {
   params: Promise<{ slug: string }>;

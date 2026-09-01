@@ -66,7 +66,7 @@ export default async function ContactPageContent({
 
   const termsHref = localizedHref("/terms/", locale);
   const privacyHref = localizedHref("/privacy/", locale);
-  const modelHref = linked ? `/models/${linked.slug}/` : null;
+  const modelHref = linked ? localizedHref(`/models/${linked.slug}/`, locale) : null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12" lang={locale === "bg" ? "bg" : "en"}>

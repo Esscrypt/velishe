@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { ISR_SECONDS } from "@/lib/isr";
 import { Model } from "@/types/model";
 import {
   fetchAllModelMetadataFromDb,
@@ -11,8 +12,6 @@ import {
 /** Shared cache tags — purged by /api/revalidate on admin edits. */
 export const CACHE_TAG_MODELS = "models";
 export const CACHE_TAG_BOARDS = "boards";
-
-const ISR_SECONDS = 60;
 
 export async function getAllModels(): Promise<Model[]> {
   return unstable_cache(

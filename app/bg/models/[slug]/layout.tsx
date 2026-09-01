@@ -8,10 +8,9 @@ import {
   OG_CARD_HEIGHT,
 } from "@/lib/metadata";
 import { buildModelBio } from "@/lib/model-bio";
-import { pageLanguageAlternates } from "@/lib/i18n/locale";
+import { bgPageMetadataPath, pageLanguageAlternates } from "@/lib/i18n/locale";
 import { modelPageLabels } from "@/lib/i18n/model-page";
 
-// Keep metadata / JSON-LD on the same ISR cadence as the page.
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
@@ -26,31 +25,28 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const model = await getModelBySlug(slug);
+  const labels = modelPageLabels("bg");
 
   if (!model) {
-    return {
-      title: modelPageLabels("en").modelNotFound,
-    };
+    return { title: labels.modelNotFound };
   }
 
-  const description = buildModelBio(model, "en");
-
-  // The OG card is served by /api/og/[slug] from the model's current featured
-  // image; ?v=<image id> changes whenever the admin swaps it, forcing a re-scrape.
+  const description = buildModelBio(model, "bg");
   const image = model.featuredImageId
     ? {
         url: `${SITE_URL}/api/og/${slug}/?v=${model.featuredImageId}`,
         width: OG_CARD_WIDTH,
         height: OG_CARD_HEIGHT,
         alt: `${model.name} — Velishe Model Management`,
-        type: "image/jpeg",
+        type: "image/jpeg" as const,
       }
     : undefined;
 
   return buildPageMetadata({
     title: model.name,
     description,
-    path: `/models/${slug}/`,
+    path: bgPageMetadataPath(`/models/${slug}/`),
+    locale: "bg_BG",
     languages: pageLanguageAlternates(`/models/${slug}/`),
     type: "profile",
     image,
@@ -58,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function ModelLayout({
+export default async function BgModelLayout({
   children,
   params,
 }: {
@@ -67,18 +63,20 @@ export default async function ModelLayout({
 }) {
   const { slug } = await params;
   const model = await getModelBySlug(slug);
-  const bio = model ? buildModelBio(model, "en") : "";
-  const labels = modelPageLabels("en");
+  const labels = modelPageLabels("bg");
+  const bio = model ? buildModelBio(model, "bg") : "";
+  const modelPath = bgPageMetadataPath(`/models/${slug}/`);
 
   const personSchema = model
     ? {
         "@context": "https://schema.org",
         "@type": "Person",
-        "@id": `${SITE_URL}/models/${slug}/#person`,
+        "@id": `${SITE_URL}${modelPath}#person`,
         name: model.name,
-        url: `${SITE_URL}/models/${slug}/`,
+        url: `${SITE_URL}${modelPath}`,
         description: bio,
         jobTitle: labels.jobTitle,
+        inLanguage: "bg",
         worksFor: {
           "@type": "Organization",
           "@id": `${SITE_URL}/#organization`,
@@ -103,7 +101,7 @@ export default async function ModelLayout({
         <BreadcrumbListScript
           slug={slug}
           modelName={model.name}
-          locale="en"
+          locale="bg"
           board={model.board}
         />
       )}
@@ -111,4 +109,3 @@ export default async function ModelLayout({
     </>
   );
 }
-

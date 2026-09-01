@@ -8,12 +8,16 @@ interface ModelProfileClientProps {
   slug: string;
   modelName: string;
   featuredImage?: string;
+  photosLabel?: string;
+  digitalsLabel?: string;
 }
 
 export default function ModelProfileClient({
   slug,
   modelName,
   featuredImage,
+  photosLabel = "Photos",
+  digitalsLabel = "Digitals",
 }: ModelProfileClientProps) {
   const [imageMode, setImageMode] = useState<"image" | "digital">("image");
   const { getFullModel } = useModels();
@@ -66,7 +70,7 @@ export default function ModelProfileClient({
             }`}
             onClick={() => setImageMode("image")}
           >
-            Photos
+            {photosLabel}
           </button>
           <button
             className={`text-lg font-semibold transition-colors ${
@@ -76,7 +80,7 @@ export default function ModelProfileClient({
             }`}
             onClick={() => setImageMode("digital")}
           >
-            Digitals
+            {digitalsLabel}
           </button>
         </div>
       )}

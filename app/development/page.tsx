@@ -5,7 +5,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 
 // Cache the board HTML (incl. featured images) at the edge. Admin edits purge
 // via /api/revalidate (trailing-slash paths); this interval is a safety net.
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata = buildPageMetadata({
   title: boardConfig("development", "en").title,

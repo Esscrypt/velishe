@@ -137,7 +137,7 @@ export default async function BlogIndexContent({
               {post.model ? (
                 <p className="mt-1 text-sm text-gray-500">
                   <Link
-                    href={`/models/${post.model.slug}/`}
+                    href={localizedHref(`/models/${post.model.slug}/`, locale)}
                     className="hover:text-gray-800"
                   >
                     {post.model.name}

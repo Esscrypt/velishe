@@ -94,12 +94,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  const modelPages = models.map((model) => ({
-    url: `${baseUrl}/models/${model.slug}/`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+  const modelPages = models.flatMap((model) => [
+    {
+      url: `${baseUrl}/models/${model.slug}/`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+      alternates: { languages: pageAlternates(`/models/${model.slug}/`) },
+    },
+    {
+      url: `${baseUrl}${bgPageMetadataPath(`/models/${model.slug}/`)}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
+      alternates: { languages: pageAlternates(`/models/${model.slug}/`) },
+    },
+  ]);
 
   const blogPages = posts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}/`,
