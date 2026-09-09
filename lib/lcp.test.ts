@@ -3,9 +3,11 @@ import {
   GRID_IMAGE_SIZES,
   LCP_IMAGE_QUALITY,
   SPOTLIGHT_CARDS_PER_SET,
+  SPOTLIGHT_ROTATE_INTERVAL_MS,
   getInitialSpotlightModels,
   getSpotlightSet,
   isLcpImageIndex,
+  shouldAutoRotateSpotlight,
   spotlightVisibilityClass,
 } from "./lcp";
 
@@ -57,6 +59,39 @@ describe("spotlightVisibilityClass", () => {
     expect(spotlightVisibilityClass(0)).toBe("");
     expect(spotlightVisibilityClass(1)).toBe("hidden md:block");
     expect(spotlightVisibilityClass(2)).toBe("hidden lg:block");
+  });
+});
+
+describe("shouldAutoRotateSpotlight", () => {
+  test("uses an 8s desktop interval", () => {
+    expect(SPOTLIGHT_ROTATE_INTERVAL_MS).toBe(8000);
+  });
+
+  test("rotates only on desktop when motion is allowed", () => {
+    expect(
+      shouldAutoRotateSpotlight({
+        isDesktop: true,
+        prefersReducedMotion: false,
+      }),
+    ).toBe(true);
+    expect(
+      shouldAutoRotateSpotlight({
+        isDesktop: false,
+        prefersReducedMotion: false,
+      }),
+    ).toBe(false);
+    expect(
+      shouldAutoRotateSpotlight({
+        isDesktop: true,
+        prefersReducedMotion: true,
+      }),
+    ).toBe(false);
+    expect(
+      shouldAutoRotateSpotlight({
+        isDesktop: false,
+        prefersReducedMotion: true,
+      }),
+    ).toBe(false);
   });
 });
 

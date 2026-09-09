@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import HomeFaqItem from "@/components/HomeFaqItem";
+import HomeIntroStrip from "@/components/HomeIntroStrip";
 import HomeSpotlight from "@/components/HomeSpotlight";
 import WebSiteSchema from "@/components/WebSiteSchema";
 import { getModelsForListing } from "@/lib/models";
@@ -7,6 +8,7 @@ import {
   languageAlternates,
   ORGANIZATION_EMAIL,
   ORGANIZATION_PHONE_DISPLAY,
+  SITE_NAME,
   SITE_URL,
 } from "@/lib/metadata";
 
@@ -26,31 +28,6 @@ const WORK_CATEGORIES = [
   "lifestyle",
   "digital content",
 ] as const;
-
-function HomeFaqItem({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <details className="group border-t border-gray-200 py-5">
-      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-        <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
-          {title}
-        </h2>
-        <span className="shrink-0 text-gray-400 text-lg group-open:hidden">
-          +
-        </span>
-        <span className="shrink-0 text-gray-400 text-lg hidden group-open:inline">
-          –
-        </span>
-      </summary>
-      <div className="mt-4 space-y-4 leading-relaxed">{children}</div>
-    </details>
-  );
-}
 
 export const revalidate = 3600;
 
@@ -103,9 +80,17 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <HomeSpotlight initialModels={models} />
+      <HomeIntroStrip
+        title={SITE_NAME}
+        subtitle="Boutique modeling agency in Sofia, Bulgaria."
+        viewModelsHref="/mainboard/"
+        becomeHref="/become-a-model/"
+        viewModelsLabel="View Our Models"
+        becomeLabel="Become a Model"
+      />
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100">
         <div className="text-gray-700">
-          <HomeFaqItem title="About VÈLISHE">
+          <HomeFaqItem title="About VÈLISHE" defaultOpen>
             <p>{intro}</p>
           </HomeFaqItem>
 

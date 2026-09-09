@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import HomeFaqItem from "@/components/HomeFaqItem";
+import HomeIntroStrip from "@/components/HomeIntroStrip";
 import HomeSpotlight from "@/components/HomeSpotlight";
 import WebSiteSchema from "@/components/WebSiteSchema";
 import { getModelsForListing } from "@/lib/models";
@@ -7,38 +8,18 @@ import {
   formatLocationList,
   uniqueBookedLocations,
 } from "@/lib/model-bio";
-import { ORGANIZATION_EMAIL, SITE_URL, BG_PATH } from "@/lib/metadata";
+import {
+  ORGANIZATION_EMAIL,
+  SITE_NAME,
+  SITE_URL,
+  BG_PATH,
+} from "@/lib/metadata";
 import { localizedHref } from "@/lib/i18n/locale";
 import {
   BG_PAGE_TITLE,
   BG_WORK_CATEGORIES,
   buildBgHomeCopy,
 } from "@/lib/bg-content";
-
-function BgFaqItem({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <details className="group border-t border-gray-200 py-5">
-      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-        <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
-          {title}
-        </h2>
-        <span className="shrink-0 text-gray-400 text-lg group-open:hidden">
-          +
-        </span>
-        <span className="shrink-0 text-gray-400 text-lg hidden group-open:inline">
-          –
-        </span>
-      </summary>
-      <div className="mt-4 space-y-4 leading-relaxed">{children}</div>
-    </details>
-  );
-}
 
 export const revalidate = 3600;
 
@@ -110,35 +91,42 @@ export default async function BgHomePage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
         />
       ))}
-      <h1 className="sr-only">{BG_PAGE_TITLE}</h1>
       <HomeSpotlight initialModels={models} />
+      <HomeIntroStrip
+        title={SITE_NAME}
+        subtitle={BG_PAGE_TITLE}
+        viewModelsHref={mainboardHref}
+        becomeHref={becomeHref}
+        viewModelsLabel="Виж моделите"
+        becomeLabel="Стани модел"
+      />
       <section
         className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100"
         lang="bg"
       >
         <div className="text-gray-700">
-          <BgFaqItem title={copy.questions.about}>
+          <HomeFaqItem title={copy.questions.about} defaultOpen>
             <p>{copy.intro}</p>
-          </BgFaqItem>
+          </HomeFaqItem>
 
-          <BgFaqItem title={copy.questions.whatWeDo}>
+          <HomeFaqItem title={copy.questions.whatWeDo}>
             <p>{copy.whatWeDo}</p>
             <ul className="list-disc list-inside space-y-1">
               {BG_WORK_CATEGORIES.map((category) => (
                 <li key={category}>{category}</li>
               ))}
             </ul>
-          </BgFaqItem>
+          </HomeFaqItem>
 
-          <BgFaqItem title={copy.questions.requirements}>
+          <HomeFaqItem title={copy.questions.requirements}>
             <p>{copy.requirements}</p>
-          </BgFaqItem>
+          </HomeFaqItem>
 
-          <BgFaqItem title={copy.questions.academy}>
+          <HomeFaqItem title={copy.questions.academy}>
             <p>{copy.academy}</p>
-          </BgFaqItem>
+          </HomeFaqItem>
 
-          <BgFaqItem title={copy.questions.journal}>
+          <HomeFaqItem title={copy.questions.journal}>
             <p>{copy.journal}</p>
             <p>
               <Link
@@ -148,9 +136,9 @@ export default async function BgHomePage() {
                 Velishe Journal
               </Link>
             </p>
-          </BgFaqItem>
+          </HomeFaqItem>
 
-          <BgFaqItem title={copy.questions.booking}>
+          <HomeFaqItem title={copy.questions.booking}>
             <p>{copy.booking}</p>
             <p>
               Кандидати за модели подават през{" "}
@@ -169,7 +157,7 @@ export default async function BgHomePage() {
               </a>
               .
             </p>
-          </BgFaqItem>
+          </HomeFaqItem>
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link

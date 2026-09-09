@@ -1,5 +1,10 @@
 export const SPOTLIGHT_CARDS_PER_SET = 3;
 
+export const SPOTLIGHT_ROTATE_INTERVAL_MS = 8000;
+
+/** Matches Tailwind `md` breakpoint used by spotlightVisibilityClass. */
+export const SPOTLIGHT_DESKTOP_MIN_WIDTH_PX = 768;
+
 export const GRID_IMAGE_SIZES =
   "(max-width: 768px) 92vw, (max-width: 1024px) 46vw, 30vw";
 
@@ -8,6 +13,16 @@ export const PROFILE_IMAGE_SIZES = "(max-width: 1024px) 100vw, 50vw";
 export const LCP_IMAGE_QUALITY = 70;
 
 export const ROSTER_ANCHOR_ID = "roster";
+
+export function shouldAutoRotateSpotlight({
+  isDesktop,
+  prefersReducedMotion,
+}: {
+  isDesktop: boolean;
+  prefersReducedMotion: boolean;
+}): boolean {
+  return isDesktop && !prefersReducedMotion;
+}
 
 export function isLcpImageIndex(index: number): boolean {
   return index === 0;

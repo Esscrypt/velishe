@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useCookieConsent } from "@/components/CookieConsentProvider";
 import { trackPageView } from "@/lib/gtm";
 
 export default function PageViewTracker() {
   const pathname = usePathname();
+  const { analyticsAllowed, hydrated } = useCookieConsent();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -13,18 +15,17 @@ export default function PageViewTracker() {
   }, []);
 
   useEffect(() => {
-    if (!isMounted || !pathname) return;
-    
-    // Get search params from window.location to avoid Suspense boundary requirement
+    if (!isMounted || !hydrated || !analyticsAllowed || !pathname) return;
+
     const searchParams = globalThis.window?.location.search
       ? new URLSearchParams(globalThis.window.location.search)
       : null;
-    
-    // Track page view when pathname changes
-    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
+
+    const url =
+      pathname +
+      (searchParams?.toString() ? `?${searchParams.toString()}` : "");
     trackPageView(url);
-  }, [pathname, isMounted]);
+  }, [pathname, isMounted, hydrated, analyticsAllowed]);
 
   return null;
 }
-

@@ -8,7 +8,10 @@ import {
   getInitialSpotlightModels,
   getSpotlightSet,
   isLcpImageIndex,
+  shouldAutoRotateSpotlight,
   spotlightVisibilityClass,
+  SPOTLIGHT_DESKTOP_MIN_WIDTH_PX,
+  SPOTLIGHT_ROTATE_INTERVAL_MS,
 } from "@/lib/lcp";
 
 interface SpotlightProps {
@@ -18,6 +21,8 @@ interface SpotlightProps {
 export default function Spotlight({ models }: SpotlightProps) {
   const [shuffleSeed, setShuffleSeed] = useState<number | undefined>(undefined);
   const [isPaused, setIsPaused] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const displayed = useMemo(
     () =>
@@ -28,16 +33,40 @@ export default function Spotlight({ models }: SpotlightProps) {
   );
 
   useEffect(() => {
-    if (models.length === 0 || isPaused) {
+    const desktopQuery = window.matchMedia(
+      `(min-width: ${SPOTLIGHT_DESKTOP_MIN_WIDTH_PX}px)`,
+    );
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const syncMedia = () => {
+      setIsDesktop(desktopQuery.matches);
+      setPrefersReducedMotion(motionQuery.matches);
+    };
+
+    syncMedia();
+    desktopQuery.addEventListener("change", syncMedia);
+    motionQuery.addEventListener("change", syncMedia);
+    return () => {
+      desktopQuery.removeEventListener("change", syncMedia);
+      motionQuery.removeEventListener("change", syncMedia);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      models.length === 0 ||
+      isPaused ||
+      !shouldAutoRotateSpotlight({ isDesktop, prefersReducedMotion })
+    ) {
       return;
     }
 
     const interval = setInterval(() => {
       setShuffleSeed(Date.now());
-    }, 3000);
+    }, SPOTLIGHT_ROTATE_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [models, isPaused]);
+  }, [models, isPaused, isDesktop, prefersReducedMotion]);
 
   if (displayed.length === 0) {
     return null;

@@ -617,8 +617,11 @@ export default function PrivacyPage() {
             </li>
           </ul>
           <p className="text-gray-700">
-            You can control cookies through your browser settings. However,
-            disabling certain cookies may affect the functionality of our Website.
+            Non-essential cookies (analytics) load only after you choose{" "}
+            <strong>Accept all</strong> on our cookie banner. You can change your
+            mind anytime via <strong>Cookie settings</strong> in the site footer,
+            or control cookies through your browser settings. Rejecting
+            non-essential cookies does not block browsing the Website.
           </p>
         </section>
 
