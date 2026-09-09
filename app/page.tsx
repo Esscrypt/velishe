@@ -3,11 +3,14 @@ import HomeFaqItem from "@/components/HomeFaqItem";
 import HomeIntroStrip from "@/components/HomeIntroStrip";
 import HomeSpotlight from "@/components/HomeSpotlight";
 import WebSiteSchema from "@/components/WebSiteSchema";
+import { EN_WORK_CATEGORIES, buildEnHomeCopy } from "@/lib/en-content";
+import {
+  formatLocationList,
+  uniqueBookedLocations,
+} from "@/lib/model-bio";
 import { getModelsForListing } from "@/lib/models";
 import {
   languageAlternates,
-  ORGANIZATION_EMAIL,
-  ORGANIZATION_PHONE_DISPLAY,
   SITE_NAME,
   SITE_URL,
 } from "@/lib/metadata";
@@ -19,31 +22,14 @@ export const metadata = {
   },
 };
 
-const WORK_CATEGORIES = [
-  "fashion editorial",
-  "commercial advertising",
-  "catalogue",
-  "runway",
-  "beauty",
-  "lifestyle",
-  "digital content",
-] as const;
-
 export const revalidate = 3600;
 
 export default async function Home() {
   const models = await getModelsForListing();
-
-  const intro =
-    "VÈLISHE Model Management is a boutique modeling agency founded in 2025 and based in Sofia, Bulgaria. We represent and develop professional fashion and commercial models — women and men with a distinct presence, individual attitude, and authentic character that translates across editorial, campaign, and digital work. We are a new-generation agency built on the belief that great representation shapes careers. We work with a selective, carefully curated roster and invest in each model's long-term development — from first casting to international placement.";
-
-  const whatWeDo = `Velishe Model Management books and develops fashion and commercial models from Sofia, Bulgaria, for Bulgarian and international productions. Talent works in seven categories: fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. The agency connects models with brands, creative directors, and photographers, and stays involved after the booking — portfolio building, market positioning, and career guidance. Clients request castings or book a specific model through ${ORGANIZATION_EMAIL}, with briefs handled in English or Bulgarian from the Sofia office. The signed roster is split in two: Mainboard for established names and Development for new faces. Browse those boards on this website; each model page includes measurements and a short bio. The VÈLISHE Academy is a training programme and is not the same as being signed. Velishe represents both women and men and places talent locally and abroad.`;
-
-  const requirementsLead = `Female models at Velishe typically begin at a minimum height of 173 cm; male models at 183 cm. Applicants submit natural photos with no filters, editing, makeup, or hair extensions — headshot, full profile, half profile, and full-length. Women usually wear a black tank or swimwear with heels; men wear fitted jeans or swimwear. Submissions are reviewed on a rolling basis through the Become a Model page; the agency only contacts successful applicants and cannot reply to every file. You must be at least 16. Include an Instagram handle and measurements in centimetres. Individual images must stay under 1 MB and the set under 4 MB. Velishe represents both women and men for editorial and commercial work in Sofia and abroad, on either the Mainboard or the Development board depending on experience.`;
-
-  const academy = `The VÈLISHE Academy is a structured training programme in Sofia for aspiring and signed models who want to understand how the industry works. It covers five areas: composites and casting preparation, professional conduct on set, industry etiquette, portfolio building, and how to sustain a modeling career. Enrolment is by intake; join the waitlist on the Academy page to be notified when the next programme opens. Classes are offered in English and Bulgarian. The Academy is run by Velishe Model Management, a boutique agency founded in 2025, and it is separate from the signed Mainboard and Development rosters — completing the programme does not by itself mean you are signed. Details of each module are on the Academy page next to the waitlist form. A certificate image on that page shows the format of completion.`;
-
-  const booking = `Clients book Velishe models for campaigns, editorials, and commercial productions by emailing ${ORGANIZATION_EMAIL} with a casting request or production brief. Include dates, usage, location, and whether you need Mainboard, Development, or a named model. The team replies from Sofia and works in English and Bulgarian. For a faster first contact you can also use WhatsApp at ${ORGANIZATION_PHONE_DISPLAY} or Instagram @velishe.mgmt. Company details, UIC, and the founder contact are on the Contact page. The legal entity is Velishe Model Management EOOD, registered in Bulgaria. Aspiring models apply on the Become a Model page; we respond only to applicants who fit current development needs and who meet the height and natural-photo requirements. Privacy terms are on the Privacy Policy page. Do not send applications to the booking inbox.`;
+  const copy = buildEnHomeCopy({
+    modelCount: models.length,
+    locationPhrase: formatLocationList(uniqueBookedLocations(models)),
+  });
 
   const faqSchema = {
     "@context": "https://schema.org",
@@ -51,23 +37,23 @@ export default async function Home() {
     mainEntity: [
       {
         "@type": "Question",
-        name: "What Does Velishe Model Management Do?",
-        acceptedAnswer: { "@type": "Answer", text: whatWeDo },
+        name: copy.questions.whatWeDo,
+        acceptedAnswer: { "@type": "Answer", text: copy.whatWeDo },
       },
       {
         "@type": "Question",
-        name: "What Are the Requirements to Become a Velishe Model?",
-        acceptedAnswer: { "@type": "Answer", text: requirementsLead },
+        name: copy.questions.requirements,
+        acceptedAnswer: { "@type": "Answer", text: copy.requirementsLead },
       },
       {
         "@type": "Question",
-        name: "What Is the VÈLISHE Model Academy?",
-        acceptedAnswer: { "@type": "Answer", text: academy },
+        name: copy.questions.academy,
+        acceptedAnswer: { "@type": "Answer", text: copy.academy },
       },
       {
         "@type": "Question",
-        name: "How Do You Book a Model or Apply to Velishe?",
-        acceptedAnswer: { "@type": "Answer", text: booking },
+        name: copy.questions.booking,
+        acceptedAnswer: { "@type": "Answer", text: copy.booking },
       },
     ],
   };
@@ -90,14 +76,14 @@ export default async function Home() {
       />
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100">
         <div className="text-gray-700">
-          <HomeFaqItem title="About VÈLISHE" defaultOpen>
-            <p>{intro}</p>
+          <HomeFaqItem title={copy.questions.about} defaultOpen>
+            <p>{copy.intro}</p>
           </HomeFaqItem>
 
-          <HomeFaqItem title="What Does Velishe Model Management Do?">
-            <p>{whatWeDo}</p>
+          <HomeFaqItem title={copy.questions.whatWeDo}>
+            <p>{copy.whatWeDo}</p>
             <ul className="list-disc list-inside space-y-1">
-              {WORK_CATEGORIES.map((category) => (
+              {EN_WORK_CATEGORIES.map((category) => (
                 <li key={category} className="capitalize">
                   {category}
                 </li>
@@ -105,22 +91,16 @@ export default async function Home() {
             </ul>
           </HomeFaqItem>
 
-          <HomeFaqItem title="What Are the Requirements to Become a Velishe Model?">
-            <p>{requirementsLead}</p>
-            <p>
-              Our vision goes beyond trends. We focus on timeless presence,
-              individuality, and a sense of narrative within every model we work
-              with. VÈLISHE is a statement — selective, bold, and quietly assured.
-              We exist to shape faces, stories, and moments that leave an imprint.
-            </p>
+          <HomeFaqItem title={copy.questions.requirements}>
+            <p>{copy.requirementsLead}</p>
           </HomeFaqItem>
 
-          <HomeFaqItem title="What Is the VÈLISHE Model Academy?">
-            <p>{academy}</p>
+          <HomeFaqItem title={copy.questions.academy}>
+            <p>{copy.academy}</p>
           </HomeFaqItem>
 
-          <HomeFaqItem title="How Do You Book a Model or Apply to Velishe?">
-            <p>{booking}</p>
+          <HomeFaqItem title={copy.questions.booking}>
+            <p>{copy.booking}</p>
             <p>
               Aspiring models can apply through our{" "}
               <Link
@@ -133,6 +113,8 @@ export default async function Home() {
               current development needs.
             </p>
           </HomeFaqItem>
+
+          <p className="mt-8 text-gray-600 leading-relaxed">{copy.vision}</p>
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link

@@ -16,6 +16,7 @@ import {
   ORGANIZATION_PHONE_DISPLAY,
   ORGANIZATION_UIC,
   SITE_URL,
+  TRUSTPILOT_URL,
   WIKIDATA_URL,
   ZH_PATH,
   BG_PATH,
@@ -45,6 +46,7 @@ Velishe Model Management (VÈLISHE) is a boutique model management agency founde
 - LinkedIn (founder): ${FOUNDER.linkedin}
 - Google Business: ${GOOGLE_BUSINESS_URL}
 - Wikidata: ${WIKIDATA_URL}
+- Trustpilot: ${TRUSTPILOT_URL}
 
 ## Key Facts
 - Founded: 2025

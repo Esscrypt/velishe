@@ -5,10 +5,12 @@ import { contactCopy } from "@/lib/i18n/contact";
 import type { SiteLocale } from "@/lib/i18n/locale";
 import { localizedHref } from "@/lib/i18n/locale";
 import {
+  FOUNDER,
   GOOGLE_BUSINESS_URL,
   INSTAGRAM_URL,
   LINKEDIN_COMPANY_URL,
   ORGANIZATION_EMAIL,
+  ORGANIZATION_PHONE,
   SITE_URL,
   WHATSAPP_URL,
 } from "@/lib/metadata";
@@ -31,6 +33,7 @@ export default async function ContactPageContent({
   const basePath = localizedHref("/contact/", locale);
   const pageUrl = `${SITE_URL}${basePath.startsWith("/") ? basePath : `/${basePath}`}`;
   const homeUrl = `${SITE_URL}${localizedHref("/", locale)}`;
+  const becomeHref = localizedHref("/become-a-model/", locale);
 
   const mailtoHref = linked
     ? `mailto:${ORGANIZATION_EMAIL}?subject=${encodeURIComponent(
@@ -80,7 +83,16 @@ export default async function ContactPageContent({
         <p className="text-lg text-gray-700 mb-4">{copy.intro1}</p>
         <p className="text-lg text-gray-700 mb-4">{copy.intro2}</p>
         <p className="text-lg text-gray-700 mb-4">{copy.intro3}</p>
-        <p className="text-lg text-gray-700 mb-8">{copy.intro4}</p>
+        <p className="text-lg text-gray-700 mb-8">
+          {copy.intro4}{" "}
+          <Link
+            href={becomeHref}
+            className="text-gray-900 underline hover:text-gray-600 transition-colors"
+          >
+            {copy.applyHint}
+          </Link>
+          .
+        </p>
 
         {linked && modelHref ? (
           <div className="not-prose mb-8 border border-gray-200 bg-gray-50 p-6">
@@ -107,12 +119,40 @@ export default async function ContactPageContent({
               <p>{copy.officeAddress}</p>
             </div>
             <div>
+              <p className="font-medium mb-1">{copy.uicLabel}</p>
+              <p>{copy.uicValue}</p>
+            </div>
+            <div>
+              <p className="font-medium mb-1">{copy.founderLabel}</p>
+              <p>
+                {copy.founderName}
+                {" · "}
+                <a
+                  href={FOUNDER.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-900 underline hover:text-gray-600 transition-colors"
+                >
+                  {copy.founderLinkedInLabel}
+                </a>
+              </p>
+            </div>
+            <div>
               <p className="font-medium mb-1">{copy.emailLabel}</p>
               <a
                 href={mailtoHref}
                 className="text-gray-900 hover:text-gray-600 transition-colors"
               >
                 {ORGANIZATION_EMAIL}
+              </a>
+            </div>
+            <div>
+              <p className="font-medium mb-1">{copy.phoneLabel}</p>
+              <a
+                href={`tel:${ORGANIZATION_PHONE}`}
+                className="text-gray-900 hover:text-gray-600 transition-colors"
+              >
+                {copy.phoneDisplay}
               </a>
             </div>
 

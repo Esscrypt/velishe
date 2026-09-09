@@ -69,22 +69,13 @@ export default async function BoardPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
-      <h1 className="sr-only">{cfg.title}</h1>
-      <BoardModels models={models} locale={locale} />
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <details className="group border-t border-gray-200 pt-6">
-          <summary className="cursor-pointer list-none text-sm font-medium uppercase tracking-[0.2em] text-gray-900 flex items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-            {labels.aboutThisBoard}
-            <span className="text-gray-400 text-base font-normal group-open:hidden">
-              +
-            </span>
-            <span className="text-gray-400 text-base font-normal hidden group-open:inline">
-              –
-            </span>
-          </summary>
-          <p className="mt-4 text-gray-700 leading-relaxed">{intro}</p>
-        </details>
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-2">
+        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight">
+          {cfg.title}
+        </h1>
+        <p className="mt-4 text-gray-700 leading-relaxed">{intro}</p>
       </section>
+      <BoardModels models={models} locale={locale} />
     </>
   );
 }

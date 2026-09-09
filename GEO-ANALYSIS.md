@@ -1,24 +1,24 @@
 # GEO Analysis — Velishe Model Management
 
-**URL:** https://www.velishemodelmanagement.com/
-**Date:** 2026-08-30
-**Codebase:** `~/Repos/modeling-portfolio` (Next.js App Router, TypeScript, Tailwind)
-**Prior score (2026-03-06):** 64/100
+**URL:** https://www.velishemodelmanagement.com/  
+**Date:** 2026-09-09  
+**Prior score (2026-08-30):** 60/100  
+**Codebase:** `~/Repos/modeling-portfolio` (Next.js App Router, ISR/prerender)
 
 ---
 
-## GEO Readiness Score: 60/100
+## GEO Readiness Score: 72/100
 
 | Category | Score | Weight | Weighted |
 |----------|------:|-------:|---------:|
-| Citability | 60 | 25% | 15.0 |
-| Structural Readability | 68 | 20% | 13.6 |
-| Multi-Modal Content | 55 | 15% | 8.3 |
-| Authority & Brand Signals | 40 | 20% | 8.0 |
-| Technical Accessibility | 78 | 20% | 15.6 |
-| **Total** | **60** | **100%** | **60.5** |
+| Citability | 80 | 25% | 20.0 |
+| Structural Readability | 82 | 20% | 16.4 |
+| Multi-Modal Content | 52 | 15% | 7.8 |
+| Authority & Brand Signals | 48 | 20% | 9.6 |
+| Technical Accessibility | 90 | 20% | 18.0 |
+| **Total** | **72** | **100%** | **72.2** |
 
-The on-site technical floor is still strong (`llms.txt`, SSR model profiles, LocalBusiness + Person + Course JSON-LD). The score dropped from 64 because FAQPage schema is no longer in the live HTML, Mainboard/Development have no H1, and citeable copy has not grown with the roster (12 → 28 models). Off-site entity presence remains the ceiling.
+**2026-09-09 implementation (on-site quick wins):** Done — expanded EN About to a 134–167 word citeable block with UIC/roster/booking (`lib/en-content.ts`); visible H1 + intro on Mainboard/Development; robots leave all crawlers allowed via `*`; Trustpilot in `llms.txt`; Contact densified with EOOD, UIC, phone, founder LinkedIn. Off-site mentions remain the ceiling.
 
 ---
 
@@ -26,57 +26,50 @@ The on-site technical floor is still strong (`llms.txt`, SSR model profiles, Loc
 
 | Platform | Score | Why |
 |----------|------:|-----|
-| **Google AI Overviews** | 50 | 92% of AIO citations come from pages that already rank. Homepage question-H2s and SSR facts help; roster pages with no H1, missing FAQPage, and thin Academy copy hurt selection. |
-| **ChatGPT** | 34 | `llms.txt` is one of the better implementations for a boutique site. No Wikipedia. LinkedIn company page exists but is thin (2 followers) and not in `sameAs`. |
-| **Perplexity** | 26 | Relies heavily on Reddit/community corroboration. Zero Reddit threads found. |
-| **Bing Copilot** | 38 | Sitemap is valid via curl (36 URLs). No IndexNow. SearchAction URL does not match `trailingSlash: true`. |
+| **Google AI Overviews** | 62 | Solid SSR facts + FAQ passages + schema. Needs stronger traditional rankings and unique data for selection rate. |
+| **ChatGPT** | 48 | Excellent `llms.txt` + Wikidata entity. Still no Wikipedia article; LinkedIn company page is thin; little third-party prose. |
+| **Perplexity** | 32 | Almost no Reddit/community discussion. Brand name also collides with unrelated “Velise” influencer content on YouTube. |
+| **Bing Copilot** | 45 | Indexable SSR site + sitemap. No IndexNow; entity graph improves with Wikidata/`sameAs`. |
 
 ---
 
 ## AI Crawler Access Status
 
-Live `robots.txt` (`app/robots.ts`):
+Live [`/robots.txt`](https://www.velishemodelmanagement.com/robots.txt) (`app/robots.ts`):
 
-| Crawler | Status | Purpose |
-|---------|--------|---------|
-| Googlebot | Allowed (`*`) | Google Search / AI Overviews |
-| OAI-SearchBot | Allowed (`*`) | OpenAI search retrieval |
-| ChatGPT-User | Allowed (`*`) | ChatGPT browsing |
-| ClaudeBot | Allowed (`*`) | Claude web features |
-| PerplexityBot | Allowed (`*`) | Perplexity AI search |
-| Google-Extended | Allowed (`*`) | Gemini / Google AI training |
-| GPTBot | **Blocked** | OpenAI training collection |
-| CCBot | **Blocked** | Common Crawl training |
-| Bytespider | **Blocked** | ByteDance training |
-| cohere-ai | **Blocked** | Cohere training |
+| Crawler | Status | Notes |
+|---------|--------|-------|
+| `*` (all) | Allowed | Includes GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Bytespider |
+| `/api/`, `/_next/` | Disallowed | Correct |
 
-**Assessment:** Search/retrieval crawlers can read the site. Blocking GPTBot while allowing OAI-SearchBot is the right split for ChatGPT *search* visibility without donating training data.
+**Change since Aug 2026:** Explicit blocks for GPTBot / CCBot / Bytespider / cohere-ai are **gone**. Everything is allowed via `*`.
 
-**Gaps:**
-- `Google-Extended` is allowed. Keep it allowed if Gemini citations matter; block it only if you want to opt out of Google AI training specifically.
-- No `llms.txt` `Allow`/`Disallow` companion (`llms-full.txt`) and no RSL 1.0 license file.
+**Recommendation:** Keep all crawlers allowed if brand learning in foundation models matters more than restricting training reuse of roster photos. `/api/` and `/_next/` stay disallowed.
 
 ---
 
 ## llms.txt Status
 
 **Present:** https://www.velishemodelmanagement.com/llms.txt  
-**Source:** `app/llms.txt/route.ts` (generated from live roster)
+**Source:** `app/llms.txt/route.ts` (roster-generated)
 
 | Item | Status |
 |------|--------|
-| Brand title + description | Present — Velishe / VÈLISHE, Sofia, 2025, 28 models |
-| Contact | Email, phone, location |
-| Social | Instagram only |
-| Key facts | Founded, legal name, heights, academy, services |
-| Full roster with measurements | Present (28 models) |
-| Notes for LLMs | Canonical name, booking path, entity note |
-| Mainboard / Development URLs | **Missing** from site structure list |
-| LinkedIn | **Missing** |
-| Founder / CEO | **Missing** |
-| Bulgarian legal name / UIC | **Missing** |
+| Brand + Sofia + founded 2025 | Present |
+| Legal name EN/BG + UIC 208665737 | Present |
+| Founder & CEO Christiana Velichkova | Present |
+| Contact + Instagram + LinkedIn (company + founder) | Present |
+| Wikidata + Google Knowledge Graph | Present |
+| BG + ZH summaries | Present |
+| Mainboard / Development / Academy / Journal | Present |
+| Full roster + measurements + short bios | Present (~27 models) |
 
-This is the strongest GEO asset on the site. Keep generating it from the database so model count never drifts.
+**Assessment:** Best GEO asset on the property. Keep DB-driven so model count never drifts.
+
+**Polish:**
+- Prefer unique booking/campaign facts in bios over the shared template sentence.
+- Add Trustpilot URL under Social (already in schema `sameAs`).
+- Optional companion `llms-full.txt` only if you want a deeper crawl map without bloating the default file.
 
 ---
 
@@ -86,231 +79,144 @@ Brand mentions correlate ~3× more strongly with AI citations than backlinks.
 
 | Platform | Presence | Evidence | Impact |
 |----------|----------|----------|--------|
-| **Wikipedia / Wikidata** | Absent | No article | ChatGPT’s largest citation source (~48%). New 2025 agency is not notable enough yet. |
-| **Reddit** | Absent | No threads for “Velishe Model Management” | Perplexity’s largest citation source (~47%). |
-| **YouTube** | Absent | No channel or mention videos | Strongest Ahrefs correlation with AI citations (~0.737). |
-| **LinkedIn company** | Weak | [Vèlishe Model Management](https://www.linkedin.com/company/v%C3%A8lishe-model-management) — 2 followers, industry set to “Retail Apparel and Fashion” | Exists but not linked in `sameAs`. |
-| **LinkedIn person** | Present | [Christiana Velichkova](https://www.linkedin.com/in/christiana-velichkova-4943351b2) — Founder & CEO; NOIRÈ Magazine 2026 Spring Issue | Strongest real-world authority signal. Not on the website. |
-| **Company registry** | Present | [Велиш Модел Мениджмънт ЕООД, ЕИК 208665737](https://companybook.bg/companies/208665737) | High-trust entity proof. Not in schema. |
-| **Trustpilot** | Widget only | Footer links to Trustpilot; widget is JS-loaded | Weak for AI crawlers (no static review text). |
-| **models.com / bgmoda.com** | Absent | Competitors listed; Velishe is not | Industry directories AI systems treat as corroboration. |
-| **Instagram** | Present | [@velishe.mgmt](https://www.instagram.com/velishe.mgmt) | Only established consumer channel. |
+| **Wikidata** | Present | [Q141222478](https://www.wikidata.org/wiki/Q141222478) in `sameAs` + `llms.txt` | Strong entity anchor for ChatGPT |
+| **Google Knowledge Graph** | Present | `kgmid=/g/11ynm3nt8y` | Strong for Google surfaces |
+| **Wikipedia** | Absent | No article | ChatGPT’s largest citation source (~48%) — not realistic until independent press |
+| **Reddit** | Absent | No substantive threads | Perplexity’s largest source (~47%) |
+| **YouTube** | Absent / noisy | No Velishe channel; “Velise” influencer videos pollute similar queries | Name collision risk |
+| **LinkedIn company** | Weak–moderate | Company page exists; industry still “Retail Apparel and Fashion” | Fix industry + post regularly |
+| **LinkedIn person** | Present | [Christiana Velichkova](https://www.linkedin.com/in/christiana-velichkova-4943351b2) — Founder & CEO | Best human authority signal |
+| **Company registry** | Present | [ЕИК 208665737](https://companybook.bg/companies/208665737) | High-trust legal entity proof |
+| **Trustpilot** | Present (link) | Footer / schema | Prefer static review excerpts only if first-party and honest |
+| **Instagram** | Present | [@velishe.mgmt](https://www.instagram.com/velishe.mgmt) | Primary consumer channel |
+| **models.com / bgmoda** | Absent | — | Industry directories AI systems corroborate |
 
 ---
 
 ## Passage-Level Citability
 
-Optimal extract length for AI citation: **134–167 words**, with the answer in the first 40–60 words.
+Optimal extract length: **134–167 words**, answer in first **40–60 words**.
 
-### Homepage (`app/page.tsx`) — live, SSR
+### Homepage FAQ (live SSR) — word counts
 
-**Opening definition (~98 words) — close, still short**
-
-> VÈLISHE Model Management is a boutique modeling agency founded in 2025 and based in Sofia, Bulgaria. We represent and develop 28 professional fashion and commercial models…
-
-**Verdict:** Correct “X is…” pattern. Specific facts (2025, Sofia, 28 models) are citeable. Below the 134-word band; no source attribution; does not mention international placements that already exist on the roster (Milan, Shanghai, Hong Kong, Kuwait City, Ho Chi Minh).
-
-**“What Does Velishe Model Management Do?” (~85 words)**
-
-> Our talent works across 7 categories: fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content…
-
-**Verdict:** Good category list. Self-contained. Still short of 134 words and names no brands, photographers, or markets.
-
-**“What Are the Requirements…?”**
-
-First paragraph is brand voice with no facts. Second paragraph has the height rules (173 cm / 183 cm). AI extractors will often skip the first paragraph.
-
-**“What Is the VÈLISHE Model Academy?” (~62 words)**
-
-Homepage Academy blurb is denser than `/academy/` itself. Still too short.
+| Block | Words | Verdict |
+|-------|------:|---------|
+| About / definition | 82 | Correct “X is…” pattern; still short of 134. Add roster size + named markets + booking email. |
+| What does Velishe do? | 137 | In band. Strong. Keep list of 7 categories. |
+| Requirements | 132 | Near band; heights lead correctly. Drop or separate the brand-voice paragraph from the answer block. |
+| Academy | 134 | In band. Matches Course themes. |
+| Booking / apply | 129 | Slightly short; already has email, WhatsApp, legal entity. |
 
 ### Other pages
 
-| Page | Approx. visible words | Citeable? |
-|------|----------------------:|-----------|
-| `/` | ~350 body / 434 with chrome | Partial — best page on the site |
-| `/models/raya/` | ~55 | Stats only. No bio. |
-| `/academy/` | ~87 | Thin. Course schema describes a curriculum the page does not. |
-| `/become-a-model/` | Form-heavy; ~80 words of requirements | Height + photo rules are citeable |
-| `/contact/` | ~127 | Location “Sofia, Bulgaria” only; no street, no phone in body (WhatsApp link only) |
-| `/mainboard/` | ~443 | Model names + measurements, **no H1**, no intro paragraph |
-| `/development/` | ~151 | Same heading gap |
-| `/search/` | ~40 | `noindex` — correctly excluded |
-
-No `datePublished` / `dateModified` on any HTML page. Footer still reads `© 2025`.
+| Page | Citeable? | Notes |
+|------|-----------|-------|
+| `/models/[slug]/` | Partial | Short bio + measurements now SSR (e.g. Raya). Bios are formulaic — add one unique credit when available. |
+| `/academy/` | Good | H1 + question H2s + module list visible. |
+| `/mainboard/`, `/development/` | Weak intro | `sr-only` H1 exists; no visible board intro paragraph in the 134–167 band. |
+| `/contact/` | Weak | Marketing voice; city-only address; phone/email less extractable than homepage booking FAQ. |
+| `/blog/*` | Good | BlogPosting + `datePublished` / `dateModified` — best freshness signal. |
 
 ---
 
 ## Server-Side Rendering Check
 
-AI crawlers do not execute JavaScript.
-
 | URL | Rendering | Crawler sees |
-|-----|-----------|----------------|
-| `/` | Server Component | Full Q&A copy + LocalBusiness + WebSite JSON-LD |
-| `/mainboard/`, `/development/` | Server CollectionPage + client gender filter | Model names and stats in HTML. **No H1/H2.** Filter is client-only (all models remain in HTML — good). |
-| `/models/` | 308/200 → mainboard | `app/models/page.tsx` (sr-only H1) is not what crawlers get. Redirect in `next.config.ts`: `/models` → `/mainboard`. |
-| `/models/[slug]/` | ISR (`revalidate = 60`) | H1, measurements, Instagram in HTML. Gallery is a client island. |
-| `/academy/` | `"use client"` page, Course JSON-LD in layout | Initial HTML still contains the short copy (Next still SSR client components). Form is JS. |
-| `/become-a-model/` | `"use client"` | Requirements list is in initial HTML. |
-| `/contact/` | Server Component | Full copy + ContactPage schema |
-| `/search/` | Client fetch of `/api/models` | Empty results for crawlers. Page is `noindex`. |
+|-----|-----------|--------------|
+| `/` | Prerender / ISR | Full FAQ copy + Organization + WebSite + FAQPage JSON-LD |
+| `/models/[slug]/` | ISR | H1, bio, measurements |
+| `/mainboard/`, `/development/` | SSR + client filter | Names/stats in HTML; H1 is `sr-only` |
+| `/academy/` | SSR of client page | Curriculum copy in HTML |
 | `/llms.txt` | Route handler | Full text |
-| `/sitemap.xml` | `app/sitemap.ts` | 36 URLs (6 static + 2 boards + 28 models). Curl returns 200. Some fetchers report 500 — monitor. |
+| `/search/` | Client | Correctly `noindex` |
+
+Homepage has **no `<h1>`** (only H2s inside `<details>`). FAQ text is still in the initial HTML — good for AI crawlers.
 
 ---
 
-## Schema Markup Status
+## Schema Markup Status (live)
 
-| Type | Where | Live? | Notes |
-|------|-------|-------|-------|
-| LocalBusiness | `components/StructuredData.tsx` | Yes | `sameAs` is Instagram only. `legalName` is “Ltd”; registry is **ЕООД / EOOD**, UIC **208665737**. Address is city-only. |
-| WebSite + SearchAction | `components/WebSiteSchema.tsx` | Yes | `target` is `/search?q=` — site uses `trailingSlash: true`, real path is `/search/`. Search is `noindex`. |
-| FAQPage | Previously claimed deployed | **No** | Not in codebase or live HTML. Regression vs March 2026 analysis. |
-| Person (model) | `app/models/[slug]/layout.tsx` | Yes | Fallback base URL is `https://velishemodelmanagement.com` **without www** — entity split vs homepage `@id`. |
-| BreadcrumbList | Model layouts | Yes | |
-| CollectionPage + ItemList | Board pages | Yes | Mainboard/Development. |
-| Course | `app/academy/layout.tsx` | Yes | Same www mismatch. Copy on page does not match schema curriculum list. |
-| ContactPage | `/contact/` | Yes | |
-| Person (founder/CEO) | — | **No** | Christiana Velichkova is both CEO and a signed model. |
-| Organization `identifier` (UIC) | — | **No** | |
-| Review / AggregateRating | Trustpilot widget | **No** in JSON-LD | Do not invent ratings. Add only if you have first-party review data. |
+| Type | Live? | Notes |
+|------|-------|-------|
+| LocalBusiness + EmploymentAgency | Yes | UIC, legalName EOOD, founder Person, rich `sameAs` |
+| WebSite + SearchAction | Yes | Trailing slash on `/search/` looks correct |
+| FAQPage | Yes | Four homepage Q&As — restored since Aug analysis |
+| Person (models) | Yes | + Instagram `sameAs` when present |
+| BlogPosting | Yes | Dates present |
+| Course (Academy) | Yes | Align page copy (done) |
+| Review / AggregateRating | No | Do not invent |
 
 ---
 
-## Top 5 Highest-Impact Changes
+## Top 5 Highest-Impact Improvements
 
-1. **Put headings and a citeable intro on Mainboard and Development.** These are the roster URLs in the sitemap (priority 0.9) and they currently have zero H1/H2. Add `Mainboard — Velishe Model Management` / `Development Board` plus a 134–167 word paragraph that states what the board is, how many models, and that talent works internationally (Milan, Shanghai, Hong Kong, etc.). Restore **FAQPage** JSON-LD on the homepage to match the four existing H2 questions.
+1. **Earn off-site corroboration (biggest unlock to 75+).** — Still open.  
+   Fix LinkedIn company industry → Modeling / Talent agency; weekly posts that say “Velishe Model Management.” List on models.com and bgmoda. Publish short YouTube clips that speak the full brand name (reduces “Velise” collision). Pitch Bulgarian fashion press with campaign credits that name the agency. Skip Wikipedia until independent coverage exists; do not astroturf Reddit.
 
-2. **Lengthen three homepage answer blocks to 134–167 words and lead with the fact.** Expand “What does Velishe do?”, requirements, and Academy. Name the 7 categories as a list, state height minima in the first sentence of the requirements section, and list Academy modules that already exist in Course schema (composites, casting, on-set conduct, etiquette, career building).
+2. **Upgrade homepage definition + board intros to citeable blocks.** — Done (2026-09-09).  
+   EN About via `buildEnHomeCopy` (~154 words with UIC, roster size, boards, booking). Visible H1 + intro on Mainboard/Development (`BoardPage`). Homepage H1 via `HomeIntroStrip`.
 
-3. **Add a 2–3 sentence bio on every model profile.** 28 SSR pages with only measurements are unciteable as people. Pattern: “{Name} is a {gender} fashion and commercial model represented by Velishe Model Management in Sofia. {Height}, {hair} hair, {eyes} eyes. {Booked location if any}.” Store `bio` in the models table (`lib/db/schema.ts` currently has no bio field).
+3. **Make model bios unique.** — Partial (template bios live; custom `bioEn`/`bioBg` fields exist).  
+   Prefer one specific credit per model when available.
 
-4. **Close the entity graph on-site.** Add LinkedIn company + founder URLs to Organization `sameAs`; emit a founder `Person` with `jobTitle: "Founder & CEO"`; set `legalName` to match the registry (Velishe Model Management EOOD / Велиш Модел Мениджмънт ЕООД) and `identifier` UIC 208665737; force `www` on every `@id` (fix `app/models/[slug]/layout.tsx` and `app/academy/layout.tsx` fallbacks); add `/mainboard/` and `/development/` plus LinkedIn to `llms.txt`.
+4. **Decide AI training policy in `robots.ts`.** — Done (2026-09-09).  
+   All crawlers allowed via `*` (including training bots) so models can learn the brand; `/api/` and `/_next/` remain disallowed.
 
-5. **Build off-site mentions (this is the remaining path to 75+).** LinkedIn company page exists — fill it (correct industry to “Modeling / Staffing & Recruiting”, employee count, website, posts). List on models.com and bgmoda.com. Publish 3–4 YouTube videos (casting tips, Academy overview, Sofia agency tour) that say the brand name on camera. One factual Reddit/AM thread in r/modeling or r/Bulgaria only if it is genuinely useful (no astroturfing). Wikipedia is not realistic until independent press exists.
-
----
-
-## Schema Recommendations (for AI discoverability)
-
-```json
-{
-  "@type": "EmploymentAgency",
-  "@id": "https://www.velishemodelmanagement.com/#organization",
-  "name": "Velishe Model Management",
-  "alternateName": ["VÈLISHE", "Велиш Модел Мениджмънт"],
-  "legalName": "Velishe Model Management EOOD",
-  "identifier": {
-    "@type": "PropertyValue",
-    "propertyID": "BG-EIK",
-    "value": "208665737"
-  },
-  "foundingDate": "2025",
-  "founder": {
-    "@type": "Person",
-    "name": "Christiana Velichkova",
-    "jobTitle": "Founder & CEO",
-    "url": "https://www.velishemodelmanagement.com/models/christiana/",
-    "sameAs": [
-      "https://www.linkedin.com/in/christiana-velichkova-4943351b2"
-    ]
-  },
-  "sameAs": [
-    "https://www.instagram.com/velishe.mgmt",
-    "https://www.linkedin.com/company/v%C3%A8lishe-model-management",
-    "https://www.trustpilot.com/review/velishemodelmanagement.com"
-  ],
-  "numberOfEmployees": { "@type": "QuantitativeValue", "minValue": 2, "maxValue": 10 }
-}
-```
-
-Use `EmploymentAgency` *in addition to* or instead of generic `LocalBusiness` — it matches talent representation more closely than a shopfront.
-
-FAQPage should wrap the four homepage Q&As that already exist as H2s. Do not add FAQ schema on commercial pages that do not have visible Q&A.
-
-Fix SearchAction to `https://www.velishemodelmanagement.com/search/?q={search_term_string}` or drop SearchAction until search is indexable SSR.
+5. **Contact page as entity landing.** — Done (2026-09-09).  
+   Legal name EOOD, UIC, founder LinkedIn, phone as text, book vs apply paths.
 
 ---
 
-## Content Reformatting Suggestions
+## Schema / Content Polish (lower effort)
 
-### 1. Homepage opening (target 140 words)
-
-Replace the current ~98-word intro with a block that still starts with the definition, then adds markets and booking path:
-
-> VÈLISHE Model Management is a boutique modeling agency founded in 2025 and based in Sofia, Bulgaria. The agency represents 28 professional women and men for fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. Velishe places talent with Bulgarian and international clients; current bookings include Milan, Shanghai, Hong Kong, Kuwait City, and Ho Chi Minh. Casting, campaign, and editorial enquiries go to models@velishemodelmanagement.com. Aspiring models apply through the Become a Model page; female applicants typically start at 173 cm and male applicants at 183 cm, with natural unedited photos.
-
-(Adjust city list to whatever is current on the roster that week.)
-
-### 2. Requirements H2 — put the answer first
-
-Move the height rules above the brand-voice paragraph:
-
-> Female models at Velishe typically begin at a minimum height of 173 cm; male models at 183 cm. Applicants submit natural photos with no filters, editing, makeup, or hair extensions. The agency reviews submissions on a rolling basis and only contacts successful applicants. Velishe represents both women and men for editorial and commercial work in Sofia and abroad.
-
-Then keep the vision paragraph as supporting copy.
-
-### 3. Academy page — match the Course schema
-
-The JSON-LD already claims modules. Put them on the page as an H2 + list (~150 words):
-
-> The VÈLISHE Academy is a structured training programme in Sofia for aspiring and signed models. It covers five areas: composites and casting preparation, professional conduct on set, industry etiquette, portfolio building, and how to sustain a modeling career. Enrolment is by intake; join the waitlist to be notified when the next programme opens. The Academy is run by Velishe Model Management and is separate from the signed Mainboard and Development rosters.
-
-Add `dateModified` in metadata when the next intake date is known.
-
-### 4. Model profile template
-
-After the H1, before Measurements:
-
-> Raya is a female fashion and commercial model represented by Velishe Model Management in Sofia, Bulgaria. She is 179 cm with brown hair and green eyes. Bookings: models@velishemodelmanagement.com.
-
-### 5. Mainboard intro (currently missing)
-
-> The Velishe Mainboard is the signed roster of established fashion and commercial models at Velishe Model Management, a boutique agency in Sofia, Bulgaria. Profiles include height, measurements, hair, eyes, and Instagram. Several Mainboard models work internationally while remaining represented from Sofia.
-
-Add a visible `<h1>Mainboard</h1>` in `components/BoardModels.tsx` or `BoardPage.tsx` (server-rendered, not inside the client filter chrome only).
-
-### 6. Contact page
-
-Add the phone number as text (`+359 885 835 499`) next to WhatsApp. Keep the public address at city level unless you have a studio you want indexed — the CompanyBook street address looks residential; do not publish it just for schema completeness.
+- Homepage: add `<h1>Velishe Model Management</h1>` (visually brand-first, not a second marketing headline).
+- Move vision/marketing copy out of the Requirements FAQ answer so extractors get facts only.
+- `dateModified` on homepage/academy when FAQ copy changes.
+- IndexNow on publish/revalidate for Bing.
+- Keep Trustpilot out of AggregateRating unless you have verified first-party ratings.
 
 ---
 
-## Quick Wins (code, this week)
+## Content Reformatting Examples
 
-1. Visible H1 on Mainboard and Development (`components/BoardPage.tsx`).
-2. Restore FAQPage JSON-LD on `app/page.tsx` for the four existing H2s.
-3. Add LinkedIn to Organization `sameAs` and to `llms.txt`.
-4. Unify `@id` base URL to `https://www.velishemodelmanagement.com` (Person + Course layouts).
-5. Fix SearchAction trailing slash or remove it.
-6. Add `/mainboard/` and `/development/` to the llms.txt “Main Pages” list.
-7. Dynamic copyright year in `app/layout.tsx`.
-8. `dateModified` in page metadata from sitemap `lastModified`.
+### Homepage About (target ~140 words)
+
+> VÈLISHE Model Management is a boutique modeling agency founded in 2025 and based in Sofia, Bulgaria. The legal entity is Velishe Model Management EOOD (UIC 208665737). The agency represents about 27 women and men across fashion editorial, commercial advertising, catalogue, runway, beauty, lifestyle, and digital content. The signed roster is split into Mainboard (established talent) and Development (new faces). Clients book castings or named models via models@velishemodelmanagement.com; briefs are handled in English and Bulgarian from Sofia. Aspiring models apply on Become a Model — typical minimum heights are 173 cm (women) and 183 cm (men), with natural unedited photos. VÈLISHE Academy is a separate training programme and is not the same as being signed.
+
+### Mainboard intro
+
+> The Velishe Mainboard is the established signed roster at Velishe Model Management, a boutique agency in Sofia, Bulgaria. Each profile lists height, measurements, hair, eyes, Instagram, and a short bio. Mainboard talent works in editorial and commercial productions in Bulgaria and abroad; recent Journal coverage includes international show and campaign placements. Bookings: models@velishemodelmanagement.com.
+
+---
+
+## Quick Wins (this week)
+
+1. Visible H1 on homepage; visible board intros (not only `sr-only`).
+2. Expand About block to 134–167 words with UIC + roster size + booking path.
+3. Re-evaluate training-bot blocks in `robots.ts`.
+4. LinkedIn company page hygiene (industry, about, website, posts).
+5. Add Trustpilot to `llms.txt` Social section.
 
 ## Medium Effort
 
-1. Bio field + 28 model bios.
-2. Expand Academy copy to match Course schema; add H2s.
-3. Lengthen homepage answer blocks to 134–167 words; convert categories and heights to lists.
-4. Founder Person schema + short About/team paragraph on Contact or a new `/about/` page.
-5. IndexNow ping on `/api/revalidate`.
-6. Consider `EmploymentAgency` schema + UIC identifier.
+1. Unique campaign lines on model bios + regenerate `llms.txt`.
+2. Contact page entity densification.
+3. IndexNow + clearer `dateModified` on key pages.
+4. Short Academy / casting tip videos on YouTube with spoken brand name.
 
 ## High Impact (mostly non-code)
 
-1. Independent press (Bulgarian fashion media, campaign credits with agency name).
-2. YouTube channel with spoken brand name.
-3. models.com + bgmoda listings.
-4. LinkedIn company page hygiene and regular posts.
-5. Original, unique data (e.g. “Sofia model height and market notes 2026”) that only this site publishes.
+1. Independent press and credited campaigns naming Velishe.
+2. Directory listings (models.com, bgmoda).
+3. Sustained LinkedIn + Instagram entity consistency (same legal name, Sofia, UIC story).
+4. One original data piece only this site owns (e.g. Sofia casting requirements / market notes 2026).
 
 ---
 
 ## What not to do
 
-- Do not add fake Review/AggregateRating stars to chase AI citations.
-- Do not publish the CompanyBook apartment address unless it is a real public office.
-- Do not astroturf Reddit or Wikipedia; empty or promotional pages get ignored and can create negative brand associations.
-- Do not unblock GPTBot unless you explicitly want OpenAI training on roster photos and measurements.
-- Do not put FAQ schema on pages that are not visible Q&A.
+- Do not invent Review/AggregateRating stars.
+- Do not publish a residential CompanyBook apartment as a public office address.
+- Do not astroturf Reddit or create a promotional Wikipedia stub.
+- Do not add FAQ schema to pages without visible Q&A.
+- Do not chase more schema while off-site mentions stay near zero — that is the real GEO gap.
