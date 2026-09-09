@@ -69,12 +69,7 @@ export default async function BoardPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-2">
-        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight">
-          {cfg.title}
-        </h1>
-        <p className="mt-4 text-gray-700 leading-relaxed">{intro}</p>
-      </section>
+      <h1 className="sr-only">{cfg.title}</h1>
       <BoardModels models={models} locale={locale} />
     </>
   );

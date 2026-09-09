@@ -161,12 +161,6 @@ export default async function BgHomePage() {
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
-              href={mainboardHref}
-              className="inline-block px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
-            >
-              Виж моделите
-            </Link>
-            <Link
               href={contactHref}
               className="inline-block px-6 py-3 border border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
             >
