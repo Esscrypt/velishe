@@ -28,7 +28,7 @@ Allow admins to override a model’s English and Bulgarian bios when needed, whi
 
 ## Data model
 
-Add to `models` (shared DB; migration owned by admin):
+Add to `models` (shared DB; migration owned by admin via `bun run db:generate` → `bun run db:migrate`):
 
 - `bio_en text` nullable  
 - `bio_bg text` nullable  

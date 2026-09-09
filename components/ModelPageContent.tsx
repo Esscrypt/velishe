@@ -8,7 +8,7 @@ import SocialIcons from "@/components/SocialIcons";
 import ModelPageTracker from "@/components/ModelPageTracker";
 import DownloadPortfolioButton from "@/components/DownloadPortfolioButton";
 import ModelProfileClient from "@/components/ModelProfileClient";
-import { buildModelBio } from "@/lib/model-bio";
+import { resolveModelBio } from "@/lib/model-bio";
 import { boardConfig } from "@/lib/i18n/boards";
 import { translateEyeColor, translateHairColor } from "@/lib/i18n/model-colors";
 import { modelPageLabels } from "@/lib/i18n/model-page";
@@ -154,7 +154,7 @@ export default async function ModelPageContent({
               </span>
             </summary>
             <p className="mt-4 text-gray-700 leading-relaxed">
-              {buildModelBio(model, locale)}
+              {resolveModelBio(model, locale)}
             </p>
           </details>
         </div>

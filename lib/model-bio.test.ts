@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { buildModelBio } from "./model-bio";
+import { buildModelBio, resolveModelBio } from "./model-bio";
 import type { Model } from "@/types/model";
 
 function sample(
@@ -100,5 +100,30 @@ describe("buildModelBio", () => {
     );
     expect(bio).toContain("Kaloyan е модел, представляван от Velishe Model Management.");
     expect(bio).toContain("Висок е 185 cm, със светлокафява коса и лешникови очи.");
+  });
+});
+
+describe("resolveModelBio", () => {
+  test("uses custom English bio when set", () => {
+    const bio = resolveModelBio({ ...sample(), bioEn: "Custom EN." }, "en");
+    expect(bio).toBe("Custom EN.");
+  });
+
+  test("falls back to auto English when bioEn is empty", () => {
+    const bio = resolveModelBio({ ...sample(), bioEn: "  " }, "en");
+    expect(bio).toContain("Raya is a female fashion and commercial model");
+  });
+
+  test("uses custom Bulgarian bio when set", () => {
+    const bio = resolveModelBio(
+      { ...sample(), bioBg: "Персонализирано." },
+      "bg",
+    );
+    expect(bio).toBe("Персонализирано.");
+  });
+
+  test("falls back to auto Bulgarian when bioBg is unset", () => {
+    const bio = resolveModelBio(sample(), "bg");
+    expect(bio).toContain("Raya е модел");
   });
 });

@@ -287,6 +287,10 @@ export default function DownloadPortfolioButton({
       }
 
       pdf.save(`${slug}-portfolio.pdf`);
+
+      const blobUrl = URL.createObjectURL(pdf.output("blob"));
+      window.open(blobUrl, "_blank", "noopener,noreferrer");
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
     } catch (err) {
       console.error("[DownloadPortfolioButton] Failed to generate PDF:", err);
       window.alert(labels.failedGeneratePdf);

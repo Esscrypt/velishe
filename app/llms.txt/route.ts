@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPublishedPosts } from "@/lib/blog";
 import { getAllModels } from "@/lib/models";
-import { buildModelBio } from "@/lib/model-bio";
+import { resolveModelBio } from "@/lib/model-bio";
 import { JOURNAL_ABOUT, JOURNAL_TITLE } from "@/lib/blog-journal";
 import { buildZhHomeCopy } from "@/lib/zh-content";
 import { buildBgHomeCopy } from "@/lib/bg-content";
@@ -129,7 +129,7 @@ The following is a complete list of all represented models and their statistics:
       const lines = [
         "",
         `### ${model.name} (${model.slug})`,
-        `- **Bio**: ${buildModelBio(model)}`,
+        `- **Bio**: ${resolveModelBio(model)}`,
         `- **Height**: ${stats.height}`,
         `- **Bust**: ${stats.bust}`,
         `- **Waist**: ${stats.waist}`,

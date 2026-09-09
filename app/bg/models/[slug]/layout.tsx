@@ -7,7 +7,7 @@ import {
   OG_CARD_WIDTH,
   OG_CARD_HEIGHT,
 } from "@/lib/metadata";
-import { buildModelBio } from "@/lib/model-bio";
+import { resolveModelBio } from "@/lib/model-bio";
 import { bgPageMetadataPath, pageLanguageAlternates } from "@/lib/i18n/locale";
 import { modelPageLabels } from "@/lib/i18n/model-page";
 
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: labels.modelNotFound };
   }
 
-  const description = buildModelBio(model, "bg");
+  const description = resolveModelBio(model, "bg");
   const image = model.featuredImageId
     ? {
         url: `${SITE_URL}/api/og/${slug}/?v=${model.featuredImageId}`,
@@ -64,7 +64,7 @@ export default async function BgModelLayout({
   const { slug } = await params;
   const model = await getModelBySlug(slug);
   const labels = modelPageLabels("bg");
-  const bio = model ? buildModelBio(model, "bg") : "";
+  const bio = model ? resolveModelBio(model, "bg") : "";
   const modelPath = bgPageMetadataPath(`/models/${slug}/`);
 
   const personSchema = model

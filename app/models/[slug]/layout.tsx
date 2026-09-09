@@ -7,7 +7,7 @@ import {
   OG_CARD_WIDTH,
   OG_CARD_HEIGHT,
 } from "@/lib/metadata";
-import { buildModelBio } from "@/lib/model-bio";
+import { resolveModelBio } from "@/lib/model-bio";
 import { pageLanguageAlternates } from "@/lib/i18n/locale";
 import { modelPageLabels } from "@/lib/i18n/model-page";
 
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const description = buildModelBio(model, "en");
+  const description = resolveModelBio(model, "en");
 
   // The OG card is served by /api/og/[slug] from the model's current featured
   // image; ?v=<image id> changes whenever the admin swaps it, forcing a re-scrape.
@@ -67,7 +67,7 @@ export default async function ModelLayout({
 }) {
   const { slug } = await params;
   const model = await getModelBySlug(slug);
-  const bio = model ? buildModelBio(model, "en") : "";
+  const bio = model ? resolveModelBio(model, "en") : "";
   const labels = modelPageLabels("en");
 
   const personSchema = model

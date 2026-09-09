@@ -23,6 +23,10 @@ export interface Model {
   instagram?: string;
   booked?: boolean;
   targetLocation?: string;
+  /** Custom English bio; empty/unset falls back to auto-generated bio. */
+  bioEn?: string;
+  /** Custom Bulgarian bio; empty/unset falls back to auto-generated bio. */
+  bioBg?: string;
   featuredImage: string;
   featuredImageId?: string;
   board?: "mainboard" | "development";

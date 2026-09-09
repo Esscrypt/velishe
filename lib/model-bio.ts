@@ -8,7 +8,14 @@ import {
 
 type BioModel = Pick<
   Model,
-  "name" | "gender" | "stats" | "booked" | "targetLocation" | "board"
+  | "name"
+  | "gender"
+  | "stats"
+  | "booked"
+  | "targetLocation"
+  | "board"
+  | "bioEn"
+  | "bioBg"
 >;
 
 function joinList(items: string[]): string {
@@ -220,4 +227,15 @@ export function buildModelBio(
   locale: SiteLocale = "en",
 ): string {
   return locale === "bg" ? buildModelBioBg(model) : buildModelBioEn(model);
+}
+
+/** Prefer a trimmed custom bio when set; otherwise auto-generate. */
+export function resolveModelBio(
+  model: BioModel,
+  locale: SiteLocale = "en",
+): string {
+  const custom =
+    locale === "bg" ? model.bioBg?.trim() : model.bioEn?.trim();
+  if (custom) return custom;
+  return buildModelBio(model, locale);
 }
