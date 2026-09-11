@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   EditableText,
   HomeFaqItemEditable,
@@ -10,6 +10,8 @@ import {
 } from "@/components/CmsPreview";
 import {
   CMS_PREVIEW_READY,
+  CMS_PREVIEW_SNAPSHOT,
+  isCmsPreviewFlush,
   isCmsPreviewPush,
   isTrustedCmsPreviewOrigin,
   type HomeFaqPreviewDraft,
@@ -95,9 +97,12 @@ export default function HomeAboutSection({
   const previewMode = useCmsPreviewMode();
   const sendPatch = usePreviewPatchSender("home_faq", locale, previewMode);
   const [copy, setCopy] = useState(initial);
+  const draftRef = useRef(toDraft(initial));
+  draftRef.current = toDraft(copy);
 
   useEffect(() => {
     setCopy(initial);
+    draftRef.current = toDraft(initial);
   }, [initial]);
 
   useEffect(() => {
@@ -105,10 +110,31 @@ export default function HomeAboutSection({
 
     const onMessage = (event: MessageEvent) => {
       if (!isTrustedCmsPreviewOrigin(event.origin)) return;
-      if (!isCmsPreviewPush(event.data)) return;
+      if (isCmsPreviewPush(event.data)) {
+        if (event.data.page !== "home_faq") return;
+        if (event.data.locale !== locale) return;
+        const nextDraft = event.data.draft as HomeFaqPreviewDraft;
+        draftRef.current = nextDraft;
+        setCopy(fromDraft(nextDraft));
+        return;
+      }
+      if (!isCmsPreviewFlush(event.data)) return;
       if (event.data.page !== "home_faq") return;
       if (event.data.locale !== locale) return;
-      setCopy(fromDraft(event.data.draft as HomeFaqPreviewDraft));
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) active.blur();
+      const replyOrigin = event.origin;
+      queueMicrotask(() => {
+        window.parent.postMessage(
+          {
+            type: CMS_PREVIEW_SNAPSHOT,
+            page: "home_faq",
+            locale,
+            draft: draftRef.current,
+          },
+          replyOrigin,
+        );
+      });
     };
 
     window.addEventListener("message", onMessage);
@@ -123,11 +149,10 @@ export default function HomeAboutSection({
   }, [locale, previewMode]);
 
   const patch = (partial: Partial<HomeFaqPreviewDraft>) => {
-    setCopy((prev) => {
-      const draft = { ...toDraft(prev), ...partial };
-      sendPatch(partial as Record<string, string>);
-      return fromDraft(draft);
-    });
+    const nextDraft = { ...draftRef.current, ...partial };
+    draftRef.current = nextDraft;
+    setCopy(fromDraft(nextDraft));
+    sendPatch(partial as Record<string, string>);
   };
 
   const editable = previewMode;

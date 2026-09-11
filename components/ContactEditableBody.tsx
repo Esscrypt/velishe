@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Instagram } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   EditableText,
   useCmsPreviewMode,
@@ -10,6 +10,8 @@ import {
 } from "@/components/CmsPreview";
 import {
   CMS_PREVIEW_READY,
+  CMS_PREVIEW_SNAPSHOT,
+  isCmsPreviewFlush,
   isCmsPreviewPush,
   isTrustedCmsPreviewOrigin,
   type ContactPreviewDraft,
@@ -74,6 +76,8 @@ export default function ContactEditableBody({
     companyHeading,
     officeAddress,
   });
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
 
   useEffect(() => {
     setDraft({ intro1, intro2, companyHeading, officeAddress });
@@ -83,10 +87,29 @@ export default function ContactEditableBody({
     if (!previewMode) return;
     const onMessage = (event: MessageEvent) => {
       if (!isTrustedCmsPreviewOrigin(event.origin)) return;
-      if (!isCmsPreviewPush(event.data)) return;
+      if (isCmsPreviewPush(event.data)) {
+        if (event.data.page !== "contact") return;
+        if (event.data.locale !== locale) return;
+        setDraft(event.data.draft as ContactPreviewDraft);
+        return;
+      }
+      if (!isCmsPreviewFlush(event.data)) return;
       if (event.data.page !== "contact") return;
       if (event.data.locale !== locale) return;
-      setDraft(event.data.draft as ContactPreviewDraft);
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) active.blur();
+      const replyOrigin = event.origin;
+      queueMicrotask(() => {
+        window.parent.postMessage(
+          {
+            type: CMS_PREVIEW_SNAPSHOT,
+            page: "contact",
+            locale,
+            draft: draftRef.current,
+          },
+          replyOrigin,
+        );
+      });
     };
     window.addEventListener("message", onMessage);
     window.parent.postMessage(
@@ -97,11 +120,10 @@ export default function ContactEditableBody({
   }, [locale, previewMode]);
 
   const patch = (partial: Partial<ContactPreviewDraft>) => {
-    setDraft((prev) => {
-      const next = { ...prev, ...partial };
-      sendPatch(partial as Record<string, string>);
-      return next;
-    });
+    const next = { ...draftRef.current, ...partial };
+    draftRef.current = next;
+    setDraft(next);
+    sendPatch(partial as Record<string, string>);
   };
 
   return (
