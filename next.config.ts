@@ -5,10 +5,7 @@ const securityHeaders = [
     key: "X-Content-Type-Options",
     value: "nosniff",
   },
-  {
-    key: "X-Frame-Options",
-    value: "SAMEORIGIN",
-  },
+  // Framing policy is set in middleware (allows admin CMS preview only).
   {
     key: "Referrer-Policy",
     value: "strict-origin-when-cross-origin",
