@@ -1,11 +1,12 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import {
   SITE_CONTENT_SINGLETON_ID,
   type ContactPageContentRow,
-  type HomeFaqContentRow,
+  type HomeFaqItemRow,
 } from "@/lib/db/schema";
 import { getDb, schema } from "@/lib/db/index";
+import type { HomeFaqItem } from "@/lib/home-faq-defaults";
 
 export const CACHE_TAG_SITE_CONTENT = "site-content";
 
@@ -23,25 +24,9 @@ export type ContactPageStored = {
   bg?: ContactLocaleBody;
 };
 
-export type HomeFaqLocaleBody = {
-  intro?: string;
-  whatWeDo?: string;
-  requirements?: string;
-  academy?: string;
-  booking?: string;
-  journal?: string;
-  vision?: string;
-  questionAbout?: string;
-  questionWhatWeDo?: string;
-  questionRequirements?: string;
-  questionAcademy?: string;
-  questionBooking?: string;
-  questionJournal?: string;
-};
-
-export type HomeFaqStored = {
-  en?: HomeFaqLocaleBody;
-  bg?: HomeFaqLocaleBody;
+export type HomeFaqItemsByLocale = {
+  en: HomeFaqItem[];
+  bg: HomeFaqItem[];
 };
 
 function textOrEmpty(value: string | null | undefined): string {
@@ -91,80 +76,21 @@ export function contactRowToStored(
   };
 }
 
-export function homeFaqRowToStored(
-  row: HomeFaqContentRow | null | undefined,
-): HomeFaqStored {
-  if (!row) {
-    return {
-      en: {
-        intro: "",
-        whatWeDo: "",
-        requirements: "",
-        academy: "",
-        booking: "",
-        journal: "",
-        vision: "",
-        questionAbout: "",
-        questionWhatWeDo: "",
-        questionRequirements: "",
-        questionAcademy: "",
-        questionBooking: "",
-        questionJournal: "",
-      },
-      bg: {
-        intro: "",
-        whatWeDo: "",
-        requirements: "",
-        academy: "",
-        booking: "",
-        journal: "",
-        vision: "",
-        questionAbout: "",
-        questionWhatWeDo: "",
-        questionRequirements: "",
-        questionAcademy: "",
-        questionBooking: "",
-        questionJournal: "",
-      },
-    };
-  }
-  return {
-    en: {
-      intro: textOrEmpty(row.introEn),
-      whatWeDo: textOrEmpty(row.whatWeDoEn),
-      requirements: textOrEmpty(row.requirementsEn),
-      academy: textOrEmpty(row.academyEn),
-      booking: textOrEmpty(row.bookingEn),
-      journal: textOrEmpty(row.journalEn),
-      vision: textOrEmpty(row.visionEn),
-      questionAbout: textOrEmpty(row.questionAboutEn),
-      questionWhatWeDo: textOrEmpty(row.questionWhatWeDoEn),
-      questionRequirements: textOrEmpty(row.questionRequirementsEn),
-      questionAcademy: textOrEmpty(row.questionAcademyEn),
-      questionBooking: textOrEmpty(row.questionBookingEn),
-      questionJournal: textOrEmpty(row.questionJournalEn),
-    },
-    bg: {
-      intro: textOrEmpty(row.introBg),
-      whatWeDo: textOrEmpty(row.whatWeDoBg),
-      requirements: textOrEmpty(row.requirementsBg),
-      academy: textOrEmpty(row.academyBg),
-      booking: textOrEmpty(row.bookingBg),
-      journal: textOrEmpty(row.journalBg),
-      vision: textOrEmpty(row.visionBg),
-      questionAbout: textOrEmpty(row.questionAboutBg),
-      questionWhatWeDo: textOrEmpty(row.questionWhatWeDoBg),
-      questionRequirements: textOrEmpty(row.questionRequirementsBg),
-      questionAcademy: textOrEmpty(row.questionAcademyBg),
-      questionBooking: textOrEmpty(row.questionBookingBg),
-      questionJournal: textOrEmpty(row.questionJournalBg),
-    },
-  };
-}
-
 export function pickFilled(override: string | null | undefined, fallback: string): string {
   const trimmed = override?.trim();
   return trimmed ? trimmed : fallback;
+}
+
+export function rowsToHomeFaqItems(rows: HomeFaqItemRow[]): HomeFaqItem[] {
+  return rows.map((row) => ({
+    id: row.id,
+    question: textOrEmpty(row.question),
+    answer: textOrEmpty(row.answer),
+  }));
+}
+
+export function hasUsableFaqAnswers(items: HomeFaqItem[]): boolean {
+  return items.some((item) => item.answer.trim().length > 0);
 }
 
 async function fetchContactRow(): Promise<ContactPageContentRow | null> {
@@ -183,20 +109,29 @@ async function fetchContactRow(): Promise<ContactPageContentRow | null> {
   }
 }
 
-async function fetchHomeFaqRow(): Promise<HomeFaqContentRow | null> {
+async function fetchHomeFaqItemRows(): Promise<HomeFaqItemRow[]> {
   const db = getDb();
-  if (!db) return null;
+  if (!db) return [];
   try {
-    const rows = await db
+    return await db
       .select()
-      .from(schema.homeFaqContent)
-      .where(eq(schema.homeFaqContent.id, SITE_CONTENT_SINGLETON_ID))
-      .limit(1);
-    return rows[0] ?? null;
+      .from(schema.homeFaqItems)
+      .orderBy(asc(schema.homeFaqItems.locale), asc(schema.homeFaqItems.sortOrder));
   } catch (error) {
-    console.error("[fetchHomeFaqRow]", error);
-    return null;
+    console.error("[fetchHomeFaqItemRows]", error);
+    return [];
   }
+}
+
+function groupHomeFaqItems(rows: HomeFaqItemRow[]): HomeFaqItemsByLocale {
+  const en: HomeFaqItem[] = [];
+  const bg: HomeFaqItem[] = [];
+  for (const row of rows) {
+    const item = { id: row.id, question: row.question, answer: row.answer };
+    if (row.locale === "bg") bg.push(item);
+    else if (row.locale === "en") en.push(item);
+  }
+  return { en, bg };
 }
 
 export function getContactPageStored(): Promise<ContactPageStored> {
@@ -207,10 +142,19 @@ export function getContactPageStored(): Promise<ContactPageStored> {
   )();
 }
 
-export function getHomeFaqStored(): Promise<HomeFaqStored> {
+/** All FAQ items grouped by locale, ordered by sort_order. */
+export function getHomeFaqItemsByLocale(): Promise<HomeFaqItemsByLocale> {
   return unstable_cache(
-    async () => homeFaqRowToStored(await fetchHomeFaqRow()),
+    async () => groupHomeFaqItems(await fetchHomeFaqItemRows()),
     ["site-content-home-faq"],
     { tags: [CACHE_TAG_SITE_CONTENT, "site-content-home-faq"], revalidate: 3600 },
   )();
+}
+
+/** FAQ items for one locale (raw DB rows; caller applies EN fallback). */
+export async function getHomeFaqItems(
+  locale: "en" | "bg",
+): Promise<HomeFaqItem[]> {
+  const byLocale = await getHomeFaqItemsByLocale();
+  return byLocale[locale];
 }

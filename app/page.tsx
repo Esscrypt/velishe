@@ -8,7 +8,7 @@ import {
 } from "@/lib/model-bio";
 import { getModelsForListing } from "@/lib/models";
 import { resolveEnHomeCopy } from "@/lib/resolve-home-copy";
-import { getHomeFaqStored } from "@/lib/site-content";
+import { getHomeFaqItemsByLocale } from "@/lib/site-content";
 import {
   languageAlternates,
   SITE_NAME,
@@ -26,7 +26,7 @@ export const revalidate = 3600;
 
 export default async function Home() {
   const models = await getModelsForListing();
-  const stored = await getHomeFaqStored();
+  const stored = await getHomeFaqItemsByLocale();
   const copy = resolveEnHomeCopy(
     {
       modelCount: models.length,
@@ -34,33 +34,16 @@ export default async function Home() {
     },
     stored,
   );
-  const { seo } = copy;
+  const { seo, items } = copy;
 
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: seo.questions.whatWeDo,
-        acceptedAnswer: { "@type": "Answer", text: seo.whatWeDo },
-      },
-      {
-        "@type": "Question",
-        name: seo.questions.requirements,
-        acceptedAnswer: { "@type": "Answer", text: seo.requirementsLead },
-      },
-      {
-        "@type": "Question",
-        name: seo.questions.academy,
-        acceptedAnswer: { "@type": "Answer", text: seo.academy },
-      },
-      {
-        "@type": "Question",
-        name: seo.questions.booking,
-        acceptedAnswer: { "@type": "Answer", text: seo.booking },
-      },
-    ],
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
   };
 
   return (
@@ -90,19 +73,10 @@ export default async function Home() {
         </div>
         <HomeAboutSection
           locale="en"
-          becomeHref="/become-a-model/"
           mainboardHref="/mainboard/"
           contactHref="/contact/"
           usingEnglishLayout
-          initial={{
-            intro: copy.intro,
-            whatWeDo: copy.whatWeDo,
-            requirements: copy.requirementsLead,
-            academy: copy.academy,
-            booking: copy.booking,
-            vision: copy.vision,
-            questions: copy.questions,
-          }}
+          items={items}
         />
       </section>
     </>

@@ -52,6 +52,7 @@ export function EditableText({
 type HomeFaqItemEditableProps = {
   title: string;
   onTitleChange?: (title: string) => void;
+  onDelete?: () => void;
   children: ReactNode;
   defaultOpen?: boolean;
   editable?: boolean;
@@ -60,6 +61,7 @@ type HomeFaqItemEditableProps = {
 export function HomeFaqItemEditable({
   title,
   onTitleChange,
+  onDelete,
   children,
   defaultOpen = false,
   editable = false,
@@ -88,6 +90,19 @@ export function HomeFaqItemEditable({
             {title}
           </h2>
         )}
+        {editable && onDelete ? (
+          <button
+            type="button"
+            className="shrink-0 rounded border border-red-200 px-2 py-0.5 text-xs text-red-700 hover:bg-red-50"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onDelete();
+            }}
+          >
+            Delete
+          </button>
+        ) : null}
         <span className="shrink-0 text-gray-400 text-lg group-open:hidden">+</span>
         <span className="shrink-0 text-gray-400 text-lg hidden group-open:inline">
           –

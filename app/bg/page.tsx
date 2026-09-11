@@ -15,13 +15,13 @@ import {
 import { localizedHref } from "@/lib/i18n/locale";
 import { BG_PAGE_TITLE } from "@/lib/bg-content";
 import { resolveBgHomeCopy } from "@/lib/resolve-home-copy";
-import { getHomeFaqStored } from "@/lib/site-content";
+import { getHomeFaqItemsByLocale } from "@/lib/site-content";
 
 export const revalidate = 3600;
 
 export default async function BgHomePage() {
   const models = await getModelsForListing();
-  const stored = await getHomeFaqStored();
+  const stored = await getHomeFaqItemsByLocale();
   const copy = resolveBgHomeCopy(
     {
       modelCount: models.length,
@@ -29,58 +29,21 @@ export default async function BgHomePage() {
     },
     stored,
   );
-  const { seo, usingEnglishFallback } = copy;
+  const { seo, usingEnglishFallback, items } = copy;
 
   const pageUrl = `${SITE_URL}${BG_PATH}`;
   const mainboardHref = localizedHref("/mainboard/", "bg");
   const contactHref = localizedHref("/contact/", "bg");
   const becomeHref = localizedHref("/become-a-model/", "bg");
-  const blogHref = localizedHref("/blog/", "bg");
 
-  const faqEntity = [
-    {
-      "@type": "Question" as const,
-      name: usingEnglishFallback ? seo.questions.whatWeDo : copy.questions.whatWeDo,
-      acceptedAnswer: {
-        "@type": "Answer" as const,
-        text: usingEnglishFallback ? seo.whatWeDo : copy.whatWeDo,
-      },
+  const faqEntity = items.map((item) => ({
+    "@type": "Question" as const,
+    name: item.question,
+    acceptedAnswer: {
+      "@type": "Answer" as const,
+      text: item.answer,
     },
-    {
-      "@type": "Question" as const,
-      name: usingEnglishFallback
-        ? seo.questions.requirements
-        : copy.questions.requirements,
-      acceptedAnswer: {
-        "@type": "Answer" as const,
-        text: usingEnglishFallback ? seo.requirementsLead : copy.requirements,
-      },
-    },
-    {
-      "@type": "Question" as const,
-      name: usingEnglishFallback ? seo.questions.academy : copy.questions.academy,
-      acceptedAnswer: {
-        "@type": "Answer" as const,
-        text: usingEnglishFallback ? seo.academy : copy.academy,
-      },
-    },
-    {
-      "@type": "Question" as const,
-      name: usingEnglishFallback ? seo.questions.booking : copy.questions.booking,
-      acceptedAnswer: {
-        "@type": "Answer" as const,
-        text: usingEnglishFallback ? seo.booking : copy.booking,
-      },
-    },
-  ];
-
-  if (!usingEnglishFallback && copy.questions.journal && copy.journal) {
-    faqEntity.splice(3, 0, {
-      "@type": "Question",
-      name: copy.questions.journal,
-      acceptedAnswer: { "@type": "Answer", text: copy.journal },
-    });
-  }
+  }));
 
   const jsonLd = [
     {
@@ -129,32 +92,22 @@ export default async function BgHomePage() {
         lang={usingEnglishFallback ? "en" : "bg"}
       >
         <div className="sr-only" aria-hidden="true">
-          <p>{usingEnglishFallback ? seo.intro : copy.intro}</p>
-          <p>{usingEnglishFallback ? seo.whatWeDo : copy.whatWeDo}</p>
-          <p>
-            {usingEnglishFallback ? seo.requirementsLead : copy.requirements}
-          </p>
-          <p>{usingEnglishFallback ? seo.academy : copy.academy}</p>
-          <p>{usingEnglishFallback ? seo.booking : copy.booking}</p>
+          {"intro" in seo ? <p>{seo.intro}</p> : null}
+          {"whatWeDo" in seo ? <p>{seo.whatWeDo}</p> : null}
+          {"requirementsLead" in seo ? (
+            <p>{seo.requirementsLead}</p>
+          ) : "requirements" in seo ? (
+            <p>{seo.requirements}</p>
+          ) : null}
+          {"academy" in seo ? <p>{seo.academy}</p> : null}
+          {"booking" in seo ? <p>{seo.booking}</p> : null}
         </div>
         <HomeAboutSection
           locale="bg"
-          becomeHref={becomeHref}
           mainboardHref={mainboardHref}
           contactHref={contactHref}
-          blogHref={blogHref}
-          showJournal={!usingEnglishFallback}
           usingEnglishLayout={usingEnglishFallback}
-          initial={{
-            intro: copy.intro,
-            whatWeDo: copy.whatWeDo,
-            requirements: copy.requirements,
-            academy: copy.academy,
-            booking: copy.booking,
-            journal: copy.journal,
-            vision: copy.vision,
-            questions: copy.questions,
-          }}
+          items={items}
         />
       </section>
     </>
