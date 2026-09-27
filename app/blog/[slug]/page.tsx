@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BlogCredits from "@/components/BlogCredits";
+import BlogGalleryCarousel from "@/components/BlogGalleryCarousel";
 import BlogPostModelCta from "@/components/BlogPostModelCta";
 import BlogRelatedPosts from "@/components/BlogRelatedPosts";
 import BlogShareBar from "@/components/BlogShareBar";
@@ -209,20 +210,18 @@ export default async function BlogPostPage({ params }: PageProps) {
         </div>
       ) : null}
 
+      {post.gallery.length > 0 ? (
+        <BlogGalleryCarousel
+          media={post.gallery}
+          title={post.title}
+          className="mb-8"
+        />
+      ) : null}
+
       <div
         className="blog-prose text-base leading-7 text-gray-900 space-y-4 mb-10 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-6 [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_blockquote]:border-l-2 [&_blockquote]:border-black [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-700"
         dangerouslySetInnerHTML={{ __html: bodyHtml }}
       />
-
-      {post.gallery.length > 0 ? (
-        <div className="mb-10 grid grid-cols-2 gap-2">
-          {post.gallery.map((media) => (
-            <div key={media.id} className="overflow-hidden bg-gray-100">
-              <PostMedia media={media} title={post.title} />
-            </div>
-          ))}
-        </div>
-      ) : null}
 
       <BlogCredits credits={post.credits} model={post.model} />
 
