@@ -2,10 +2,10 @@ import { SITE_NAME, SITE_URL, type OgImage } from "@/lib/metadata";
 import { buildJournalIndexOgImage } from "@/lib/blog-og";
 import type { BlogPostListItem } from "@/types/blog";
 
-export const JOURNAL_TITLE = "Velishe Journal";
+export const JOURNAL_TITLE = "Vèlishe Journal";
 
 export const JOURNAL_META_DESCRIPTION =
-  "Velishe Journal — updates from a Sofia boutique model agency: castings, new faces, campaigns, and news from Velishe Model Management.";
+  "Vèlishe Journal — updates from a Sofia boutique model agency: castings, new faces, campaigns, and news from Velishe Model Management.";
 
 export const JOURNAL_INTRO =
   "Notes from the agency — castings, new faces, and what we’re watching.";
@@ -13,22 +13,22 @@ export const JOURNAL_INTRO =
 export const JOURNAL_ABOUT = `${JOURNAL_TITLE} is the official blog of ${SITE_NAME} (VÈLISHE), a boutique model agency in Sofia, Bulgaria. We publish casting notes, roster updates, campaign stories, and industry news for clients, models, and collaborators. Subscribe below for email updates.`;
 
 export const JOURNAL_ZH_BLURB =
-  "Velishe Journal（英文）发布索非亚精品模特经纪公司 VÈLISHE 的选角动态、新面孔介绍与广告战役故事。";
+  "Vèlishe Journal（英文）发布索非亚精品模特经纪公司 VÈLISHE 的选角动态、新面孔介绍与广告战役故事。";
 
 export const JOURNAL_BG_BLURB =
-  "Velishe Journal (на английски) публикува новини за кастинги, нови лица и кампании от бутиковата модел агенция VÈLISHE в София.";
+  "Vèlishe Journal (на английски) публикува новини за кастинги, нови лица и кампании от бутиковата модел агенция VÈLISHE в София.";
 
 export const JOURNAL_FAQ = [
   {
-    question: "What is Velishe Journal?",
+    question: "What is Vèlishe Journal?",
     answer: `${JOURNAL_TITLE} is the blog of ${SITE_NAME}, a boutique model agency based in Sofia, Bulgaria. It covers castings, new faces, campaigns, and agency news.`,
   },
   {
-    question: "Who publishes Velishe Journal?",
+    question: "Who publishes Vèlishe Journal?",
     answer: `Posts are written and published by ${SITE_NAME} (VÈLISHE), the Sofia-based agency representing fashion and commercial models in Bulgaria and internationally.`,
   },
   {
-    question: "How can I subscribe to Velishe Journal?",
+    question: "How can I subscribe to Vèlishe Journal?",
     answer:
       "Enter your email at the bottom of the Journal page and confirm your subscription. You can unsubscribe at any time from every email.",
   },

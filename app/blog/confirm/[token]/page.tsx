@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { token } = await params;
   return buildPageMetadata({
     title: "Confirm subscription",
-    description: "Confirm your Velishe Journal subscription.",
+    description: "Confirm your Vèlishe Journal subscription.",
     path: `/blog/confirm/${token}/`,
     index: false,
   });
@@ -61,7 +61,7 @@ export default async function BlogConfirmPage({ params }: PageProps) {
   return (
     <Centered
       title="You’re subscribed"
-      body="You’re subscribed to Velishe Journal."
+      body="You’re subscribed to Vèlishe Journal."
     />
   );
 }

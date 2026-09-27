@@ -54,7 +54,7 @@ function PostMedia({
   return (
     <Image
       src={publicBlogImageUrl(media.id)}
-      alt={media.alt || `${title} — ${SITE_NAME} Journal`}
+      alt={media.alt || `${title} — ${JOURNAL_TITLE}`}
       width={1600}
       height={2000}
       className="h-auto w-full"
@@ -169,7 +169,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <p className="text-xs tracking-[0.14em] uppercase text-gray-500 mb-3">
-        Journal
+        {JOURNAL_TITLE}
       </p>
       <h1 className="font-serif text-4xl sm:text-5xl font-bold text-black leading-tight mb-3">
         {post.title}

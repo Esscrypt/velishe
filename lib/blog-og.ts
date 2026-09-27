@@ -38,13 +38,13 @@ export function buildJournalIndexOgImage(posts: BlogPostListItem[]): OgImage {
       url: blogOgImageUrl(post.slug, still.id),
       width: OG_CARD_WIDTH,
       height: OG_CARD_HEIGHT,
-      alt: `${post.title} — Velishe Journal`,
+      alt: `${post.title} — Vèlishe Journal`,
       type: "image/jpeg",
     };
   }
 
   return {
     ...DEFAULT_OG_IMAGE,
-    alt: "Velishe Journal — Velishe Model Management",
+    alt: "Vèlishe Journal — Velishe Model Management",
   };
 }

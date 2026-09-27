@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { token } = await params;
   return buildPageMetadata({
     title: "Unsubscribe",
-    description: "Unsubscribe from Velishe Journal.",
+    description: "Unsubscribe from Vèlishe Journal.",
     path: `/blog/unsubscribe/${token}/`,
     index: false,
   });

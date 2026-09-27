@@ -116,10 +116,10 @@ export default function PrivacyPage() {
           </ul>
 
           <h3 className="text-xl font-semibold text-gray-900 mb-3">
-            3.1a Mailing List / Velishe Journal
+            3.1a Mailing List / Vèlishe Journal
           </h3>
           <p className="text-gray-700 mb-4">
-            If you subscribe to Velishe Journal, we collect your email address
+            If you subscribe to Vèlishe Journal, we collect your email address
             with your explicit consent so we can send you journal updates and
             related agency news. Subscription uses double opt-in: you must
             confirm via a link we email you before we add you to the active

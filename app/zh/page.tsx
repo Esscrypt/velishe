@@ -145,7 +145,7 @@ export default async function ZhHomePage() {
                 href="/blog/"
                 className="text-gray-900 underline hover:text-gray-600 transition-colors"
               >
-                Velishe Journal
+                Vèlishe Journal
               </Link>
             </p>
           </ZhFaqItem>
@@ -182,7 +182,7 @@ export default async function ZhHomePage() {
               href="/blog/"
               className="inline-block px-6 py-3 border border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
             >
-              Velishe Journal
+              Vèlishe Journal
             </Link>
             <Link
               href="/contact/"

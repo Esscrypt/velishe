@@ -229,7 +229,7 @@ export function legacyLocaleToFaqItems(
       "journal",
       journalQ,
       journalA,
-      journalDef?.question ?? (locale === "bg" ? "Какво е Velishe Journal?" : "Journal"),
+      journalDef?.question ?? (locale === "bg" ? "Какво е Vèlishe Journal?" : "Journal"),
       journalDef?.answer ?? (locale === "en" ? JOURNAL_ABOUT : journalA),
     );
   }

@@ -57,7 +57,7 @@ export function buildBgHomeCopy({ modelCount, locationPhrase }: BgHomeCopyArgs) 
       whatWeDo: "Какво прави Velishe Model Management?",
       requirements: "Какви са изискванията да станеш модел в Velishe?",
       academy: "Какво е VÈLISHE Model Academy?",
-      journal: "Какво е Velishe Journal?",
+      journal: "Какво е Vèlishe Journal?",
       booking: "Как да резервирате модел или да кандидатствате в Velishe?",
     },
   };

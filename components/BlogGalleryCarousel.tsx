@@ -5,8 +5,8 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import BlogVideoEmbed from "@/components/BlogVideoEmbed";
+import { JOURNAL_TITLE } from "@/lib/blog-journal";
 import { publicBlogImageUrl } from "@/lib/image-url";
-import { SITE_NAME } from "@/lib/metadata";
 import type { BlogMediaItem } from "@/types/blog";
 
 type BlogGalleryCarouselProps = {
@@ -82,7 +82,7 @@ export default function BlogGalleryCarousel({
             ) : (
               <Image
                 src={publicBlogImageUrl(current.id)}
-                alt={current.alt || `${title} — ${SITE_NAME} Journal`}
+                alt={current.alt || `${title} — ${JOURNAL_TITLE}`}
                 fill
                 className="object-contain"
                 sizes="(max-width: 680px) 100vw, 680px"

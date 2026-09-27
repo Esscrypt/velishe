@@ -57,7 +57,7 @@ export function buildZhHomeCopy({ modelCount, locationPhrase }: ZhHomeCopyArgs) 
       whatWeDo: "Velishe Model Management 做什么？",
       requirements: "成为 Velishe 模特需要什么条件？",
       academy: "VÈLISHE 模特学院是什么？",
-      journal: "Velishe Journal 是什么？",
+      journal: "Vèlishe Journal 是什么？",
       booking: "如何预订模特或申请加入 Velishe？",
     },
   };

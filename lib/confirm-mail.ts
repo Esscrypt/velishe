@@ -53,7 +53,7 @@ export async function sendConfirmSubscriptionEmail(
   await transporter.sendMail({
     from: `"${SITE_NAME}" <${smtpUser}>`,
     to: email,
-    subject: "Confirm your Velishe Journal subscription",
+    subject: "Confirm your Vèlishe Journal subscription",
     text: `Confirm your subscription: ${confirmUrl}`,
     html,
   });

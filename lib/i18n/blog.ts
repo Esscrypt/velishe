@@ -17,29 +17,29 @@ export type BlogCopy = {
 };
 
 const EN_ABOUT =
-  "Velishe Journal is the official blog of Velishe Model Management (VÈLISHE), a boutique model agency in Sofia, Bulgaria. We publish casting notes, roster updates, campaign stories, and industry news for clients, models, and collaborators. Subscribe below for email updates.";
+  "Vèlishe Journal is the official blog of Velishe Model Management (VÈLISHE), a boutique model agency in Sofia, Bulgaria. We publish casting notes, roster updates, campaign stories, and industry news for clients, models, and collaborators. Subscribe below for email updates.";
 
 const BG_ABOUT =
-  "Velishe Journal е официалният блог на Velishe Model Management (VÈLISHE) — бутикова модел агенция в София. Публикуваме бележки за кастинги, актуализации на roster-а, истории от кампании и новини от индустрията за клиенти, модели и партньори. Абонирайте се по-долу за имейл актуализации.";
+  "Vèlishe Journal е официалният блог на Velishe Model Management (VÈLISHE) — бутикова модел агенция в София. Публикуваме бележки за кастинги, актуализации на roster-а, истории от кампании и новини от индустрията за клиенти, модели и партньори. Абонирайте се по-долу за имейл актуализации.";
 
 const EN: BlogCopy = {
-  metaTitle: "Velishe Journal",
+  metaTitle: "Vèlishe Journal",
   metaDescription:
-    "Velishe Journal — updates from a Sofia boutique model agency: castings, new faces, campaigns, and news from Velishe Model Management.",
+    "Vèlishe Journal — updates from a Sofia boutique model agency: castings, new faces, campaigns, and news from Velishe Model Management.",
   about: EN_ABOUT,
   faq: [
     {
-      question: "What is Velishe Journal?",
+      question: "What is Vèlishe Journal?",
       answer:
-        "Velishe Journal is the blog of Velishe Model Management, a boutique model agency based in Sofia, Bulgaria. It covers castings, new faces, campaigns, and agency news.",
+        "Vèlishe Journal is the blog of Velishe Model Management, a boutique model agency based in Sofia, Bulgaria. It covers castings, new faces, campaigns, and agency news.",
     },
     {
-      question: "Who publishes Velishe Journal?",
+      question: "Who publishes Vèlishe Journal?",
       answer:
         "Posts are written and published by Velishe Model Management (VÈLISHE), the Sofia-based agency representing fashion and commercial models in Bulgaria and internationally.",
     },
     {
-      question: "How can I subscribe to Velishe Journal?",
+      question: "How can I subscribe to Vèlishe Journal?",
       answer:
         "Enter your email at the bottom of the Journal page and confirm your subscription. You can unsubscribe at any time from every email.",
     },
@@ -57,23 +57,23 @@ const EN: BlogCopy = {
 };
 
 const BG: BlogCopy = {
-  metaTitle: "Velishe Journal",
+  metaTitle: "Vèlishe Journal",
   metaDescription:
-    "Velishe Journal — новини от бутикова модел агенция в София: кастинги, нови лица, кампании и актуалности от Velishe Model Management.",
+    "Vèlishe Journal — новини от бутикова модел агенция в София: кастинги, нови лица, кампании и актуалности от Velishe Model Management.",
   about: BG_ABOUT,
   faq: [
     {
-      question: "Какво е Velishe Journal?",
+      question: "Какво е Vèlishe Journal?",
       answer:
-        "Velishe Journal е блогът на Velishe Model Management — бутикова модел агенция в София. Охваща кастинги, нови лица, кампании и новини от агенцията.",
+        "Vèlishe Journal е блогът на Velishe Model Management — бутикова модел агенция в София. Охваща кастинги, нови лица, кампании и новини от агенцията.",
     },
     {
-      question: "Кой публикува Velishe Journal?",
+      question: "Кой публикува Vèlishe Journal?",
       answer:
         "Публикациите са от Velishe Model Management (VÈLISHE) — агенция в София, представляваща модели за мода и реклама в България и международно.",
     },
     {
-      question: "Как мога да се абонирам за Velishe Journal?",
+      question: "Как мога да се абонирам за Vèlishe Journal?",
       answer:
         "Въведете имейл в долната част на страницата и потвърдете абонамента. Можете да се отпишете по всяко време от всеки имейл.",
     },

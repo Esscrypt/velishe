@@ -74,7 +74,7 @@ export default async function BlogIndexContent({
 
   return (
     <div
-      className="max-w-[680px] mx-auto px-4 sm:px-6 py-12 sm:py-16"
+      className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16"
       lang={locale === "bg" ? "bg" : "en"}
     >
       <script
@@ -111,7 +111,7 @@ export default async function BlogIndexContent({
       {posts.length === 0 ? (
         <p className="text-gray-600 mb-10">{labels.noPostsYet}</p>
       ) : (
-        <div className="space-y-12 mb-10">
+        <div className="mb-10 grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 md:gap-y-12">
           {posts.map((post) => (
             <article key={post.id}>
               <Link href={`/blog/${post.slug}/`} className="group block">
@@ -119,11 +119,11 @@ export default async function BlogIndexContent({
                   <div className="mb-4 w-full overflow-hidden bg-gray-100">
                     <Image
                       src={publicBlogImageUrl(post.cover.id)}
-                      alt={`${post.title} — ${SITE_NAME} Journal`}
+                      alt={`${post.title} — ${JOURNAL_TITLE}`}
                       width={1600}
                       height={2000}
                       className="h-auto w-full transition-opacity group-hover:opacity-90"
-                      sizes="(max-width: 680px) 100vw, 680px"
+                      sizes="(max-width: 768px) 100vw, 480px"
                       unoptimized
                     />
                   </div>
