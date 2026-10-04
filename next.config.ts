@@ -19,8 +19,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
-    formats: ["image/avif", "image/webp"],
-    minimumCacheTTL: 86400,
+    // Hobby plan: avoid Vercel Image Optimization quotas (already serve WebP via /api/images).
+    unoptimized: true,
     localPatterns: [
       {
         pathname: "/api/images/**",
