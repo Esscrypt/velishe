@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp, serial, unique, boolean, pgEnum, jsonb, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, serial, unique, boolean, pgEnum, jsonb, primaryKey, index } from "drizzle-orm/pg-core";
 
 export const boardEnum = pgEnum("board", ["mainboard", "development"]);
 export const genderEnum = pgEnum("gender", ["male", "female"]);
@@ -23,7 +23,17 @@ export const models = pgTable("models", {
   published: boolean("published").notNull().default(false),
   board: boardEnum("board").notNull().default("mainboard"),
   gender: genderEnum("gender").notNull().default("female"),
-});
+}, (table) => ({
+  publishedBoardOrderIdx: index("models_published_board_order_idx").on(
+    table.published,
+    table.board,
+    table.displayOrder,
+  ),
+  publishedOrderIdx: index("models_published_order_idx").on(
+    table.published,
+    table.displayOrder,
+  ),
+}));
 
 export const images = pgTable("images", {
   id: text("id").primaryKey(),
@@ -36,6 +46,11 @@ export const images = pgTable("images", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => ({
   modelOrderUnique: unique().on(table.modelId, table.order),
+  modelTypeOrderIdx: index("images_model_type_order_idx").on(
+    table.modelId,
+    table.type,
+    table.order,
+  ),
 }));
 
 export const academyWishlistEntries = pgTable("academy_wishlist_entries", {
@@ -45,7 +60,10 @@ export const academyWishlistEntries = pgTable("academy_wishlist_entries", {
   emailSent: boolean("email_sent").notNull().default(false),
   confirmed: boolean("confirmed").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (table) => ({
+  emailIdx: index("academy_wishlist_entries_email_idx").on(table.email),
+  phoneIdx: index("academy_wishlist_entries_phone_idx").on(table.phoneNumber),
+}));
 
 export type ModelRow = typeof models.$inferSelect;
 export type ModelInsert = typeof models.$inferInsert;
@@ -77,7 +95,17 @@ export const blogPosts = pgTable("blog_posts", {
   credits: jsonb("credits"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => ({
+  publishedAtIdx: index("blog_posts_published_at_idx").on(
+    table.published,
+    table.publishedAt,
+  ),
+  modelPublishedAtIdx: index("blog_posts_model_published_at_idx").on(
+    table.modelId,
+    table.published,
+    table.publishedAt,
+  ),
+}));
 
 export const blogImages = pgTable("blog_images", {
   id: text("id").primaryKey(),
@@ -93,6 +121,10 @@ export const blogImages = pgTable("blog_images", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => ({
   postOrderUnique: unique().on(table.postId, table.order),
+  postOrderIdx: index("blog_images_post_order_idx").on(
+    table.postId,
+    table.order,
+  ),
 }));
 
 export const mailingListSubscribers = pgTable("mailing_list_subscribers", {

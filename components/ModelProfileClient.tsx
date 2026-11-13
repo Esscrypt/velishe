@@ -21,32 +21,16 @@ export default function ModelProfileClient({
   digitalsLabel = "Digitals",
 }: ModelProfileClientProps) {
   const [imageMode, setImageMode] = useState<"image" | "digital">("image");
-  const { getFullModel } = useModels();
+  const { fullModels } = useModels();
   const { notifyCarouselReady } = useModelPageLoad();
   const [hasDigitals, setHasDigitals] = useState(false);
 
   useEffect(() => {
-    const checkForDigitals = () => {
-      const fullModel = getFullModel(slug);
-      if (fullModel?.digitals && fullModel.digitals.length > 0) {
-        setHasDigitals(true);
-        return true;
-      }
-      return false;
-    };
-
-    if (checkForDigitals()) return;
-
-    const interval = setInterval(() => {
-      if (checkForDigitals()) clearInterval(interval);
-    }, 500);
-    const timeout = setTimeout(() => clearInterval(interval), 5000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, [slug, getFullModel]);
+    const fullModel = fullModels.get(slug);
+    if (fullModel?.digitals && fullModel.digitals.length > 0) {
+      setHasDigitals(true);
+    }
+  }, [fullModels, slug]);
 
   useEffect(() => {
     if (imageMode === "digital" && !hasDigitals) {

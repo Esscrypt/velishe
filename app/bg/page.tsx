@@ -20,8 +20,10 @@ import { getHomeFaqItemsByLocale } from "@/lib/site-content";
 export const revalidate = 3600;
 
 export default async function BgHomePage() {
-  const models = await getModelsForListing();
-  const stored = await getHomeFaqItemsByLocale();
+  const [models, stored] = await Promise.all([
+    getModelsForListing(),
+    getHomeFaqItemsByLocale(),
+  ]);
   const copy = resolveBgHomeCopy(
     {
       modelCount: models.length,

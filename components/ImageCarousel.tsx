@@ -9,6 +9,7 @@ import VideoPlayer from "./VideoPlayer";
 import { useModels } from "@/contexts/ModelsContext";
 import Tooltip from "@/components/Tooltip";
 import { PROFILE_IMAGE_SIZES } from "@/lib/lcp";
+import { fetchWithTimeout } from "@/lib/fetch-with-timeout";
 
 interface ImageCarouselProps {
   media?: ModelMedia[];
@@ -90,7 +91,7 @@ export default function ImageCarousel({
       // For digitals: offset starts from 0
       const apiOffset = isDigital ? offset : offset + 1;
       const typeParam = isDigital ? "&type=digital" : "&type=image";
-      const response = await fetch(`/api/models/${slug}?offset=${apiOffset}&limit=${limit}${typeParam}`);
+      const response = await fetchWithTimeout(`/api/models/${slug}?offset=${apiOffset}&limit=${limit}${typeParam}`);
       if (!response.ok) throw new Error("Failed to fetch more images");
       
       const model: Model = await response.json();
@@ -194,8 +195,8 @@ export default function ImageCarousel({
     const fetchModelImages = async () => {
       try {
         const [imagesResponse, digitalsResponse] = await Promise.all([
-          fetch(`/api/models/${slug}?offset=0&limit=10&type=image`),
-          fetch(`/api/models/${slug}?offset=0&limit=10&type=digital`),
+          fetchWithTimeout(`/api/models/${slug}?offset=0&limit=10&type=image`),
+          fetchWithTimeout(`/api/models/${slug}?offset=0&limit=10&type=digital`),
         ]);
 
         let galleryMedia: ModelMedia[] = [];

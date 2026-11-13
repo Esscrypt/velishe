@@ -1,37 +1,43 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useDeferredValue } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { SearchResultSkeleton } from "@/components/Skeleton";
-import { Model } from "@/types/model";
+import { useModels } from "@/contexts/ModelsContext";
+
+const SEARCH_DEBOUNCE_MS = 200;
 
 export default function SearchPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [allModels, setAllModels] = useState<Model[]>([]);
-  const [isLoadingModels, setIsLoadingModels] = useState(true);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const { models: allModels, isLoading: isLoadingModels, fetchModels } = useModels();
+  const deferredQuery = useDeferredValue(debouncedQuery);
 
   useEffect(() => {
-    fetch("/api/models")
-      .then((res) => res.json())
-      .then((data) => setAllModels(data))
-      .catch(() => setAllModels([]))
-      .finally(() => setIsLoadingModels(false));
-  }, []);
+    if (allModels.length === 0) {
+      void fetchModels();
+    }
+  }, [allModels.length, fetchModels]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const filteredModels = useMemo(() => {
-    if (!searchQuery.trim()) {
+    const query = deferredQuery.toLowerCase().trim();
+    if (!query) {
       return [];
     }
 
-    const query = searchQuery.toLowerCase().trim();
     return allModels.filter(
       (model) =>
         model.name.toLowerCase().includes(query) ||
-        model.slug.toLowerCase().includes(query)
+        model.slug.toLowerCase().includes(query),
     );
-  }, [searchQuery, allModels]);
+  }, [deferredQuery, allModels]);
 
   const handleModelClick = (slug: string) => {
     router.push(`/models/${slug}/`);
@@ -73,7 +79,7 @@ export default function SearchPage() {
 
       {searchQuery.trim() && (
         <div>
-          {isLoadingModels ? (
+          {isLoadingModels && allModels.length === 0 ? (
             <SearchResultSkeleton />
           ) : filteredModels.length > 0 ? (
             <div className="space-y-2">

@@ -18,11 +18,11 @@ export function getDb() {
   if (!sqlInstance) {
     try {
       sqlInstance = postgres(process.env.DATABASE_URL, {
-        max: 1,
+        max: 5,
         idle_timeout: 20,
         connect_timeout: 10,
+        max_lifetime: 60 * 30,
       });
-      console.log("[getDb] Database connection instance created");
     } catch (error) {
       console.error("[getDb] Failed to create database connection:", error);
       return null;

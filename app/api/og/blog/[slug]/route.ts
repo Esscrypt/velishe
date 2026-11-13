@@ -10,10 +10,11 @@ const fallback = () =>
   Response.redirect(new URL("/og/default.jpg", SITE_URL), 307);
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
+  const version = request.nextUrl.searchParams.get("v");
 
   const source = await fetchBlogOgSourceBySlug(slug);
   const buffer = source ? imageDataToBuffer(source.data) : null;
@@ -21,13 +22,17 @@ export async function GET(
     return fallback();
   }
 
+  const versionMatches = Boolean(version) && version === source?.imageId;
+  const cacheControl = versionMatches
+    ? "public, max-age=31536000, s-maxage=31536000, immutable"
+    : "public, max-age=0, s-maxage=300, stale-while-revalidate=3600";
+
   try {
     const card = await generateOgCard(buffer);
     return new Response(new Uint8Array(card), {
       headers: {
         "Content-Type": "image/jpeg",
-        "Cache-Control":
-          "public, max-age=31536000, s-maxage=31536000, immutable",
+        "Cache-Control": cacheControl,
       },
     });
   } catch (error) {

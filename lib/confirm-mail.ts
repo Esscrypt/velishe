@@ -25,10 +25,12 @@ export async function sendConfirmSubscriptionEmail(
       pass: smtpPassword.trim(),
     },
     tls: {
-      rejectUnauthorized: false,
       minVersion: "TLSv1.2",
     },
     requireTLS: !isSecure,
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
   });
 
   const confirmUrl = `${SITE_URL}/blog/confirm/${confirmToken}/`;

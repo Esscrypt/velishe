@@ -4,15 +4,32 @@ import { getDb, schema } from "@/lib/db/index";
 import { sendConfirmSubscriptionEmail } from "@/lib/confirm-mail";
 import { planSubscribeAction } from "@/lib/mailing-list-state";
 import { newToken } from "@/lib/mailing-list-tokens";
+import { clientIpFrom, rateLimit } from "@/lib/rate-limit";
 
 const GENERIC_SUCCESS = { message: "Check your email to confirm." };
 
+const RATE_LIMIT_MAX_REQUESTS = 5;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const MAX_EMAIL_CHARS = 320;
+
 function validateEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return email.length <= MAX_EMAIL_CHARS && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 export async function POST(request: NextRequest) {
   try {
+    const limit = rateLimit(
+      `mailing-list:${clientIpFrom(request.headers)}`,
+      RATE_LIMIT_MAX_REQUESTS,
+      RATE_LIMIT_WINDOW_MS,
+    );
+    if (!limit.ok) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+      );
+    }
+
     const body = (await request.json().catch(() => null)) as {
       email?: unknown;
       consent?: unknown;
@@ -65,7 +82,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(GENERIC_SUCCESS, { status: 200 });
     }
 
-    let confirmToken = newToken();
+    let confirmToken: string;
 
     if (plan.action === "create_pending") {
       confirmToken = newToken();
@@ -75,7 +92,7 @@ export async function POST(request: NextRequest) {
         confirmToken,
         unsubscribeToken: newToken(),
       });
-    } else if (plan.action === "resend_confirm" && row) {
+    } else {
       confirmToken = newToken();
       await db
         .update(schema.mailingListSubscribers)
@@ -83,16 +100,7 @@ export async function POST(request: NextRequest) {
           confirmToken,
           confirmed: false,
         })
-        .where(eq(schema.mailingListSubscribers.id, row.id));
-    } else if (plan.action === "reactivate_pending" && row) {
-      confirmToken = newToken();
-      await db
-        .update(schema.mailingListSubscribers)
-        .set({
-          confirmToken,
-          confirmed: false,
-        })
-        .where(eq(schema.mailingListSubscribers.id, row.id));
+        .where(eq(schema.mailingListSubscribers.id, row!.id));
     }
 
     try {

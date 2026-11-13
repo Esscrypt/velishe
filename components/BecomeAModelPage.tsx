@@ -493,14 +493,16 @@ export default function BecomeAModelPage({ locale = "en" }: { locale?: SiteLocal
       }
     }
 
-    // Validate total file size (4MB limit)
+    // Images are base64-encoded for transport, which adds ~33%, and the
+    // platform rejects request bodies over 4.5MB. 3.3MB raw keeps the encoded
+    // payload under that ceiling.
     const totalSize = getTotalFileSize();
-    const maxTotalSize = 4 * 1024 * 1024; // 4MB
+    const maxTotalSize = 3.3 * 1024 * 1024;
     if (totalSize > maxTotalSize) {
-      const totalSizeError = `Total file size must be less than 4MB. Current total: ${formatFileSize(totalSize)}`;
+      const totalSizeError = `Total file size must be less than ${formatFileSize(maxTotalSize)}. Current total: ${formatFileSize(totalSize)}`;
       newErrors.headshot = newErrors.headshot || totalSizeError;
       if (!errorSummary.includes("Total file size limit")) {
-        errorSummary.push("Total file size limit (4MB)");
+        errorSummary.push(`Total file size limit (${formatFileSize(maxTotalSize)})`);
       }
     }
 

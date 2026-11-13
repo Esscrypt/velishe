@@ -76,14 +76,11 @@ export async function fetchAllModelMetadataFromDb(): Promise<Model[] | null> {
 export async function fetchModelsListFromDb(): Promise<Model[] | null> {
   const db = getDb();
   if (!db) {
-    console.warn("[fetchModelsListFromDb] Database connection not available, returning null");
     return null;
   }
 
   try {
-    console.log("[fetchModelsListFromDb] Attempting to fetch models list from database...");
-    // Optimized query: Filter for featured images (order 0) in SQL, not JavaScript
-    // This reduces data transfer and processing time
+    // Filter for featured images (order 0) in SQL, not JavaScript
     const rows = await db
       .select({
         modelId: schema.models.id,
@@ -159,7 +156,6 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
       });
     }
 
-    console.log(`[fetchModelsListFromDb] Successfully fetched ${models.length} models from database`);
     return models;
   } catch (error) {
     console.error("[fetchModelsListFromDb] Failed to fetch models from database:", error);
@@ -167,119 +163,58 @@ export async function fetchModelsListFromDb(): Promise<Model[] | null> {
   }
 }
 
-/**
- * Fetch all models from database with their images using a single JOIN query
- * Returns null if database is not available or query fails
- * Skips database connection during build time (static generation)
- * @deprecated Use fetchModelsListFromDb for list views (no gallery) or fetchModelBySlugFromDb for single model (with gallery)
- */
-export async function fetchModelsFromDb(): Promise<Model[] | null> {
-  const db = getDb();
-  if (!db) {
-    return null;
-  }
+type ModelColumns = {
+  modelId: number;
+  slug: string | null;
+  name: string | null;
+  height: string | null;
+  bust: string | null;
+  waist: string | null;
+  hips: string | null;
+  shoeSize: string | null;
+  hairColor: string | null;
+  eyeColor: string | null;
+  instagram: string | null;
+  bioEn: string | null;
+  bioBg: string | null;
+  booked: boolean | null;
+  targetLocation: string | null;
+  board: "mainboard" | "development";
+  gender: "male" | "female";
+};
 
-  try {
-    // Single query with LEFT JOIN to get all models with their images
-    const rows = await db
-      .select({
-        modelId: schema.models.id,
-        slug: schema.models.slug,
-        name: schema.models.name,
-        height: schema.models.height,
-        bust: schema.models.bust,
-        waist: schema.models.waist,
-        hips: schema.models.hips,
-        shoeSize: schema.models.shoeSize,
-        hairColor: schema.models.hairColor,
-        eyeColor: schema.models.eyeColor,
-        instagram: schema.models.instagram,
-        bioEn: schema.models.bioEn,
-        bioBg: schema.models.bioBg,
-        booked: schema.models.booked,
-        targetLocation: schema.models.targetLocation,
-        displayOrder: schema.models.displayOrder,
-        imageId: schema.images.id,
-        imageData: schema.images.data,
-        imageOrder: schema.images.order,
-      })
-      .from(schema.models)
-      .leftJoin(schema.images, eq(schema.models.id, schema.images.modelId))
-      .where(eq(schema.models.published, true))
-      .orderBy(asc(schema.models.displayOrder), asc(schema.images.order));
-
-    // Group by model and collect images
-    const modelsMap = new Map<number, Model>();
-
-    for (const row of rows) {
-      if (!modelsMap.has(row.modelId)) {
-        modelsMap.set(row.modelId, {
-          id: String(row.modelId),
-          slug: row.slug || "",
-          name: row.name || "",
-          stats: {
-            height: row.height || "",
-            bust: row.bust || "",
-            waist: row.waist || "",
-            hips: row.hips || "",
-            shoeSize: row.shoeSize || "",
-            hairColor: row.hairColor || "",
-            eyeColor: row.eyeColor || "",
-          },
-          instagram: row.instagram || undefined,
-          bioEn: row.bioEn || undefined,
-          bioBg: row.bioBg || undefined,
-          booked: row.booked ?? false,
-          targetLocation: row.targetLocation || undefined,
-          featuredImage: "",
-          gallery: [],
-        });
-      }
-      
-      // Add image to gallery or set as featured if order is 0
-      if (row.imageId && row.imageData) {
-        const model = modelsMap.get(row.modelId)!;
-        const imageSrc = row.imageData;
-        
-        if (row.imageOrder === 0) {
-          // Image with order 0 is the featured image
-          model.featuredImage = imageSrc;
-        } else {
-          // Other images go to gallery
-          model.gallery.push({
-            type: "image",
-            src: imageSrc,
-            alt: `${model.name} - Portfolio photo`,
-          });
-        }
-      }
-    }
-    
-    // For models without a featured image (order 0), use the first image if available
-    for (const model of modelsMap.values()) {
-      if (!model.featuredImage || model.featuredImage.trim() === "") {
-        if (model.gallery.length > 0) {
-          // Use the first gallery image as featured
-          model.featuredImage = model.gallery[0].src;
-          // Remove it from gallery since it's now featured
-          model.gallery.shift();
-        }
-      }
-    }
-    
-    // Convert to array and sort by display order
-    const models = Array.from(modelsMap.values()).sort((a, b) => {
-      // Models are already sorted by displayOrder from the query
-      // This is just a safety sort in case
-      return 0;
-    });
-
-    console.log(`[fetchModelsFromDb] Successfully fetched ${models.length} models from database`);
-    return models;
-  } catch (error) {
-    console.error("[fetchModelsFromDb] Failed to fetch models from database:", error);
-    return null;
-  }
+function buildModel(
+  row: ModelColumns,
+  featuredImage: string,
+  featuredImageId: string | undefined,
+  gallery: ModelMedia[],
+  digitals: ModelMedia[],
+): Model {
+  return {
+    id: String(row.modelId),
+    slug: row.slug || "",
+    name: row.name || "",
+    stats: {
+      height: row.height || "",
+      bust: row.bust || "",
+      waist: row.waist || "",
+      hips: row.hips || "",
+      shoeSize: row.shoeSize || "",
+      hairColor: row.hairColor || "",
+      eyeColor: row.eyeColor || "",
+    },
+    instagram: row.instagram || undefined,
+    bioEn: row.bioEn || undefined,
+    bioBg: row.bioBg || undefined,
+    booked: row.booked ?? false,
+    targetLocation: row.targetLocation || undefined,
+    board: row.board,
+    gender: row.gender,
+    featuredImage,
+    featuredImageId,
+    gallery,
+    digitals: digitals.length > 0 ? digitals : undefined,
+  };
 }
 
 /**
@@ -302,8 +237,14 @@ export async function fetchModelBySlugFromDb(
   }
 
   try {
-    // First, get the model info without images to ensure it exists
-    const modelRow = await db
+    const imageJoin = imageType
+      ? and(
+          eq(schema.images.modelId, schema.models.id),
+          eq(schema.images.type, imageType),
+        )
+      : eq(schema.images.modelId, schema.models.id);
+
+    const baseQuery = db
       .select({
         modelId: schema.models.id,
         slug: schema.models.slug,
@@ -322,43 +263,77 @@ export async function fetchModelBySlugFromDb(
         targetLocation: schema.models.targetLocation,
         board: schema.models.board,
         gender: schema.models.gender,
-      })
-      .from(schema.models)
-      .where(and(eq(schema.models.slug, slug), eq(schema.models.published, true)))
-      .limit(1);
-
-    if (modelRow.length === 0) {
-      return null;
-    }
-
-    const modelData = modelRow[0];
-
-    // Then fetch images with pagination if specified
-    const baseQuery = db
-      .select({
         imageId: schema.images.id,
-        imageData: schema.images.data,
         imageOrder: schema.images.order,
         imageType: schema.images.type,
       })
-      .from(schema.images)
+      .from(schema.models)
+      .leftJoin(schema.images, imageJoin)
       .where(
-        imageType 
-          ? and(eq(schema.images.modelId, modelData.modelId), eq(schema.images.type, imageType))
-          : eq(schema.images.modelId, modelData.modelId)
+        and(eq(schema.models.slug, slug), eq(schema.models.published, true)),
       )
       .orderBy(asc(schema.images.order));
 
-    const imagesQuery = 
-      imageLimit !== undefined && imageLimit > 0
-        ? imageOffset !== undefined && imageOffset > 0
-          ? baseQuery.limit(imageLimit).offset(imageOffset)
-          : baseQuery.limit(imageLimit)
-        : imageOffset !== undefined && imageOffset > 0
-          ? baseQuery.offset(imageOffset)
-          : baseQuery;
+    // A limit of 0 is an explicit empty page, not "no limit" — applying it
+    // keeps the caller's contract instead of returning the whole gallery.
+    const hasLimit = imageLimit !== undefined;
+    const hasOffset = imageOffset !== undefined && imageOffset > 0;
 
-    const imageRows = await imagesQuery;
+    const rows = hasLimit
+      ? hasOffset
+        ? await baseQuery.limit(imageLimit).offset(imageOffset)
+        : await baseQuery.limit(imageLimit)
+      : hasOffset
+        ? await baseQuery.offset(imageOffset)
+        : await baseQuery;
+
+    if (rows.length === 0) {
+      // An empty page past the end of a gallery is not a missing model, so
+      // confirm existence separately before reporting 404.
+      const exists = await db
+        .select({ modelId: schema.models.id })
+        .from(schema.models)
+        .where(
+          and(eq(schema.models.slug, slug), eq(schema.models.published, true)),
+        )
+        .limit(1);
+
+      if (exists.length === 0) {
+        return null;
+      }
+
+      const model = await db
+        .select({
+          modelId: schema.models.id,
+          slug: schema.models.slug,
+          name: schema.models.name,
+          height: schema.models.height,
+          bust: schema.models.bust,
+          waist: schema.models.waist,
+          hips: schema.models.hips,
+          shoeSize: schema.models.shoeSize,
+          hairColor: schema.models.hairColor,
+          eyeColor: schema.models.eyeColor,
+          instagram: schema.models.instagram,
+          bioEn: schema.models.bioEn,
+          bioBg: schema.models.bioBg,
+          booked: schema.models.booked,
+          targetLocation: schema.models.targetLocation,
+          board: schema.models.board,
+          gender: schema.models.gender,
+        })
+        .from(schema.models)
+        .where(eq(schema.models.id, exists[0].modelId))
+        .limit(1);
+
+      if (model.length === 0) {
+        return null;
+      }
+
+      return buildModel(model[0], "", undefined, [], []);
+    }
+
+    const modelData = rows[0];
 
     // Separate images by type and handle featured image (order 0, type 'image')
     let featuredImage = "";
@@ -366,8 +341,8 @@ export async function fetchModelBySlugFromDb(
     const gallery: ModelMedia[] = [];
     const digitals: ModelMedia[] = [];
 
-    imageRows
-      .filter((row) => row.imageId !== null && row.imageData !== null)
+    rows
+      .filter((row) => row.imageId !== null)
       .forEach((row) => {
         const imageSrc = publicImageUrl(row.imageId!);
         const mediaItem: ModelMedia = {
@@ -382,7 +357,7 @@ export async function fetchModelBySlugFromDb(
           featuredImageId = row.imageId!;
           return; // Don't include in gallery
         }
-        
+
         // Separate by type
         if (row.imageType === "digital") {
           digitals.push(mediaItem);
@@ -391,31 +366,13 @@ export async function fetchModelBySlugFromDb(
         }
       });
 
-    const result: Model = {
-      id: String(modelData.modelId), // Convert to string for Model type
-      slug: modelData.slug || "",
-      name: modelData.name || "",
-      stats: {
-        height: modelData.height || "",
-        bust: modelData.bust || "",
-        waist: modelData.waist || "",
-        hips: modelData.hips || "",
-        shoeSize: modelData.shoeSize || "",
-        hairColor: modelData.hairColor || "",
-        eyeColor: modelData.eyeColor || "",
-      },
-      instagram: modelData.instagram || undefined,
-      bioEn: modelData.bioEn || undefined,
-      bioBg: modelData.bioBg || undefined,
-      booked: modelData.booked ?? false,
-      targetLocation: modelData.targetLocation || undefined,
-      board: modelData.board,
-      gender: modelData.gender,
+    const result: Model = buildModel(
+      modelData,
       featuredImage,
       featuredImageId,
       gallery,
-      digitals: digitals.length > 0 ? digitals : undefined,
-    };
+      digitals,
+    );
 
     return result;
   } catch (error) {
@@ -457,35 +414,49 @@ export async function fetchModelsByBoard(
       .from(schema.models)
       .leftJoin(
         schema.images,
-        and(eq(schema.images.modelId, schema.models.id), eq(schema.images.order, 0)),
+        and(
+          eq(schema.images.modelId, schema.models.id),
+          eq(schema.images.order, 0),
+          eq(schema.images.type, "image"),
+        ),
       )
       .where(and(eq(schema.models.published, true), eq(schema.models.board, board)))
       .orderBy(asc(schema.models.displayOrder));
 
-    return rows.map((row) => ({
-      id: String(row.modelId),
-      slug: row.slug || "",
-      name: row.name || "",
-      stats: {
-        height: row.height || "",
-        bust: row.bust || "",
-        waist: row.waist || "",
-        hips: row.hips || "",
-        shoeSize: row.shoeSize || "",
-        hairColor: row.hairColor || "",
-        eyeColor: row.eyeColor || "",
-      },
-      instagram: row.instagram || undefined,
-      bioEn: row.bioEn || undefined,
-      bioBg: row.bioBg || undefined,
-      booked: row.booked ?? false,
-      targetLocation: row.targetLocation || undefined,
-      board: row.board,
-      gender: row.gender,
-      featuredImage: row.imageId ? publicImageUrl(row.imageId) : "",
-      featuredImageId: row.imageId || undefined,
-      gallery: [],
-    }));
+    const seen = new Set<number>();
+    const models: Model[] = [];
+
+    for (const row of rows) {
+      if (seen.has(row.modelId)) continue;
+      seen.add(row.modelId);
+
+      models.push({
+        id: String(row.modelId),
+        slug: row.slug || "",
+        name: row.name || "",
+        stats: {
+          height: row.height || "",
+          bust: row.bust || "",
+          waist: row.waist || "",
+          hips: row.hips || "",
+          shoeSize: row.shoeSize || "",
+          hairColor: row.hairColor || "",
+          eyeColor: row.eyeColor || "",
+        },
+        instagram: row.instagram || undefined,
+        bioEn: row.bioEn || undefined,
+        bioBg: row.bioBg || undefined,
+        booked: row.booked ?? false,
+        targetLocation: row.targetLocation || undefined,
+        board: row.board,
+        gender: row.gender,
+        featuredImage: row.imageId ? publicImageUrl(row.imageId) : "",
+        featuredImageId: row.imageId || undefined,
+        gallery: [],
+      });
+    }
+
+    return models;
   } catch (error) {
     console.error(`Failed to fetch models for board ${board}:`, error);
     return [];

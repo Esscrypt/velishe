@@ -25,8 +25,10 @@ export const metadata = {
 export const revalidate = 3600;
 
 export default async function Home() {
-  const models = await getModelsForListing();
-  const stored = await getHomeFaqItemsByLocale();
+  const [models, stored] = await Promise.all([
+    getModelsForListing(),
+    getHomeFaqItemsByLocale(),
+  ]);
   const copy = resolveEnHomeCopy(
     {
       modelCount: models.length,

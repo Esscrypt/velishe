@@ -167,10 +167,13 @@ export default function AcademyPage({ locale = "en" }: { locale?: SiteLocale }) 
         <div className="order-3 md:col-start-2 md:row-start-1 md:row-span-2 -my-1 md:my-0">
           <div className="relative w-full overflow-hidden flex items-center justify-center min-h-[28rem] sm:min-h-[32rem]">
             <img
-              src="/academy-certificate.png"
+              src="/academy-certificate.webp"
               alt={t.certificateAlt}
+              width={990}
+              height={1024}
               className="w-full h-[28rem] object-contain sm:h-[32rem] md:h-[620px] transition-transform duration-700 ease-out hover:scale-[1.02]"
               loading="lazy"
+              decoding="async"
             />
           </div>
         </div>

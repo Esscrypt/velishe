@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db/index";
 import { imageDataToBuffer } from "@/lib/og-card";
+import {
+  IMAGE_CACHE_CONTROL,
+  IMAGE_CDN_CACHE_CONTROL,
+} from "@/lib/image-cache";
 
+// No route-level ISR: a 404 for an unpublished post must not be cached, or the
+// image stays broken for the whole revalidate window after re-publishing.
+// Bytes are still cached at the CDN via Cache-Control below.
 export const dynamic = "force-dynamic";
 
 function contentTypeFromDataUri(data: string): string {
@@ -28,7 +35,16 @@ export async function GET(
     const rows = await db
       .select({ data: schema.blogImages.data })
       .from(schema.blogImages)
-      .where(eq(schema.blogImages.id, id))
+      .innerJoin(
+        schema.blogPosts,
+        eq(schema.blogImages.postId, schema.blogPosts.id),
+      )
+      .where(
+        and(
+          eq(schema.blogImages.id, id),
+          eq(schema.blogPosts.published, true),
+        ),
+      )
       .limit(1);
 
     if (rows.length === 0 || !rows[0].data) {
@@ -45,7 +61,8 @@ export async function GET(
       status: 200,
       headers: {
         "Content-Type": contentTypeFromDataUri(dataUri),
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        "Cache-Control": IMAGE_CACHE_CONTROL,
+        "CDN-Cache-Control": IMAGE_CDN_CACHE_CONTROL,
       },
     });
   } catch (error) {

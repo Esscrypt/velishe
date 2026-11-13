@@ -8,7 +8,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
 }
 
 export function SkeletonText({ className = "" }: { className?: string }) {
-  return <Skeleton className={`h-4 w-2/3 ${className}`} />;
+  return <Skeleton className={`h-4 ${className || "w-2/3"}`} />;
 }
 
 export function ModelCardSkeleton() {

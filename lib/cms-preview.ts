@@ -59,14 +59,41 @@ export type CmsPreviewSnapshotMessage = {
   draft: HomeFaqPreviewDraft | ContactPreviewDraft;
 };
 
+export const TRUSTED_CMS_PREVIEW_HOSTS = [
+  "www.velishemodelmanagement.com",
+  "velishemodelmanagement.com",
+];
+
+const ADMIN_VERCEL_HOST = "velishe-admin.vercel.app";
+
+/**
+ * Vercel branch deploys of the admin app use
+ * `<project>-git-<branch>-<team>.vercel.app`, so matching the bare hostname
+ * alone would break preview on every branch. Anchoring on the project name
+ * keeps the admin's own deployments working without trusting all of
+ * *.vercel.app, where any attacker can deploy.
+ */
+function isTrustedAdminVercelHost(hostname: string): boolean {
+  return (
+    hostname === ADMIN_VERCEL_HOST ||
+    /^velishe-admin-git-[a-z0-9-]+\.vercel\.app$/.test(hostname)
+  );
+}
+
+/** Origins allowed to frame preview pages, for the CSP frame-ancestors list. */
+export const TRUSTED_CMS_PREVIEW_FRAME_ORIGINS = [
+  "http://localhost:3001",
+  `https://${ADMIN_VERCEL_HOST}`,
+  ...TRUSTED_CMS_PREVIEW_HOSTS.map((host) => `https://${host}`),
+];
+
 export function isTrustedCmsPreviewOrigin(origin: string): boolean {
   try {
     const { hostname, protocol } = new URL(origin);
     if (protocol !== "http:" && protocol !== "https:") return false;
     if (hostname === "localhost" || hostname === "127.0.0.1") return true;
-    if (hostname.endsWith(".vercel.app")) return true;
-    if (hostname.endsWith("velishemodelmanagement.com")) return true;
-    return false;
+    if (isTrustedAdminVercelHost(hostname)) return true;
+    return TRUSTED_CMS_PREVIEW_HOSTS.includes(hostname);
   } catch {
     return false;
   }

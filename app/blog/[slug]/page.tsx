@@ -109,17 +109,17 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post) notFound();
 
   const bodyHtml = markdownToSafeHtml(post.body);
-  const description =
-    post.teaser?.trim() || plainTextFromMarkdown(post.body, 160);
-  const jsonLdImage =
-    stillImageUrl(pickStillBlogMedia(post.cover, post.gallery)) ||
-    DEFAULT_OG_IMAGE.url;
   const relatedPosts = post.model
     ? await getPublishedPostsByModelId(post.model.id, {
         excludePostId: post.id,
         limit: 3,
       })
     : [];
+  const description =
+    post.teaser?.trim() || plainTextFromMarkdown(post.body, 160);
+  const jsonLdImage =
+    stillImageUrl(pickStillBlogMedia(post.cover, post.gallery)) ||
+    DEFAULT_OG_IMAGE.url;
 
   const jsonLd = {
     "@context": "https://schema.org",

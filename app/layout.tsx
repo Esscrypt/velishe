@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import ConsentGatedScripts from "@/components/ConsentGatedScripts";
@@ -17,6 +17,13 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["700"],
+  variable: "--font-playfair",
 });
 
 export const viewport: Viewport = {
@@ -118,7 +125,7 @@ export default async function RootLayout({
   });
 
   return (
-    <html lang="en" className={`h-full ${inter.variable}`} data-scroll-behavior="smooth">
+    <html lang="en" className={`h-full ${inter.variable} ${playfair.variable}`} data-scroll-behavior="smooth">
       <body
         className="antialiased bg-white text-gray-900 min-h-full flex flex-col"
         suppressHydrationWarning

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db/index";
 import { imageDataToBuffer } from "@/lib/og-card";
 import {
@@ -7,7 +7,10 @@ import {
   IMAGE_CDN_CACHE_CONTROL,
 } from "@/lib/image-cache";
 
-export const revalidate = 86400;
+// No route-level ISR: a 404 for an unpublished model must not be cached, or the
+// image stays broken for the whole revalidate window after re-publishing.
+// Bytes are still cached at the CDN via Cache-Control below.
+export const dynamic = "force-dynamic";
 
 function contentTypeFromDataUri(data: string): string {
   const match = /^data:([^;,]+)/i.exec(data);
@@ -32,7 +35,8 @@ export async function GET(
     const rows = await db
       .select({ data: schema.images.data })
       .from(schema.images)
-      .where(eq(schema.images.id, id))
+      .innerJoin(schema.models, eq(schema.images.modelId, schema.models.id))
+      .where(and(eq(schema.images.id, id), eq(schema.models.published, true)))
       .limit(1);
 
     if (rows.length === 0 || !rows[0].data) {

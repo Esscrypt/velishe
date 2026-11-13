@@ -20,6 +20,7 @@
 .DS_Store
 *.pem
 .superpowers/
+.claude/settings.local.json
 
 # debug
 npm-debug.log*

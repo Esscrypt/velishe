@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import OptimizedImage from "./OptimizedImage";
 import { GRID_IMAGE_SIZES, isLcpImageIndex } from "@/lib/lcp";
 import { ModelStats } from "@/types/model";
@@ -52,7 +51,7 @@ export default function ModelCard({
   ];
 
   return (
-    <motion.div whileHover={{ scale: 1.02 }} className="group">
+    <div className="group transition-transform duration-300 hover:scale-[1.02] motion-reduce:transform-none">
       <Link href={modelHref} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:rounded-none rounded-lg">
           {booked && (
@@ -104,6 +103,6 @@ export default function ModelCard({
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
-import jsPDF from "jspdf";
+import type jsPDF from "jspdf";
 import type { Model, ModelMedia, ModelStats } from "@/types/model";
+import { fetchWithTimeout } from "@/lib/fetch-with-timeout";
 import { modelPageLabels } from "@/lib/i18n/model-page";
 import { translateEyeColor, translateHairColor } from "@/lib/i18n/model-colors";
 import type { SiteLocale } from "@/lib/i18n/locale";
@@ -177,9 +178,7 @@ async function fetchAllGalleryImages(slug: string): Promise<{
   featuredImage: string;
 } | null> {
   try {
-    const response = await fetch(`/api/models/${slug}?type=image`, {
-      cache: "no-store",
-    });
+    const response = await fetchWithTimeout(`/api/models/${slug}?type=image`);
     if (!response.ok) {
       console.error(
         `[DownloadPortfolioButton] Failed to fetch model: ${response.status}`,
@@ -233,7 +232,8 @@ export default function DownloadPortfolioButton({
         return;
       }
 
-      const pdf = new jsPDF({
+      const { default: JsPDF } = await import("jspdf");
+      const pdf = new JsPDF({
         orientation: "landscape",
         unit: "mm",
         format: "a4",

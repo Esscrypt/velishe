@@ -1,4 +1,4 @@
-CREATE TABLE "contact_page_content" (
+CREATE TABLE IF NOT EXISTS "contact_page_content" (
 	"id" text PRIMARY KEY NOT NULL,
 	"intro1_en" text DEFAULT '' NOT NULL,
 	"intro2_en" text DEFAULT '' NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE "contact_page_content" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "home_faq_content" (
+CREATE TABLE IF NOT EXISTS "home_faq_content" (
 	"id" text PRIMARY KEY NOT NULL,
 	"intro_en" text DEFAULT '' NOT NULL,
 	"what_we_do_en" text DEFAULT '' NOT NULL,
