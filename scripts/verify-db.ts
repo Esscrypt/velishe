@@ -38,13 +38,26 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const host = (() => {
+  const target = (() => {
     try {
-      return new URL(process.env.DATABASE_URL).hostname;
+      const parsed = new URL(process.env.DATABASE_URL);
+      return {
+        host: parsed.hostname,
+        port: parsed.port,
+        label: `${parsed.hostname}:${parsed.port}${parsed.pathname}`,
+      };
     } catch {
-      return "";
+      return { host: "", port: "", label: "(unparseable DATABASE_URL)" };
     }
   })();
+
+  console.log(`db:verify: targeting ${target.label}`);
+  console.log(
+    "  (drizzle.config.ts now resolves the same file precedence; confirm the\n" +
+      "   host matches what `db:migrate` printed before trusting the result.)\n",
+  );
+
+  const host = target.host;
 
   if (host.endsWith(".railway.internal")) {
     console.error(
