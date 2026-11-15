@@ -37,6 +37,11 @@ export async function fetchWithTimeout(
       }
     };
 
+    const readJson = response.json.bind(response);
+    const readText = response.text.bind(response);
+    const readArrayBuffer = response.arrayBuffer.bind(response);
+    const readBlob = response.blob.bind(response);
+
     const guarded = response as Response & {
       json: () => Promise<unknown>;
       text: () => Promise<string>;
@@ -44,10 +49,10 @@ export async function fetchWithTimeout(
       blob: () => Promise<Blob>;
     };
 
-    guarded.json = wrap(() => response.json());
-    guarded.text = wrap(() => response.text());
-    guarded.arrayBuffer = wrap(() => response.arrayBuffer());
-    guarded.blob = wrap(() => response.blob());
+    guarded.json = wrap(readJson);
+    guarded.text = wrap(readText);
+    guarded.arrayBuffer = wrap(readArrayBuffer);
+    guarded.blob = wrap(readBlob);
 
     return guarded;
   } catch (error) {
