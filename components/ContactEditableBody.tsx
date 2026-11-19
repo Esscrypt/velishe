@@ -17,6 +17,7 @@ import {
   type ContactPreviewDraft,
 } from "@/lib/cms-preview";
 import {
+  CONTACT_PHONES,
   INSTAGRAM_URL,
   ORGANIZATION_EMAIL,
   WHATSAPP_URL,
@@ -31,6 +32,7 @@ type ContactEditableBodyProps = {
   officeAddress: string;
   officeAddressLabel: string;
   emailLabel: string;
+  phoneLabel: string;
   socialMediaLabel: string;
   whatsAppLabel: string;
   legalHeading: string;
@@ -57,6 +59,7 @@ export default function ContactEditableBody({
   officeAddress,
   officeAddressLabel,
   emailLabel,
+  phoneLabel,
   socialMediaLabel,
   whatsAppLabel,
   legalHeading,
@@ -211,6 +214,20 @@ export default function ContactEditableBody({
               >
                 {ORGANIZATION_EMAIL}
               </a>
+            </div>
+            <div>
+              <p className="font-medium mb-1">{phoneLabel}</p>
+              <div className="flex flex-col gap-1">
+                {CONTACT_PHONES.map((phone) => (
+                  <a
+                    key={phone.href}
+                    href={`tel:${phone.href}`}
+                    className="text-gray-900 hover:text-gray-600 transition-colors"
+                  >
+                    {phone.display}
+                  </a>
+                ))}
+              </div>
             </div>
             <div>
               <p className="font-medium mb-1">{socialMediaLabel}</p>

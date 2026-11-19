@@ -33,6 +33,7 @@ export type ContactCopy = {
   officeAddressLabel: string;
   officeAddress: string;
   emailLabel: string;
+  phoneLabel: string;
   socialMediaLabel: string;
   whatsAppLabel: string;
   legalHeading: string;
@@ -101,6 +102,7 @@ export function resolveContactCopy(
         "Използвайте имейла по-долу — темата е предварително попълнена за тази резервация.",
       officeAddressLabel: "Адрес на офиса:",
       emailLabel: "Имейл:",
+      phoneLabel: "Телефон:",
       socialMediaLabel: "Социални мрежи:",
       whatsAppLabel: "WhatsApp",
       legalHeading: "Правна информация",
@@ -129,6 +131,7 @@ export function resolveContactCopy(
       "Use the email below — the subject is prefilled for this booking.",
     officeAddressLabel: "Office Address:",
     emailLabel: "Email:",
+    phoneLabel: "Phone:",
     socialMediaLabel: "Social Media:",
     whatsAppLabel: "WhatsApp",
     legalHeading: "Legal",

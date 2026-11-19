@@ -14,6 +14,10 @@ export const ORGANIZATION_UIC = "208665737";
 export const ORGANIZATION_EMAIL = "models@velishemodelmanagement.com";
 export const ORGANIZATION_PHONE = "+359885835499";
 export const ORGANIZATION_PHONE_DISPLAY = "+359 885 835 499";
+export const CONTACT_PHONES = [
+  { href: "+359887084419", display: "+359 887 084 419" },
+  { href: ORGANIZATION_PHONE, display: ORGANIZATION_PHONE_DISPLAY },
+] as const;
 export const INSTAGRAM_URL = "https://www.instagram.com/velishe.mgmt";
 export const LINKEDIN_COMPANY_URL =
   "https://www.linkedin.com/company/v%C3%A8lishe-model-management";

@@ -88,6 +88,7 @@ export default async function ContactPageContent({
         officeAddress={copy.officeAddress}
         officeAddressLabel={copy.officeAddressLabel}
         emailLabel={copy.emailLabel}
+        phoneLabel={copy.phoneLabel}
         socialMediaLabel={copy.socialMediaLabel}
         whatsAppLabel={copy.whatsAppLabel}
         legalHeading={copy.legalHeading}
